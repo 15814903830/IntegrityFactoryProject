@@ -22,6 +22,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/TranslucentStatusTheme">
+        <activity android:name=".face.activity.AddFaceRGBActivity"></activity>
         <activity android:name=".mylogin.LogwebActivity"></activity>
         <activity android:name=".StartActivity">
             <intent-filter>

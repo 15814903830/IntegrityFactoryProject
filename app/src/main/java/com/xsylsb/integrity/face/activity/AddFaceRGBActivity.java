@@ -41,12 +41,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
-import com.xsylsb.integrity.MainActivity;
 import com.xsylsb.integrity.R;
 import com.xsylsb.integrity.WebActivity;
+import com.xsylsb.integrity.base.AddFaceBase;
 import com.xsylsb.integrity.base.FaceRecongitRGBBase;
 import com.xsylsb.integrity.face.activity.ui.FaceOverlayView;
-import com.xsylsb.integrity.face.activity.ui.LoginFaceDetectRGBActivity;
 import com.xsylsb.integrity.face.adapter.ImagePreviewAdapter;
 import com.xsylsb.integrity.face.adapter.MyFacelistviewAdapter;
 import com.xsylsb.integrity.face.model.FaceResult;
@@ -85,12 +84,12 @@ import java.util.List;
  */
 
 
-public final class FaceDetectRGBActivity extends AppCompatActivity implements SurfaceHolder.Callback, Camera.PreviewCallback, HttpCallBack {
+public final class AddFaceRGBActivity extends AppCompatActivity implements SurfaceHolder.Callback, Camera.PreviewCallback, HttpCallBack {
 
     // Number of Cameras in device.
     private int numberOfCameras;
     public static final String KEY_URL = "url";
-    public static final String TAG = FaceDetectRGBActivity.class.getSimpleName();
+    public static final String TAG = AddFaceRGBActivity.class.getSimpleName();
     private boolean mBooleanfetect = true;
     ;
     private Camera mCamera;
@@ -113,7 +112,7 @@ public final class FaceDetectRGBActivity extends AppCompatActivity implements Su
     private final CameraErrorCallback mErrorCallback = new CameraErrorCallback();
 
     private HttpCallBack mHttpCallBack;
-    private FaceRecongitRGBBase mFaceRecongitRGBBase;
+    private AddFaceBase mAddFaceBase;
 
     private static final int MAX_FACE = 10;
     private boolean isThreadWorking = false;
@@ -189,10 +188,11 @@ public final class FaceDetectRGBActivity extends AppCompatActivity implements Su
             public void run() {
                 try {
                     JSONObject jsonObject = new JSONObject();
-                    jsonObject.put("memberId", "0");//id
+                    jsonObject.put("workerId", MyURL.id);//id
+                    jsonObject.put("fileName", "png");//人脸数据
                     jsonObject.put("fileData", img);//人脸数据
                     Log.e("id----", MyURL.id);
-                    OkHttpUtils.doPostJson(MyURL.URL + "SearchFaces/" + MyURL.id, jsonObject.toString(), mHttpCallBack, 0);
+                    OkHttpUtils.doPostJson(MyURL.URL + "UpdateTenCentFaces/" + MyURL.id, jsonObject.toString(), mHttpCallBack, 0);
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -218,7 +218,9 @@ public final class FaceDetectRGBActivity extends AppCompatActivity implements Su
             case 0:
                 if (response != null) {
                     try {
-                        mFaceRecongitRGBBase = JSON.parseObject(response, FaceRecongitRGBBase.class);
+                        mAddFaceBase = JSON.parseObject(response, AddFaceBase.class);
+                            Toast.makeText(this, mAddFaceBase.getMsg(), Toast.LENGTH_SHORT).show();
+                            finish();
                         succeeddialog();
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -236,33 +238,6 @@ public final class FaceDetectRGBActivity extends AppCompatActivity implements Su
 
 
     public void succeeddialog() {//扫描成功
-        NiceDialog.init()
-                .setLayoutId(R.layout.succeed_dialog)
-                .setConvertListener(new ViewConvertListener() {
-                    @Override
-                    protected void convertView(ViewHolder holder, final BaseNiceDialog dialog) {
-                        TextView succeed = holder.getView(R.id.tv_succeed);//查看详情
-                        succeed.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                //查看详情
-                                String particularurl = "http://liugangapi.gx11.cn/Worker/Credit?id=" + mFaceRecongitRGBBase.getData().getId();
-                                Intent intent = new Intent(FaceDetectRGBActivity.this, WebActivity.class);
-                                intent.putExtra(KEY_URL, particularurl);
-                                startActivity(intent);
-                                dialog.dismiss();
-                                finish();
-                            }
-                        });
-
-
-                    }
-                })
-                .setDimAmount(0.3f)
-                .setShowBottom(false)
-                .setAnimStyle(R.style.PracticeModeAnimation)
-                .setOutCancel(false) //触摸外部是否取消
-                .show(getSupportFragmentManager());
     }
 
     public void forgive() {//查无此人
@@ -336,53 +311,10 @@ public final class FaceDetectRGBActivity extends AppCompatActivity implements Su
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
 
         if (grantResults.length != 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED && requestCode == RC_HANDLE_CAMERA_PERM_RGB) {
-            Intent intent = new Intent(this, FaceDetectRGBActivity.class);
+            Intent intent = new Intent(this, AddFaceRGBActivity.class);
             startActivity(intent);
             return;
         }
-    }
-    public void usertwodialog(final List<String> list) {//查无此人
-        NiceDialog.init()
-                .setLayoutId(R.layout.usertwodialog_dialog)
-                .setConvertListener(new ViewConvertListener() {
-                    @Override
-                    protected void convertView(ViewHolder holder, final BaseNiceDialog dialog) {
-                        TextView textView = holder.getView(R.id.userdialog_title_tv_detect);//标题
-                        TextView entrance = holder.getView(R.id.tv_entrance_main_detect);//知道了
-                        TextView particular = holder.getView(R.id.tv_particular_detect);//查看详情
-                        ListView listView = holder.getView(R.id.listview_face_detect);
-                        MyFacelistviewAdapter myFacelistviewAdapter = new MyFacelistviewAdapter(FaceDetectRGBActivity.this, list);
-                        listView.setAdapter(myFacelistviewAdapter);
-                        if (list != null) {
-                            textView.setText(list.get(0));
-                        }
-                        entrance.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                //知道了
-                                dialog.dismiss();
-                                finish();
-                            }
-                        });
-                        particular.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                String particularurl = "http://liugangapi.gx11.cn/Worker/Credit?id=" + mFaceRecongitRGBBase.getData().getId();
-                                //查看详情
-                                Intent intent = new Intent(FaceDetectRGBActivity.this, WebActivity.class);
-                                intent.putExtra(KEY_URL, particularurl);
-                                startActivity(intent);
-                            }
-                        });
-
-
-                    }
-                })
-                .setDimAmount(0.3f)
-                .setShowBottom(false)
-                .setAnimStyle(R.style.PracticeModeAnimation)
-                .setOutCancel(false) //触摸外部是否取消
-                .show(getSupportFragmentManager());
     }
 
 
@@ -462,92 +394,9 @@ public final class FaceDetectRGBActivity extends AppCompatActivity implements Su
         return result;
     }
 
-    /**
-     * 将 Bitmap 保存到SD卡
-     *
-     * @param context
-     * @param mybitmap
-     * @param name
-     * @return
-     */
-    public static boolean saveBitmapToSdCard(Context context, Bitmap mybitmap, String name) {
-        boolean result = false;
-        //创建位图保存目录
-        String path = Environment.getExternalStorageDirectory().getAbsolutePath();
-        File sd = new File(path);
-        if (!sd.exists()) {
-            sd.mkdir();
-        }
-
-        File file = new File(path + "/" + name + ".jpg");
-        FileOutputStream fileOutputStream = null;
-        if (!file.exists()) {
-            try {
-                // 判断SD卡是否存在，并且是否具有读写权限
-                if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-                    fileOutputStream = new FileOutputStream(file);
-                    mybitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
-                    fileOutputStream.flush();
-                    fileOutputStream.close();
-
-                    //update gallery
-                    Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-                    Uri uri = Uri.fromFile(file);
-                    intent.setData(uri);
-                    context.sendBroadcast(intent);
-                    Toast.makeText(context, "保存成功", Toast.LENGTH_SHORT).show();
-                    result = true;
-                } else {
-                    Toast.makeText(context, "不能读取到SD卡", Toast.LENGTH_SHORT).show();
-                }
-
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return result;
-    }
-
-    /**
-     * 截取viewGroup内容，生成图片
-     *
-     * @param viewGroup 容器控件
-     * @return 图片bitmap
-     */
-    public static Bitmap getViewGroupBitmap(ViewGroup viewGroup) {
-        int h = viewGroup.getHeight();
-        Bitmap bitmap;
-        // 创建相应大小的bitmap
-        bitmap = Bitmap.createBitmap(viewGroup.getMeasuredWidth(), h, Bitmap.Config.RGB_565);
-        final Canvas canvas = new Canvas(bitmap);
-        //获取当前主题背景颜色，设置canvas背景
-        canvas.drawColor(Color.WHITE);
-        //绘制viewGroup内容
-        viewGroup.draw(canvas);
-        return bitmap;
-    }
 
 
-    /**
-     * view转bitmap
-     */
-    public Bitmap viewConversionBitmap(View v) {
-        int w = v.getWidth();
-        int h = v.getHeight();
 
-        Bitmap bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-        Canvas c = new Canvas(bmp);
-
-        c.drawColor(Color.WHITE);
-        /** 如果不设置canvas画布为白色，则生成透明 */
-
-        v.layout(0, 0, w, h);
-        v.draw(c);
-
-        return bmp;
-    }
 
 
     @Override
@@ -710,7 +559,7 @@ public final class FaceDetectRGBActivity extends AppCompatActivity implements Su
 
     private void setDisplayOrientation() {
         // Now set the display orientation:
-        mDisplayRotation = Util.getDisplayRotation(FaceDetectRGBActivity.this);
+        mDisplayRotation = Util.getDisplayRotation(AddFaceRGBActivity.this);
         mDisplayOrientation = Util.getDisplayOrientation(mDisplayRotation, cameraId);
 
         mCamera.setDisplayOrientation(mDisplayOrientation);
@@ -1021,7 +870,7 @@ public final class FaceDetectRGBActivity extends AppCompatActivity implements Su
     private void resetData() {
         if (imagePreviewAdapter == null) {
             facesBitmap = new ArrayList<>();
-            imagePreviewAdapter = new ImagePreviewAdapter(FaceDetectRGBActivity.this, facesBitmap, new ImagePreviewAdapter.ViewHolder.OnItemClickListener() {
+            imagePreviewAdapter = new ImagePreviewAdapter(AddFaceRGBActivity.this, facesBitmap, new ImagePreviewAdapter.ViewHolder.OnItemClickListener() {
                 @Override
                 public void onClick(View v, int position) {
                     imagePreviewAdapter.setCheck(position);
