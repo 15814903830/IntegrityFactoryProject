@@ -62,6 +62,11 @@ public class LogwebActivity extends AppCompatActivity {
         //自动加载图片
         webSettings.setLoadsImagesAutomatically(true);
         webSettings.setDomStorageEnabled(true);
+    }
+
+    @Override
+    public void onBackPressed() {
 
     }
+
 }
