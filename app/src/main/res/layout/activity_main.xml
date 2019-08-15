@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    android:orientation="vertical"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+<com.xsylsb.integrity.view.StatusBarHeightView
+    android:id="@+id/height"
+    android:layout_alignParentTop="true"
+    app:use_type="use_height"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+</com.xsylsb.integrity.view.StatusBarHeightView>
+
+    <FrameLayout
+        android:layout_below="@+id/height"
+        android:layout_marginBottom="50dp"
+        android:background="#F5F5F5"
+        android:id="@+id/main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    </FrameLayout>
+
+    <View
+        android:layout_alignTop="@+id/ll"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#E5E5E5"></View>
+    <LinearLayout
+        android:id="@+id/ll"
+        android:background="@color/result_text"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="50dp">
+        <LinearLayout
+            android:id="@+id/main_ll_home"
+            android:gravity="bottom"
+            android:layout_marginBottom="5dp"
+            android:orientation="vertical"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="50dp">
+
+            <LinearLayout
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+        <TextView
+            android:gravity="center"
+            android:id="@+id/main_tv_home"
+            android:background="@drawable/home"
+            android:layout_width="22dp"
+            android:layout_height="22dp" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="首页" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/main_ll_notice"
+            android:gravity="bottom"
+            android:layout_marginBottom="5dp"
+            android:orientation="vertical"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="50dp">
+
+            <LinearLayout
+
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:gravity="center"
+                    android:id="@+id/main_tv_notice"
+                    android:background="@drawable/notice"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="通知" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/main_ll_scan"
+            android:gravity="bottom"
+            android:layout_marginBottom="5dp"
+            android:orientation="vertical"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="50dp">
+
+            <LinearLayout
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/main_tv_scan"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:background="@drawable/scan"
+                    android:gravity="center" />
+            </LinearLayout>
+            <TextView
+                android:gravity="center"
+                android:text="扫一扫"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/main_ll_train"
+            android:gravity="bottom"
+            android:layout_marginBottom="5dp"
+            android:orientation="vertical"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="50dp">
+
+            <LinearLayout
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:gravity="center"
+                    android:id="@+id/main_tv_train"
+                    android:background="@drawable/train"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp" />
+            </LinearLayout>
+            <TextView
+                android:gravity="center"
+                android:text="培训"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+
+
+        <LinearLayout
+            android:id="@+id/main_ll_personage"
+            android:gravity="bottom"
+            android:layout_marginBottom="5dp"
+            android:orientation="vertical"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="50dp">
+
+            <LinearLayout
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:gravity="center"
+                    android:id="@+id/main_tv_personage"
+                    android:background="@drawable/personage"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp" />
+            </LinearLayout>
+            <TextView
+                android:gravity="center"
+                android:text="个人"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+    </LinearLayout>
+
+
+
+</RelativeLayout>

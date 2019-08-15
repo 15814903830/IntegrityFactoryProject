@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:padding="@dimen/dp_10"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:id="@+id/ll_a_examination_fragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="15dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+        <TextView
+            android:visibility="visible"
+            android:id="@+id/tv_a_practi_fragment"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:background="@drawable/quan"
+            android:gravity="center"
+            android:text="A" />
+            <ImageView
+            android:visibility="gone"
+            android:src="@mipmap/sitilianxi3"
+            android:id="@+id/iv_a_practi_fragment_true"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:background="@drawable/quan"
+            android:gravity="center"
+            android:text="A" />
+            <ImageView
+                android:visibility="gone"
+                android:src="@mipmap/sitilianxi4"
+                android:id="@+id/iv_a_practi_fragment_false"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:background="@drawable/quan"
+                android:gravity="center"
+                android:text="A" />
+        </FrameLayout>
+        <TextView
+            android:id="@+id/tv_a_text_fragment_practi"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:text="预防为主，消防结合"
+            android:textColor="#333333"
+            android:textSize="17sp" />
+    </LinearLayout>
+</LinearLayout>

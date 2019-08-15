@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+<com.xsylsb.integrity.view.StatusBarHeightView
+    app:use_type="use_height"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"/>
+    <LinearLayout
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="120dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_weight="1"
+            android:textStyle="bold"
+            android:textSize="32sp"
+            android:textColor="#333333"
+            android:text="欢迎回来"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+        <LinearLayout
+            android:id="@+id/ll_face_login"
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+        <TextView
+            android:layout_marginRight="10dp"
+            android:layout_gravity="center_vertical"
+            android:textSize="15sp"
+            android:textColor="#00AD7C"
+            android:text="人脸识别"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <ImageView
+            android:id="@+id/im_face"
+            android:layout_gravity="center_vertical"
+            android:src="@mipmap/denglu6"
+            android:layout_width="20dp"
+            android:layout_height="20dp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_marginHorizontal="25dp"
+        android:layout_marginTop="80dp"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:layout_marginRight="15dp"
+                android:layout_gravity="center_vertical"
+                android:src="@mipmap/denglu2"
+                android:layout_width="20dp"
+                android:layout_height="20dp" />
+
+            <EditText
+                android:id="@+id/identitycard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:hint="请输入您的身份证号"
+                android:text="340102199305011501" />
+        </LinearLayout>
+        <View
+            android:layout_marginTop="12dp"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#E5E5E5"></View>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_marginTop="20dp"
+        android:layout_marginHorizontal="25dp"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:layout_marginRight="15dp"
+                android:layout_gravity="center_vertical"
+                android:src="@mipmap/denglu3"
+                android:layout_width="20dp"
+                android:layout_height="20dp" />
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/password"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@null"
+                    android:hint="请输入您的密码"
+                    android:inputType="textPassword"
+                    android:text="654321" />
+            <ImageView
+                android:src="@mipmap/denglu4"
+                android:layout_marginTop="10dp"
+                android:id="@+id/img_password"
+                android:layout_gravity="right"
+                android:layout_width="20dp"
+                android:layout_height="20dp" />
+            </FrameLayout>
+        </LinearLayout>
+        <View
+            android:layout_marginTop="12dp"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#E5E5E5"></View>
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btn_login"
+        android:textSize="17sp"
+        android:textColor="#FFFFFF"
+        android:text="登录"
+        android:background="@drawable/login"
+        android:layout_marginTop="40dp"
+        android:layout_marginHorizontal="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="50dp" />
+</LinearLayout>
