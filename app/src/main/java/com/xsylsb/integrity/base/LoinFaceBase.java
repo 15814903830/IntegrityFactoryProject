@@ -9,13 +9,12 @@ import java.util.List;
  * @updateAuthor $Author$
  * @updateDes ${TODO}
  */
-public class FaceRecongitRGBBase {
-
+public class LoinFaceBase {
 
     /**
      * suc : true
      * msg : 扫描成功
-     * data : {"faceImagesUrl":null,"age":26,"dengJiTag":"厂级","statusTag":"在岗","workShop":null,"company":null,"workArea":null,"workAreaNames":null,"workJob":null,"securityClassHour":0,"sanJiAnQuanPeiXunClassHour":0,"zaiJiaoYuPeiXunClassHour":0,"badRecord":null,"jurisdictionValues":null,"id":24,"role":0,"bossId":1,"userName":null,"idno":"340102199305011501","idstarTime":null,"idendTime":null,"faceImages":null,"password":"5CE22403A04C2AB1","fullName":"宋先生01测试领导","gender":0,"birthday":"1993-05-01T00:00:00","companyId":null,"workShopId":2300,"workAreaId":"2100000001","jobId":117,"dengJi":1,"safetyExamination":false,"isCompanyHead":false,"isSpecialOperator":false,"isSafetyManager":false,"totalBadRecordScore":0,"totalViolationRecord":0,"totalCompanyHour":0,"status":0,"leaveTime":null,"createTime":"2019-07-15T14:13:02.953","blacklist":null,"courseExamRecord":[],"courseSignIn":[],"forceCourseExamRecord":[],"jobRecord":[],"notice":[],"operationCertificate":[],"workAreaBoss":[],"workerJurisdiction":[]}
+     * data : {"age":39,"dengJiTag":"车间/科室级","statusTag":"在岗","workShop":null,"company":null,"workArea":null,"workAreaNames":null,"workJob":null,"securityClassHour":0,"sanJiAnQuanPeiXunClassHour":0,"zaiJiaoYuPeiXunClassHour":0,"badRecord":null,"jurisdictionValues":null,"id":44,"role":0,"bossId":1,"userName":null,"idno":"110105198001011606","idstarTime":null,"idendTime":null,"faceImages":null,"password":"91BFD3AD08D66D6E","fullName":"测试第6号人员","gender":0,"birthday":"1980-01-01T00:00:00","companyId":null,"workShopId":2300000000,"workAreaId":"2100000000","jobId":117,"dengJi":2,"safetyExamination":false,"isCompanyHead":false,"isSpecialOperator":false,"isSafetyManager":false,"totalBadRecordScore":0,"totalViolationRecord":0,"totalCompanyHour":0,"status":0,"leaveTime":null,"createTime":"2019-07-15T21:12:15.153","blacklist":null,"courseExamRecord":[],"courseSignIn":[],"forceCourseExamRecord":[],"jobRecord":[],"notice":[],"operationCertificate":[],"workAreaBoss":[],"workerJurisdiction":[]}
      * code : 200
      */
 
@@ -58,9 +57,8 @@ public class FaceRecongitRGBBase {
 
     public static class DataBean {
         /**
-         * faceImagesUrl : null
-         * age : 26
-         * dengJiTag : 厂级
+         * age : 39
+         * dengJiTag : 车间/科室级
          * statusTag : 在岗
          * workShop : null
          * company : null
@@ -72,23 +70,23 @@ public class FaceRecongitRGBBase {
          * zaiJiaoYuPeiXunClassHour : 0
          * badRecord : null
          * jurisdictionValues : null
-         * id : 24
+         * id : 44
          * role : 0
          * bossId : 1
          * userName : null
-         * idno : 340102199305011501
+         * idno : 110105198001011606
          * idstarTime : null
          * idendTime : null
          * faceImages : null
-         * password : 5CE22403A04C2AB1
-         * fullName : 宋先生01测试领导
+         * password : 91BFD3AD08D66D6E
+         * fullName : 测试第6号人员
          * gender : 0
-         * birthday : 1993-05-01T00:00:00
+         * birthday : 1980-01-01T00:00:00
          * companyId : null
-         * workShopId : 2300
-         * workAreaId : 2100000001
+         * workShopId : 2300000000
+         * workAreaId : 2100000000
          * jobId : 117
-         * dengJi : 1
+         * dengJi : 2
          * safetyExamination : false
          * isCompanyHead : false
          * isSpecialOperator : false
@@ -98,7 +96,7 @@ public class FaceRecongitRGBBase {
          * totalCompanyHour : 0
          * status : 0
          * leaveTime : null
-         * createTime : 2019-07-15T14:13:02.953
+         * createTime : 2019-07-15T21:12:15.153
          * blacklist : null
          * courseExamRecord : []
          * courseSignIn : []
@@ -110,7 +108,6 @@ public class FaceRecongitRGBBase {
          * workerJurisdiction : []
          */
 
-        private Object faceImagesUrl;
         private int age;
         private String dengJiTag;
         private String statusTag;
@@ -137,7 +134,7 @@ public class FaceRecongitRGBBase {
         private int gender;
         private String birthday;
         private Object companyId;
-        private int workShopId;
+        private long workShopId;
         private String workAreaId;
         private int jobId;
         private int dengJi;
@@ -160,14 +157,6 @@ public class FaceRecongitRGBBase {
         private List<?> operationCertificate;
         private List<?> workAreaBoss;
         private List<?> workerJurisdiction;
-
-        public Object getFaceImagesUrl() {
-            return faceImagesUrl;
-        }
-
-        public void setFaceImagesUrl(Object faceImagesUrl) {
-            this.faceImagesUrl = faceImagesUrl;
-        }
 
         public int getAge() {
             return age;
@@ -377,11 +366,11 @@ public class FaceRecongitRGBBase {
             this.companyId = companyId;
         }
 
-        public int getWorkShopId() {
+        public long getWorkShopId() {
             return workShopId;
         }
 
-        public void setWorkShopId(int workShopId) {
+        public void setWorkShopId(long workShopId) {
             this.workShopId = workShopId;
         }
 

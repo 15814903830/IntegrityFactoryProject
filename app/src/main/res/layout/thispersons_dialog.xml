@@ -16,7 +16,7 @@
             android:background="#ffffff"
             android:layout_marginTop="40dp"
             android:layout_marginHorizontal="123dp"
-            android:src="@mipmap/shaoyishao6"
+            android:src="@mipmap/shaoyishao5"
             android:layout_width="50dp"
             android:layout_height="50dp" />
 
@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="20dp"
             android:layout_marginTop="20dp"
-            android:text="添加人脸成功"
+            android:text="添加人脸失败"
             android:textColor="#333333"
             android:textSize="17sp"
             android:textStyle="bold"

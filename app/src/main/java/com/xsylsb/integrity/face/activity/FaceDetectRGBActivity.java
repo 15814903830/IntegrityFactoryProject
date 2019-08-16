@@ -36,6 +36,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -45,6 +46,7 @@ import com.xsylsb.integrity.MainActivity;
 import com.xsylsb.integrity.R;
 import com.xsylsb.integrity.WebActivity;
 import com.xsylsb.integrity.base.FaceRecongitRGBBase;
+import com.xsylsb.integrity.base.LoinFaceBase;
 import com.xsylsb.integrity.face.activity.ui.FaceOverlayView;
 import com.xsylsb.integrity.face.activity.ui.LoginFaceDetectRGBActivity;
 import com.xsylsb.integrity.face.adapter.ImagePreviewAdapter;
@@ -113,7 +115,7 @@ public final class FaceDetectRGBActivity extends AppCompatActivity implements Su
     private final CameraErrorCallback mErrorCallback = new CameraErrorCallback();
 
     private HttpCallBack mHttpCallBack;
-    private FaceRecongitRGBBase mFaceRecongitRGBBase;
+    private LoinFaceBase mFaceRecongitRGBBase;
 
     private static final int MAX_FACE = 10;
     private boolean isThreadWorking = false;
@@ -135,6 +137,7 @@ public final class FaceDetectRGBActivity extends AppCompatActivity implements Su
     private ImagePreviewAdapter imagePreviewAdapter;
     private ArrayList<Bitmap> facesBitmap;
 
+    private ImageView textimg;
     /**
      * Initializes the UI and initiates the creation of a face detector.
      */
@@ -143,6 +146,7 @@ public final class FaceDetectRGBActivity extends AppCompatActivity implements Su
         super.onCreate(icicle);
         setContentView(R.layout.activity_camera_viewer);
         mView = (SurfaceView) findViewById(R.id.surfaceview);
+        textimg=findViewById(R.id.textimg);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         mHttpCallBack = this;
         // Now create the OverlayView:
@@ -155,7 +159,6 @@ public final class FaceDetectRGBActivity extends AppCompatActivity implements Su
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-
 
         handler = new Handler();
         faces = new FaceResult[MAX_FACE];
@@ -174,6 +177,7 @@ public final class FaceDetectRGBActivity extends AppCompatActivity implements Su
         if (icicle != null)
             cameraId = icicle.getInt(BUNDLE_CAMERA_ID, 0);
 
+
     }
 
     private boolean mBoolean = false;
@@ -191,9 +195,8 @@ public final class FaceDetectRGBActivity extends AppCompatActivity implements Su
                     JSONObject jsonObject = new JSONObject();
                     jsonObject.put("memberId", "0");//id
                     jsonObject.put("fileData", img);//人脸数据
-                    Log.e("id----", MyURL.id);
-                    OkHttpUtils.doPostJson(MyURL.URL + "SearchFaces/" + MyURL.id, jsonObject.toString(), mHttpCallBack, 0);
-
+                  OkHttpUtils.doPostJson(MyURL.URL + "SearchFaces/" + MyURL.id, jsonObject.toString(), mHttpCallBack, 0);
+                   // OkHttpUtils.doPostJson("http://192.168.0.46/GY.API/api/account/" + "SearchFaces/" + MyURL.id, jsonObject.toString(), mHttpCallBack, 0);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -213,18 +216,25 @@ public final class FaceDetectRGBActivity extends AppCompatActivity implements Su
 
     @Override
     public void onHandlerMessageCallback(String response, int requestId) {
-        Log.e("response", response);
+        Log.e("responsesss", response);
         switch (requestId) {
             case 0:
                 if (response != null) {
                     try {
-                        mFaceRecongitRGBBase = JSON.parseObject(response, FaceRecongitRGBBase.class);
-                        succeeddialog();
+                        mFaceRecongitRGBBase = JSON.parseObject(response, LoinFaceBase.class);
+                        if (mFaceRecongitRGBBase.isSuc()){
+                            succeeddialog();//成功
+                        }else {
+                            if (mFaceRecongitRGBBase.getData().getFaceImages().equals("null")){
+                                getface();//没有就添加
+                            }else {
+                                Toast.makeText(this, "识别错误", Toast.LENGTH_SHORT).show();
+                            }
+                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                         // forgive();
-                        getface();
-                        Log.e("catch", "catch");
+                        Log.e("catch", e.toString());
                     }
 
                 }
@@ -301,6 +311,7 @@ public final class FaceDetectRGBActivity extends AppCompatActivity implements Su
                             @Override
                             public void onClick(View v) {
                                 addface();
+                                finish();
                             }
 
                         });
@@ -425,7 +436,7 @@ public final class FaceDetectRGBActivity extends AppCompatActivity implements Su
         //将Bitmap转换成字符串
         String string = null;
         ByteArrayOutputStream bStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, bStream);
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 20, bStream);
         byte[] bytes = bStream.toByteArray();
         string = Base64.encodeToString(bytes, Base64.DEFAULT);
         return string;
@@ -462,72 +473,7 @@ public final class FaceDetectRGBActivity extends AppCompatActivity implements Su
         return result;
     }
 
-    /**
-     * 将 Bitmap 保存到SD卡
-     *
-     * @param context
-     * @param mybitmap
-     * @param name
-     * @return
-     */
-    public static boolean saveBitmapToSdCard(Context context, Bitmap mybitmap, String name) {
-        boolean result = false;
-        //创建位图保存目录
-        String path = Environment.getExternalStorageDirectory().getAbsolutePath();
-        File sd = new File(path);
-        if (!sd.exists()) {
-            sd.mkdir();
-        }
 
-        File file = new File(path + "/" + name + ".jpg");
-        FileOutputStream fileOutputStream = null;
-        if (!file.exists()) {
-            try {
-                // 判断SD卡是否存在，并且是否具有读写权限
-                if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-                    fileOutputStream = new FileOutputStream(file);
-                    mybitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
-                    fileOutputStream.flush();
-                    fileOutputStream.close();
-
-                    //update gallery
-                    Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-                    Uri uri = Uri.fromFile(file);
-                    intent.setData(uri);
-                    context.sendBroadcast(intent);
-                    Toast.makeText(context, "保存成功", Toast.LENGTH_SHORT).show();
-                    result = true;
-                } else {
-                    Toast.makeText(context, "不能读取到SD卡", Toast.LENGTH_SHORT).show();
-                }
-
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return result;
-    }
-
-    /**
-     * 截取viewGroup内容，生成图片
-     *
-     * @param viewGroup 容器控件
-     * @return 图片bitmap
-     */
-    public static Bitmap getViewGroupBitmap(ViewGroup viewGroup) {
-        int h = viewGroup.getHeight();
-        Bitmap bitmap;
-        // 创建相应大小的bitmap
-        bitmap = Bitmap.createBitmap(viewGroup.getMeasuredWidth(), h, Bitmap.Config.RGB_565);
-        final Canvas canvas = new Canvas(bitmap);
-        //获取当前主题背景颜色，设置canvas背景
-        canvas.drawColor(Color.WHITE);
-        //绘制viewGroup内容
-        viewGroup.draw(canvas);
-        return bitmap;
-    }
 
 
     /**
@@ -904,7 +850,6 @@ public final class FaceDetectRGBActivity extends AppCompatActivity implements Su
             }
 
             fdet = new android.media.FaceDetector(bmp.getWidth(), bmp.getHeight(), MAX_FACE);
-
             android.media.FaceDetector.Face[] fullResults = new android.media.FaceDetector.Face[MAX_FACE];
             fdet.findFaces(bmp, fullResults);
 
@@ -977,9 +922,9 @@ public final class FaceDetectRGBActivity extends AppCompatActivity implements Su
                                     handler.post(new Runnable() {
                                         public void run() {
                                             if (mBooleanfetect) {
-                                                Log.e("faceCroped:", bitmaptoString(faceCroped));
-                                                Log.e("faceCroped:", bitmapToBase64(faceCroped));
-                                                getdata(bitmapToBase64(faceCroped));
+                                                textimg.setImageBitmap(faceCroped);
+                                                Log.e("faceCroped:", bitmaptoString(convertViewToBitmap(textimg)));
+                                                getdata(bitmaptoString(convertViewToBitmap(textimg)));
                                                 imagePreviewAdapter.add(faceCroped);
                                                 mBooleanfetect = false;
                                             }
@@ -1015,6 +960,18 @@ public final class FaceDetectRGBActivity extends AppCompatActivity implements Su
         }
     }
 
+
+    public Bitmap convertViewToBitmap(View view){
+
+        view.setDrawingCacheEnabled(true);
+
+        view.buildDrawingCache();
+
+        Bitmap bitmap=view.getDrawingCache();
+
+        return bitmap;
+
+    }
     /**
      * Release Memory
      */

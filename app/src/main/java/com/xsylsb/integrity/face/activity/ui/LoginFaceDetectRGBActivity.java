@@ -33,6 +33,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -43,6 +44,7 @@ import com.xsylsb.integrity.R;
 import com.xsylsb.integrity.WebActivity;
 import com.xsylsb.integrity.base.FaceFalseBase;
 import com.xsylsb.integrity.base.FaceRecongitRGBBase;
+import com.xsylsb.integrity.base.LoinFaceBase;
 import com.xsylsb.integrity.face.adapter.ImagePreviewAdapter;
 import com.xsylsb.integrity.face.adapter.MyFacelistviewAdapter;
 import com.xsylsb.integrity.face.model.FaceResult;
@@ -111,7 +113,7 @@ public final class LoginFaceDetectRGBActivity extends AppCompatActivity implemen
     private final CameraErrorCallback mErrorCallback = new CameraErrorCallback();
 
     private HttpCallBack mHttpCallBack;
-    private FaceRecongitRGBBase mFaceRecongitRGBBase;
+    private LoinFaceBase mFaceRecongitRGBBase;
 
     private boolean mBoolean = true;//是否采集
     private static final int MAX_FACE = 10;
@@ -134,7 +136,7 @@ public final class LoginFaceDetectRGBActivity extends AppCompatActivity implemen
     private RecyclerView recyclerView;
     private ImagePreviewAdapter imagePreviewAdapter;
     private ArrayList<Bitmap> facesBitmap;
-
+    private ImageView textimg;
     /**
      * Initializes the UI and initiates the creation of a face detector.
      */
@@ -143,6 +145,7 @@ public final class LoginFaceDetectRGBActivity extends AppCompatActivity implemen
         super.onCreate(icicle);
         setContentView(R.layout.activity_camera_viewer);
         mView = (SurfaceView) findViewById(R.id.surfaceview);
+        textimg=findViewById(R.id.textimg);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         mHttpCallBack = this;
         // Now create the OverlayView:
@@ -274,8 +277,7 @@ public final class LoginFaceDetectRGBActivity extends AppCompatActivity implemen
                 if (response != null) {
                     try {
                         //识别成功
-                        mFaceRecongitRGBBase = JSON.parseObject(response, FaceRecongitRGBBase.class);
-
+                        mFaceRecongitRGBBase = JSON.parseObject(response, LoinFaceBase.class);
                         if (mFaceRecongitRGBBase.isSuc()) {//人脸识别成功  //扫描成功
                             MyURL.id = "" + mFaceRecongitRGBBase.getData().getId();
 //                            startActivity(new Intent(LoginFaceDetectRGBActivity.this, MainActivity.class));
@@ -283,32 +285,10 @@ public final class LoginFaceDetectRGBActivity extends AppCompatActivity implemen
                             finish();
                         }
                     } catch (Exception e) {
-                        forgive();
+                        Toast.makeText(this, "未成功识别", Toast.LENGTH_SHORT).show();
+                        Log.e("Exception",e.toString());
                         e.printStackTrace();
                     }
-
-                    //                    String s=response.split(":")[1];
-                    //                    if (s.split(",")[0].equals("false")){//识别失败
-                    //                        mFaceFalseBase = JSON.parseObject(response, FaceFalseBase.class);
-                    //                        Intent intent=new Intent(LoginFaceDetectRGBActivity.this, MyloginActivity.class);
-                    //                        intent.putExtra("thispersondialog","true");
-                    //                        intent.putExtra("msg",mFaceFalseBase.getMsg());
-                    //                        startActivity(intent);
-                    //                        finish();
-                    //                    }else {
-                    //                        try {
-                    //                            //识别成功
-                    //                            mFaceRecongitRGBBase = JSON.parseObject(response, FaceRecongitRGBBase.class);
-                    //
-                    //                            if (mFaceRecongitRGBBase.isSuc()){//人脸识别成功  //扫描成功
-                    //                                                                MyURL.id=""+mFaceRecongitRGBBase.getData().getId();
-                    //                                                                startActivity(new Intent(LoginFaceDetectRGBActivity.this, MainActivity.class));
-                    //                                                                finish();
-                    //                            }
-                    //                        } catch (Exception e) {
-                    //                            e.printStackTrace();
-                    //                        }
-                    //                    }
                 }
                 break;
         }
@@ -896,7 +876,9 @@ public final class LoginFaceDetectRGBActivity extends AppCompatActivity implemen
                                     handler.post(new Runnable() {
                                         public void run() {
                                             if (mBoolean) {
-                                                getdata(bitmapToBase64(faceCroped));
+                                                //人脸
+                                                textimg.setImageBitmap(faceCroped);
+                                                getdata(bitmaptoString(convertViewToBitmap(textimg)));
                                                 imagePreviewAdapter.add(faceCroped);
                                                 mBoolean = false;
                                             }
@@ -930,6 +912,26 @@ public final class LoginFaceDetectRGBActivity extends AppCompatActivity implemen
                 }
             });
         }
+    }
+    public Bitmap convertViewToBitmap(View view){
+
+        view.setDrawingCacheEnabled(true);
+
+        view.buildDrawingCache();
+
+        Bitmap bitmap=view.getDrawingCache();
+
+        return bitmap;
+
+    }
+    public String bitmaptoString(Bitmap bitmap) {
+        //将Bitmap转换成字符串
+        String string = null;
+        ByteArrayOutputStream bStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 20, bStream);
+        byte[] bytes = bStream.toByteArray();
+        string = Base64.encodeToString(bytes, Base64.DEFAULT);
+        return string;
     }
 
     /**

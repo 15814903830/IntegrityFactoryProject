@@ -8,7 +8,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:keepScreenOn="true">
-
+    <ImageView
+        android:layout_marginLeft="500dp"
+        android:src="@mipmap/tianjiaface"
+        android:id="@+id/textimg"
+        android:layout_width="100dp"
+        android:layout_height="100dp" />
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">

@@ -36,6 +36,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -52,6 +53,8 @@ import com.xsylsb.integrity.face.model.FaceResult;
 import com.xsylsb.integrity.face.utils.CameraErrorCallback;
 import com.xsylsb.integrity.face.utils.ImageUtils;
 import com.xsylsb.integrity.face.utils.Util;
+import com.xsylsb.integrity.mylogin.LogwebActivity;
+import com.xsylsb.integrity.mylogin.MyloginActivity;
 import com.xsylsb.integrity.util.HttpCallBack;
 import com.xsylsb.integrity.util.MyURL;
 import com.xsylsb.integrity.util.OkHttpUtils;
@@ -133,7 +136,8 @@ public final class AddFaceRGBActivity extends AppCompatActivity implements Surfa
     private RecyclerView recyclerView;
     private ImagePreviewAdapter imagePreviewAdapter;
     private ArrayList<Bitmap> facesBitmap;
-
+    private ImageView textimg;
+    private Context mContext;
     /**
      * Initializes the UI and initiates the creation of a face detector.
      */
@@ -142,6 +146,8 @@ public final class AddFaceRGBActivity extends AppCompatActivity implements Surfa
         super.onCreate(icicle);
         setContentView(R.layout.activity_camera_viewer);
         mView = (SurfaceView) findViewById(R.id.surfaceview);
+        textimg=findViewById(R.id.textimg);
+        mContext=this;
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         mHttpCallBack = this;
         // Now create the OverlayView:
@@ -168,13 +174,11 @@ public final class AddFaceRGBActivity extends AppCompatActivity implements Surfa
         getSupportActionBar().setDisplayShowTitleEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("人脸识别");
-
-        if (icicle != null)
+        getSupportActionBar().setTitle("添加人脸");
+        if (icicle != null){
             cameraId = icicle.getInt(BUNDLE_CAMERA_ID, 0);
-
+        }
     }
-
     private boolean mBoolean = false;
 
     private void getdata(final String img) {
@@ -183,7 +187,6 @@ public final class AddFaceRGBActivity extends AppCompatActivity implements Surfa
         }
         mBoolean = true;
         new Thread(new Runnable() {
-
             @Override
             public void run() {
                 try {
@@ -191,9 +194,7 @@ public final class AddFaceRGBActivity extends AppCompatActivity implements Surfa
                     jsonObject.put("workerId", MyURL.id);//id
                     jsonObject.put("fileName", "png");//人脸数据
                     jsonObject.put("fileData", img);//人脸数据
-                    Log.e("id----", MyURL.id);
-                    OkHttpUtils.doPostJson(MyURL.URL + "UpdateTenCentFaces/" + MyURL.id, jsonObject.toString(), mHttpCallBack, 0);
-
+                    OkHttpUtils.doPostJson(MyURL.URL + "UpdateTenCentFaces", jsonObject.toString(), mHttpCallBack, 0);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -219,14 +220,15 @@ public final class AddFaceRGBActivity extends AppCompatActivity implements Surfa
                 if (response != null) {
                     try {
                         mAddFaceBase = JSON.parseObject(response, AddFaceBase.class);
-                            Toast.makeText(this, mAddFaceBase.getMsg(), Toast.LENGTH_SHORT).show();
-                            finish();
-                        succeeddialog();
+                        Log.e("catchssss", "catch");
+                        if (mAddFaceBase.getSuc()){
+                            forgive();//添加人脸成功
+                        }else {
+                            forgives();//添加人脸失败
+                        }
                     } catch (Exception e) {
+                        forgives();//添加人脸失败
                         e.printStackTrace();
-                        // forgive();
-                        getface();
-                        Log.e("catch", "catch");
                     }
 
                 }
@@ -240,9 +242,33 @@ public final class AddFaceRGBActivity extends AppCompatActivity implements Surfa
     public void succeeddialog() {//扫描成功
     }
 
-    public void forgive() {//查无此人
+    public void forgive() {//添加人脸成功
         NiceDialog.init()
                 .setLayoutId(R.layout.thisperson_dialog)
+                .setConvertListener(new ViewConvertListener() {
+                    @Override
+                    protected void convertView(ViewHolder holder, final BaseNiceDialog dialog) {
+                        TextView succeed = holder.getView(R.id.tv_roger);//查看详情
+                        succeed.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                startActivity(new Intent(AddFaceRGBActivity.this, LogwebActivity.class));
+                                dialog.dismiss();
+                                finish();
+                            }
+                        });
+                    }
+                })
+                .setDimAmount(0.3f)
+                .setShowBottom(false)
+                .setAnimStyle(R.style.PracticeModeAnimation)
+                .setOutCancel(false) //触摸外部是否取消
+                .show(getSupportFragmentManager());
+    }
+
+    public void forgives() {//添加人脸失败
+        NiceDialog.init()
+                .setLayoutId(R.layout.thispersons_dialog)
                 .setConvertListener(new ViewConvertListener() {
                     @Override
                     protected void convertView(ViewHolder holder, final BaseNiceDialog dialog) {
@@ -254,8 +280,6 @@ public final class AddFaceRGBActivity extends AppCompatActivity implements Surfa
                                 finish();
                             }
                         });
-
-
                     }
                 })
                 .setDimAmount(0.3f)
@@ -265,30 +289,7 @@ public final class AddFaceRGBActivity extends AppCompatActivity implements Surfa
                 .show(getSupportFragmentManager());
     }
 
-    public void getface() {//采集人脸数据
-        NiceDialog.init()
-                .setLayoutId(R.layout.getface_dialog)
-                .setConvertListener(new ViewConvertListener() {
-                    @Override
-                    protected void convertView(ViewHolder holder, final BaseNiceDialog dialog) {
-                        TextView succeed = holder.getView(R.id.tv_roger);//查看详情
-                        succeed.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                addface();
-                            }
 
-                        });
-
-
-                    }
-                })
-                .setDimAmount(0.3f)
-                .setShowBottom(false)
-                .setAnimStyle(R.style.PracticeModeAnimation)
-                .setOutCancel(false) //触摸外部是否取消
-                .show(getSupportFragmentManager());
-    }
     private void addface() {//添加人脸
         //人脸识别
         int rc = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
@@ -357,7 +358,7 @@ public final class AddFaceRGBActivity extends AppCompatActivity implements Surfa
         //将Bitmap转换成字符串
         String string = null;
         ByteArrayOutputStream bStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, bStream);
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 20, bStream);
         byte[] bytes = bStream.toByteArray();
         string = Base64.encodeToString(bytes, Base64.DEFAULT);
         return string;
@@ -826,9 +827,9 @@ public final class AddFaceRGBActivity extends AppCompatActivity implements Surfa
                                     handler.post(new Runnable() {
                                         public void run() {
                                             if (mBooleanfetect) {
-                                                Log.e("faceCroped:", bitmaptoString(faceCroped));
-                                                Log.e("faceCroped:", bitmapToBase64(faceCroped));
-                                                getdata(bitmapToBase64(faceCroped));
+                                                textimg.setImageBitmap(faceCroped);
+                                                Log.e("textimg:",bitmaptoString(convertViewToBitmap(textimg)));
+                                                getdata(bitmaptoString(convertViewToBitmap(textimg)));
                                                 imagePreviewAdapter.add(faceCroped);
                                                 mBooleanfetect = false;
                                             }
@@ -864,6 +865,18 @@ public final class AddFaceRGBActivity extends AppCompatActivity implements Surfa
         }
     }
 
+
+    public Bitmap convertViewToBitmap(View view){
+
+        view.setDrawingCacheEnabled(true);
+
+        view.buildDrawingCache();
+
+        Bitmap bitmap=view.getDrawingCache();
+
+        return bitmap;
+
+    }
     /**
      * Release Memory
      */

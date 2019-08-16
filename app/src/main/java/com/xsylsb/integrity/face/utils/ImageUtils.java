@@ -11,9 +11,11 @@ import android.graphics.Rect;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.util.Base64;
 
 import com.xsylsb.integrity.face.model.FaceResult;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 
@@ -125,7 +127,6 @@ public class ImageUtils {
         bitmap.recycle();
         return ret;
     }
-
 
     public static Bitmap cropFace(FaceResult face, Bitmap bitmap, int rotate) {
         Bitmap bmp;

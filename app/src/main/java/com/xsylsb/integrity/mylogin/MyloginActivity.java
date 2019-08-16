@@ -34,6 +34,7 @@ import com.xsylsb.integrity.MainActivity;
 import com.xsylsb.integrity.R;
 import com.xsylsb.integrity.base.LoginBase;
 import com.xsylsb.integrity.base.VersionBase;
+import com.xsylsb.integrity.face.activity.AddFaceRGBActivity;
 import com.xsylsb.integrity.face.activity.ui.LoginFaceDetectRGBActivity;
 import com.xsylsb.integrity.util.HttpCallBack;
 import com.xsylsb.integrity.util.MyURL;
@@ -191,7 +192,41 @@ public class MyloginActivity extends AppCompatActivity implements HttpCallBack {
         message.obj = response;
         mHandler.sendMessage(message);
     }
+    private void addface() {//添加人脸
+        //人脸识别
+        int rc = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
+        if (rc == PackageManager.PERMISSION_GRANTED) {
+            Intent intent = new Intent(this, AddFaceRGBActivity.class);
+            startActivity(intent);
+        } else {
+            requestCameraPermission(RC_HANDLE_CAMERA_PERM_RGB);
+        }
+    }
+    public void getface() {//采集人脸数据
+        NiceDialog.init()
+                .setLayoutId(R.layout.getface_dialog)
+                .setConvertListener(new ViewConvertListener() {
+                    @Override
+                    protected void convertView(ViewHolder holder, final BaseNiceDialog dialog) {
+                        TextView succeed = holder.getView(R.id.tv_roger);//查看详情
+                        succeed.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                addface();
+                                finish();
+                            }
 
+                        });
+
+
+                    }
+                })
+                .setDimAmount(0.3f)
+                .setShowBottom(false)
+                .setAnimStyle(R.style.PracticeModeAnimation)
+                .setOutCancel(false) //触摸外部是否取消
+                .show(getSupportFragmentManager());
+    }
     @Override
     public void onHandlerMessageCallback(String response, int requestId) {
 
@@ -202,21 +237,28 @@ public class MyloginActivity extends AppCompatActivity implements HttpCallBack {
                 Log.e("isSuc", "" + mLoginBase.isSuc());
                 if (mLoginBase.isSuc()) {
                     MyURL.id = "" + mLoginBase.getData().getId();
-                    //登陆操作
-                    //验证账号密码，跳转到主页
-//                    Intent intent = new Intent();
-//                    intent.putExtra("name", mLoginBase.getData().getFullName());
-//                    intent.setClass(this, MainActivity.class);
-//                    startActivity(intent);
-                     startActivity(new Intent(MyloginActivity.this,LogwebActivity.class));
-                    //获取Editor
-                    SharedPreferences.Editor editor = sp.edit();
-                    //输入内容
-                    editor.putString("number", identitycard.getText().toString());
-                    editor.putString("password", password.getText().toString());
-                    //必须提交才会生效，也可以使用apply
-                    editor.commit();
-                    finish();
+
+                    try {
+                        if (mLoginBase.getData().getFaceImages().equals("")){
+                            getface();//没有就添加
+                        }else {
+                            startActivity(new Intent(MyloginActivity.this,LogwebActivity.class));
+                            //获取Editor
+                            SharedPreferences.Editor editor = sp.edit();
+                            //输入内容
+                            editor.putString("number", identitycard.getText().toString());
+                            editor.putString("password", password.getText().toString());
+                            //必须提交才会生效，也可以使用apply
+                            editor.commit();
+                            finish();
+                        }
+                    } catch (Exception e) {
+                        getface();//没有就添加
+                        e.printStackTrace();
+                    }
+
+
+
                 } else {
                     Toast.makeText(this, "请输入正确的用户信息", Toast.LENGTH_SHORT).show();
                 }
