@@ -1,36 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout
-    android:background="#000000"
-    android:orientation="vertical"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/topLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:keepScreenOn="true">
+    android:background="#000000"
+    android:keepScreenOn="true"
+    android:orientation="vertical">
+
     <ImageView
-        android:layout_marginLeft="500dp"
-        android:src="@mipmap/tianjiaface"
         android:id="@+id/textimg"
         android:layout_width="100dp"
-        android:layout_height="100dp" />
+        android:layout_height="100dp"
+        android:layout_marginLeft="500dp"
+        android:src="@mipmap/tianjiaface" />
+
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-    <com.xsylsb.integrity.face.MySurfaceView
-        android:layout_gravity="center"
-        android:id="@+id/surfaceview"
+
+        <com.xsylsb.integrity.face.MySurfaceView
+            android:id="@+id/surfaceview"
             android:layout_width="300dp"
             android:layout_height="300dp"
+            android:layout_gravity="center"
+            android:layout_marginBottom="100dp"
             android:background="#00000000" />
-    <android.support.v7.widget.RecyclerView
-        android:visibility="gone"
-        android:id="@+id/recycler_view"
-        android:layout_width="60dp"
-        android:layout_height="match_parent"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_margin="10dp"
-        android:scrollbars="vertical" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="150dp"
+            android:gravity="center"
+            android:text="人脸识别中！请保持人脸在相机框内且亮度清晰，静止3秒左右不要移动"
+            android:textColor="#FFFFFF"
+            android:textSize="22sp" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycler_view"
+            android:layout_width="60dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_margin="10dp"
+            android:scrollbars="vertical"
+            android:visibility="gone" />
     </FrameLayout>
 </LinearLayout>

@@ -18,6 +18,7 @@ import android.graphics.YuvImage;
 import android.hardware.Camera;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
@@ -138,6 +139,7 @@ public final class AddFaceRGBActivity extends AppCompatActivity implements Surfa
     private ArrayList<Bitmap> facesBitmap;
     private ImageView textimg;
     private Context mContext;
+    private CountDownTimer timer;
     /**
      * Initializes the UI and initiates the creation of a face detector.
      */
@@ -169,8 +171,6 @@ public final class AddFaceRGBActivity extends AppCompatActivity implements Surfa
             faces[i] = new FaceResult();
             faces_previous[i] = new FaceResult();
         }
-
-
         getSupportActionBar().setDisplayShowTitleEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -178,9 +178,27 @@ public final class AddFaceRGBActivity extends AppCompatActivity implements Surfa
         if (icicle != null){
             cameraId = icicle.getInt(BUNDLE_CAMERA_ID, 0);
         }
+
+        if (MyURL.isBooleanface){
+            /** 倒计时60秒，一次1秒 */
+            timer = new CountDownTimer(50, 1000) {
+                @Override
+                public void onTick(long millisUntilFinished) {
+
+                }
+
+                @Override
+                public void onFinish() {
+                    cameraId = (cameraId + 1) % numberOfCameras;
+                    recreate();
+                    timer.cancel();
+                }
+            }.start();
+            MyURL.isBooleanface=false;
+        }
+
     }
     private boolean mBoolean = false;
-
     private void getdata(final String img) {
         if (mBoolean) {
             return;
@@ -252,6 +270,7 @@ public final class AddFaceRGBActivity extends AppCompatActivity implements Surfa
                         succeed.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
+                                MyURL.isBooleanface=true;
                                 startActivity(new Intent(AddFaceRGBActivity.this, LogwebActivity.class));
                                 dialog.dismiss();
                                 finish();
@@ -276,6 +295,7 @@ public final class AddFaceRGBActivity extends AppCompatActivity implements Surfa
                         succeed.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
+                                MyURL.isBooleanface=true;
                                 dialog.dismiss();
                                 finish();
                             }

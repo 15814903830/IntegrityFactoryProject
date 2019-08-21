@@ -68,7 +68,7 @@
                 android:layout_height="wrap_content"
                 android:background="@null"
                 android:hint="请输入您的身份证号"
-                android:text="340102199305011501" />
+                />
         </LinearLayout>
         <View
             android:layout_marginTop="12dp"
@@ -105,7 +105,7 @@
                     android:background="@null"
                     android:hint="请输入您的密码"
                     android:inputType="textPassword"
-                    android:text="654321" />
+                    />
             <ImageView
                 android:src="@mipmap/denglu4"
                 android:layout_marginTop="10dp"

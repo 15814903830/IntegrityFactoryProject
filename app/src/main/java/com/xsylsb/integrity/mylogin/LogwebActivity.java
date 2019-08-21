@@ -29,10 +29,12 @@ public class LogwebActivity extends AppCompatActivity {
         setContentView(R.layout.activity_logweb);//http://liugangapi.gx11.cn/Worker/Credit?id=24
         initView();
         webView.loadUrl("http://liugangapi.gx11.cn/Worker/Credit?id="+ MyURL.id);
+        MyURL.isBooleanface=true;
     }
 
     public void ShowMain(View view) {
         startActivity(new Intent(LogwebActivity.this, MainActivity.class));
+        finish();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)

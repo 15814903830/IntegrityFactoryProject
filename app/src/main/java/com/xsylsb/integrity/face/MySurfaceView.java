@@ -24,6 +24,8 @@ import android.view.SurfaceView;
  */
 public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback {
 
+	private int mWidth;
+	private int mHeight;
 	private Paint paint;
 	private Camera camera;
 	private int height; // 圆的半径
@@ -43,7 +45,13 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 		initView();
 	}
 
-	
+	@Override
+	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+		super.onSizeChanged(w, h, oldw, oldh);
+		mWidth=w;
+		mHeight=h;
+	}
+
 	private void initView() {
 		this.setFocusable(true);
 		this.setFocusableInTouchMode(true);
@@ -58,7 +66,8 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 		int widthSize = MeasureSpec.getSize(widthMeasureSpec);
 		int heightSize = MeasureSpec.getSize(heightMeasureSpec);
 
-		height=widthSize;
+		height=widthSize>heightSize?heightSize:widthSize;
+
 
 		Log.e("onMeasure", "draw: widthMeasureSpec = " +widthSize + "  heightMeasureSpec = " + heightSize);
 

@@ -16,6 +16,7 @@ import android.graphics.YuvImage;
 import android.hardware.Camera;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
@@ -130,13 +131,15 @@ public final class LoginFaceDetectRGBActivity extends AppCompatActivity implemen
     private FaceFalseBase mFaceFalseBase;
     private String BUNDLE_CAMERA_ID = "camera";
 
-
+    private CountDownTimer timer;
     //RecylerView face image
     private HashMap<Integer, Integer> facesCount = new HashMap<>();
     private RecyclerView recyclerView;
     private ImagePreviewAdapter imagePreviewAdapter;
     private ArrayList<Bitmap> facesBitmap;
     private ImageView textimg;
+    private boolean isBooleanface = true;
+
     /**
      * Initializes the UI and initiates the creation of a face detector.
      */
@@ -145,7 +148,12 @@ public final class LoginFaceDetectRGBActivity extends AppCompatActivity implemen
         super.onCreate(icicle);
         setContentView(R.layout.activity_camera_viewer);
         mView = (SurfaceView) findViewById(R.id.surfaceview);
-        textimg=findViewById(R.id.textimg);
+
+
+
+
+
+        textimg = findViewById(R.id.textimg);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         mHttpCallBack = this;
         // Now create the OverlayView:
@@ -176,6 +184,24 @@ public final class LoginFaceDetectRGBActivity extends AppCompatActivity implemen
 
         if (icicle != null)
             cameraId = icicle.getInt(BUNDLE_CAMERA_ID, 0);
+
+        if (MyURL.isBooleanface) {
+            /** 倒计时60秒，一次1秒 */
+            timer = new CountDownTimer(50, 1000) {
+                @Override
+                public void onTick(long millisUntilFinished) {
+
+                }
+
+                @Override
+                public void onFinish() {
+                    cameraId = (cameraId + 1) % numberOfCameras;
+                    recreate();
+                    timer.cancel();
+                }
+            }.start();
+            MyURL.isBooleanface = false;
+        }
 
     }
 
@@ -280,20 +306,21 @@ public final class LoginFaceDetectRGBActivity extends AppCompatActivity implemen
                         mFaceRecongitRGBBase = JSON.parseObject(response, LoinFaceBase.class);
                         if (mFaceRecongitRGBBase.isSuc()) {//人脸识别成功  //扫描成功
                             MyURL.id = "" + mFaceRecongitRGBBase.getData().getId();
-//                            startActivity(new Intent(LoginFaceDetectRGBActivity.this, MainActivity.class));
+                            //                            startActivity(new Intent(LoginFaceDetectRGBActivity.this, MainActivity.class));
                             startActivity(new Intent(LoginFaceDetectRGBActivity.this, LogwebActivity.class));
                             finish();
                         }
                     } catch (Exception e) {
                         Toast.makeText(this, "未成功识别", Toast.LENGTH_SHORT).show();
-                        Log.e("Exception",e.toString());
+                        Log.e("Exception", e.toString());
                         e.printStackTrace();
                     }
                 }
                 break;
         }
     }
-    public void forgive(){//查无此人
+
+    public void forgive() {//查无此人
         NiceDialog.init()
                 .setLayoutId(R.layout.thisperson_dialog)
                 .setConvertListener(new ViewConvertListener() {
@@ -622,10 +649,15 @@ public final class LoginFaceDetectRGBActivity extends AppCompatActivity implemen
     private void configureCamera(int width, int height) {
         Camera.Parameters parameters = mCamera.getParameters();
         // Set the PreviewSize and AutoFocus:
+        ViewGroup.LayoutParams layoutParams= mView.getLayoutParams();
+
+        layoutParams.width=width;
+        layoutParams.height=height;
         setOptimalPreviewSize(parameters, width, height);
         setAutoFocus(parameters);
         // And set the parameters:
         mCamera.setParameters(parameters);
+
     }
 
     private void setOptimalPreviewSize(Camera.Parameters cameraParameters, int width, int height) {
@@ -658,6 +690,7 @@ public final class LoginFaceDetectRGBActivity extends AppCompatActivity implemen
             prevSettingHeight = 120;
         }
 
+        int size = previewWidth > previewHeight ? previewHeight : previewWidth;
         cameraParameters.setPreviewSize(previewSize.width, previewSize.height);
 
         mFaceView.setPreviewWidth(previewWidth);
@@ -913,17 +946,19 @@ public final class LoginFaceDetectRGBActivity extends AppCompatActivity implemen
             });
         }
     }
-    public Bitmap convertViewToBitmap(View view){
+
+    public Bitmap convertViewToBitmap(View view) {
 
         view.setDrawingCacheEnabled(true);
 
         view.buildDrawingCache();
 
-        Bitmap bitmap=view.getDrawingCache();
+        Bitmap bitmap = view.getDrawingCache();
 
         return bitmap;
 
     }
+
     public String bitmaptoString(Bitmap bitmap) {
         //将Bitmap转换成字符串
         String string = null;

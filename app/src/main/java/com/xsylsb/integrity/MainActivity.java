@@ -350,4 +350,10 @@ public class MainActivity extends AppCompatActivity implements HttpCallBack , St
     public void StowMainInfc() {
         finish();
     }
+
+    @Override
+    public void onBackPressed() {
+
+    }
+
 }

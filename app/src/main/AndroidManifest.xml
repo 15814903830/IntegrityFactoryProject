@@ -15,6 +15,7 @@
     <uses-feature android:name="android.hardware.camera.autofocus" />
 
     <application
+        android:screenOrientation="portrait"
         android:allowBackup="true"
         android:icon="@mipmap/icon"
         android:label="@string/app_name"
@@ -22,8 +23,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/TranslucentStatusTheme">
-        <activity android:name=".face.activity.AddFaceRGBActivity"
-            android:screenOrientation="fullSensor"
+        <activity
+            android:name=".face.activity.AddFaceRGBActivity"
             android:theme="@style/Face"
             ></activity>
         <activity android:name=".mylogin.LogwebActivity"></activity>
@@ -67,11 +68,9 @@
 
         <activity
             android:name=".face.activity.FaceDetectRGBActivity"
-            android:screenOrientation="fullSensor"
             android:theme="@style/Face" />
         <activity
             android:name=".face.activity.ui.LoginFaceDetectRGBActivity"
-            android:screenOrientation="fullSensor"
             android:theme="@style/Face" />
     </application>
 

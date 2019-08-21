@@ -146,6 +146,13 @@ public class MyloginActivity extends AppCompatActivity implements HttpCallBack {
         }
     }
 
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        MyURL.isBooleanface=true;
+    }
+
     private void requestCameraPermission(final int RC_HANDLE_CAMERA_PERM) {
 
         final String[] permissions = new String[]{Manifest.permission.CAMERA};
@@ -212,8 +219,8 @@ public class MyloginActivity extends AppCompatActivity implements HttpCallBack {
                         succeed.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
+                                dialog.dismiss();
                                 addface();
-                                finish();
                             }
 
                         });
@@ -508,4 +515,8 @@ public class MyloginActivity extends AppCompatActivity implements HttpCallBack {
                 .show(getSupportFragmentManager());
     }
 
+    @Override
+    public void onBackPressed() {
+
+    }
 }

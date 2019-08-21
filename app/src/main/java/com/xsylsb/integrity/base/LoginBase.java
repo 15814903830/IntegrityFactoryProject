@@ -124,7 +124,7 @@ public class LoginBase {
         private int gender;
         private String birthday;
         private Object companyId;
-        private int workShopId;
+        private String workShopId;
         private String workAreaId;
         private int jobId;
         private int dengJi;
@@ -356,11 +356,11 @@ public class LoginBase {
             this.companyId = companyId;
         }
 
-        public int getWorkShopId() {
+        public String getWorkShopId() {
             return workShopId;
         }
 
-        public void setWorkShopId(int workShopId) {
+        public void setWorkShopId(String workShopId) {
             this.workShopId = workShopId;
         }
 
