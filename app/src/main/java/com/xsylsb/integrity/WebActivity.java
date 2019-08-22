@@ -40,6 +40,7 @@ public class WebActivity extends AppCompatActivity {
     public static final String KEY_TITLE = "title";
     private String mUrl = "";
     private String mTitle = "";
+    private boolean mBoolean=false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,13 +60,18 @@ public class WebActivity extends AppCompatActivity {
             }
         });
 
-
-
-
-
-
-
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (mBoolean){
+            webView.loadUrl(mUrl);
+        }
+        mBoolean=true;
+    }
+
+
     private void initData() {
         mUrl = getIntent().getStringExtra(KEY_URL);
         //mTitle = getIntent().getStringExtra(KEY_TITLE);

@@ -259,7 +259,6 @@ public class Examination_Activity extends AppCompatActivity implements MyTopicSu
         }else if (mCommitanswerBase.isSuc()) {//答对
             startActivity(new Intent(Examination_Activity.this, TranscriptQualifiedActivity.class));
             finish();
-            commitanswer();
         } else  {
             startActivity(new Intent(Examination_Activity.this, TranscriptFailActivity.class));
             finish();
@@ -282,7 +281,7 @@ public class Examination_Activity extends AppCompatActivity implements MyTopicSu
         //获取当前时间
         Date date = new Date(System.currentTimeMillis());
         commitanswers(simpleDateFormat.format(date),""+timesum,""+truesum,""+(mExUserBaseList.size()-truesum),true,answer);
-
+        Log.e("commitanswer","提交答案按钮");
     }
 
 
@@ -394,15 +393,16 @@ public class Examination_Activity extends AppCompatActivity implements MyTopicSu
             public void run() {
                 try {
                     JSONObject jsonObject=new JSONObject();
-                    jsonObject.put("courseId","2");//培训id
+                    jsonObject.put("courseId",id);//培训id
                     jsonObject.put("workerId",MyURL.id);//登录传来的id
                     jsonObject.put("startTime",startTime);//开始时间
                     jsonObject.put("takeUpTime",takeUpTime);//考试时长
                     jsonObject.put("correctNumber",truesum);//答对数量
-                    jsonObject.put("correctNumber",falsesumfinal);//答错数量
+                    jsonObject.put("errornumber",falsesumfinal);//答错数量
                     jsonObject.put("isqualified",ifqualified);//是否合格
                     jsonObject.put("answerCard",answer);//答错数量
                     OkHttpUtils.doPostJson(MyURL.URL+"CourseExamRecord",jsonObject.toString(),mHttpCallBack,1);
+                    Log.e("commitanswer","提交答案HTTP");
                 } catch (JSONException e) {
                     e.printStackTrace();
 
@@ -455,13 +455,14 @@ public class Examination_Activity extends AppCompatActivity implements MyTopicSu
                     }.start();
                 } catch (Exception e) {
                     e.printStackTrace();
+                    Log.e("responsee",e.toString());
                     Toast.makeText(this, "获取数据失败", Toast.LENGTH_SHORT).show();
                 }
                 break;
             case 1:
                 try {
                     mCommitanswerBase= JSON.parseObject(response, CommitanswerBase.class);
-                    Log.e("mCommitanswerBase", mCommitanswerBase.getMsg());
+                    Log.e("mCommitanswerBase", response);
                     initcommtian(mCommitanswerBase);//验证结果
                 } catch (Exception e) {
                     e.printStackTrace();
