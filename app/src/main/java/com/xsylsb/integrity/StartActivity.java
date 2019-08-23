@@ -1,8 +1,11 @@
 package com.xsylsb.integrity;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Message;
@@ -35,7 +38,9 @@ public class StartActivity extends AppCompatActivity implements HttpCallBack {
         sp = getSharedPreferences("info",MODE_PRIVATE);
          numberStr1 = sp.getString("number","");
          passwordStr2 = sp.getString("password","");
-        Login();
+         if (isNetworkConnected(this)){
+             Login();
+         }
         /** 倒计时60秒，一次1秒 */
         timer = new CountDownTimer(1* 1000, 1000) {
             @Override
@@ -106,14 +111,17 @@ public class StartActivity extends AppCompatActivity implements HttpCallBack {
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Log.e("mylog","服务器异常");
-                    Toast.makeText(this, "服务器异常", Toast.LENGTH_SHORT).show();
+                    if (isNetworkConnected(this)){
+                    }else {
+                        Intent intent = new Intent();
+                        intent.setClass(this, MyloginActivity.class);
+                        startActivity(intent);
+                        finish();
+                        Toast.makeText(this, "请检查网络连接", Toast.LENGTH_SHORT).show();
+                    }
                 }
                 break;
-
         }
-
-
     }
 
     @SuppressLint("HandlerLeak")
@@ -131,8 +139,17 @@ public class StartActivity extends AppCompatActivity implements HttpCallBack {
 
 
 
-
-
+    public boolean isNetworkConnected(Context context) {
+        if (context != null) {
+            ConnectivityManager mConnectivityManager = (ConnectivityManager) context
+                    .getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo mNetworkInfo = mConnectivityManager.getActiveNetworkInfo();
+            if (mNetworkInfo != null) {
+                return mNetworkInfo.isAvailable();
+            }
+        }
+        return false;
+    }
 
 
 

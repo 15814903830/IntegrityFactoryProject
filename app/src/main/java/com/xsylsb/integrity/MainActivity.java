@@ -99,10 +99,15 @@ public class MainActivity extends AppCompatActivity implements HttpCallBack , St
         Title = "欢迎您，" + getIntent().getStringExtra("name");
         mainTvHome.setSelected(true);
         //首页
-        if (homepageFragment == null) {
-            homepageFragment = HomepageFragment.newInstance();
-        }
-        showFragment(homepageFragment,"HOME");
+//        if (homepageFragment == null) {
+//            homepageFragment = HomepageFragment.newInstance();
+//        }
+//        showFragment(homepageFragment,"HOME");
+
+        homepageFragment = HomepageFragment.newInstance();
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.main, homepageFragment)
+                .commit();
 
     }
 
@@ -111,10 +116,12 @@ public class MainActivity extends AppCompatActivity implements HttpCallBack , St
         switch (view.getId()) {
             case R.id.main_ll_home:
                 //首页
-                if (homepageFragment == null) {
                     homepageFragment = HomepageFragment.newInstance();
-                }
-                showFragment(homepageFragment,"HOME");
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.main, homepageFragment)
+                        .commit();
+
+               // showFragment(homepageFragment,"HOME");
                 mainTvHome.setSelected(true);
                 mainTvTrain.setSelected(false);
                 mainTvScan.setSelected(false);
@@ -122,12 +129,18 @@ public class MainActivity extends AppCompatActivity implements HttpCallBack , St
                 mainTvPersonage.setSelected(false);
                 break;
             case R.id.main_ll_train:
-                //培训
-                if (mTrainFragment == null) {
-                    mTrainFragment = TrainFragment.newInstance();
-                }
+//                //培训
+//                if (mTrainFragment == null) {
+//                    mTrainFragment = TrainFragment.newInstance();
+//                }
+//
+//                showFragment(mTrainFragment,"TRAIN");
+                mTrainFragment = TrainFragment.newInstance();
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.main, mTrainFragment)
+                        .commit();
 
-                showFragment(mTrainFragment,"TRAIN");
+
                 mainTvHome.setSelected(false);
                 mainTvTrain.setSelected(true);
                 mainTvScan.setSelected(false);
@@ -154,15 +167,21 @@ public class MainActivity extends AppCompatActivity implements HttpCallBack , St
                                 linearLayout.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
+                                        if (isNetworkConnected(MainActivity.this)){
                                         //二维吗
                                         startActivityForResult(new Intent(MainActivity.this, QRCodeActivity.class), 0);
                                         dialog.dismiss();
+                                        }else {
+                                            Toast.makeText(mContext, "请检查网络链接", Toast.LENGTH_SHORT).show();
+                                            dialog.dismiss();
+                                        }
                                     }
                                 });
 
                                 linearLayout1.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
+                                        if (isNetworkConnected(MainActivity.this)){
                                         //人脸识别
                                         int rc = ActivityCompat.checkSelfPermission(mContext, Manifest.permission.CAMERA);
                                         if (rc == PackageManager.PERMISSION_GRANTED) {
@@ -172,6 +191,10 @@ public class MainActivity extends AppCompatActivity implements HttpCallBack , St
                                             requestCameraPermission(RC_HANDLE_CAMERA_PERM_RGB);
                                         }
                                         dialog.dismiss();
+                                        }else {
+                                            Toast.makeText(mContext, "请检查网络链接", Toast.LENGTH_SHORT).show();
+                                            dialog.dismiss();
+                                        }
                                     }
                                 });
 
@@ -181,8 +204,6 @@ public class MainActivity extends AppCompatActivity implements HttpCallBack , St
                         .setShowBottom(false)
                         .setAnimStyle(R.style.PracticeModeAnimation)
                         .show(getSupportFragmentManager());
-
-
                 mainTvHome.setSelected(false);
                 mainTvTrain.setSelected(false);
                 mainTvScan.setSelected(true);
@@ -190,11 +211,16 @@ public class MainActivity extends AppCompatActivity implements HttpCallBack , St
                 mainTvPersonage.setSelected(false);
                 break;
             case R.id.main_ll_notice:
-                //通知
-                if (mNoticeFragment == null) {
-                    mNoticeFragment = NoticeFragment.newInstance();
-                }
-                showFragment(mNoticeFragment,"NOTICE");
+//                //通知
+//                if (mNoticeFragment == null) {
+//                    mNoticeFragment = NoticeFragment.newInstance();
+//                }
+//                showFragment(mNoticeFragment,"NOTICE");
+
+                mNoticeFragment = NoticeFragment.newInstance();
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.main, mNoticeFragment)
+                        .commit();
                 mainTvHome.setSelected(false);
                 mainTvTrain.setSelected(false);
                 mainTvScan.setSelected(false);
@@ -203,11 +229,16 @@ public class MainActivity extends AppCompatActivity implements HttpCallBack , St
                 break;
 
             case R.id.main_ll_personage:
-                //个人
-                                if (mPersonageFragment==null){
-                                    mPersonageFragment = PersonageFragment.newInstance(this);
-                                }
-                showFragment(mPersonageFragment,"PERSINAGE");
+              //个人
+                //                                if (mPersonageFragment==null){
+                //                                    mPersonageFragment = PersonageFragment.newInstance(this);
+                //                                }
+                //
+                //                showFragment(mPersonageFragment,"PERSINAGE");
+                mPersonageFragment = PersonageFragment.newInstance(this);
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.main, mPersonageFragment)
+                        .commit();
                 mainTvHome.setSelected(false);
                 mainTvTrain.setSelected(false);
                 mainTvScan.setSelected(false);
@@ -239,6 +270,18 @@ public class MainActivity extends AppCompatActivity implements HttpCallBack , St
             mFragment=fragment;
             mtag=tag;
         }
+
+    public boolean isNetworkConnected(Context context) {
+        if (context != null) {
+            ConnectivityManager mConnectivityManager = (ConnectivityManager) context
+                    .getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo mNetworkInfo = mConnectivityManager.getActiveNetworkInfo();
+            if (mNetworkInfo != null) {
+                return mNetworkInfo.isAvailable();
+            }
+        }
+        return false;
+    }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);

@@ -17,6 +17,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.xsylsb.integrity.Examination_Activity;
 import com.xsylsb.integrity.MainActivity;
@@ -242,4 +243,5 @@ public class PersonageFragment extends MVPBaseFragment<PersonageContract.View, P
                 .setShowBottom(false)
                 .show(getChildFragmentManager());
     }
+
 }

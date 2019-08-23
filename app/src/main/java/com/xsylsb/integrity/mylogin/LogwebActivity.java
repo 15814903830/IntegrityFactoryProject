@@ -30,6 +30,17 @@ public class LogwebActivity extends AppCompatActivity {
         initView();
         webView.loadUrl("http://liugangapi.gx11.cn/Worker/Credit?id="+ MyURL.id);
         MyURL.isBooleanface=true;
+
+        webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                Log.e("urkkk", url);
+                    webView.loadUrl(url);
+
+                return true;
+            }
+
+        });
     }
 
     public void ShowMain(View view) {

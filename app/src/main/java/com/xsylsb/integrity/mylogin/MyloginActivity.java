@@ -10,9 +10,12 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
@@ -21,6 +24,7 @@ import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -98,10 +102,13 @@ public class MyloginActivity extends AppCompatActivity implements HttpCallBack {
 
         context = this;
         mHttpCallBack = this;
-        getVersion();
+        if (isNetworkConnected(this)){
+            getVersion();
+        }
         Log.e("codename", getAppVersionName(this));
         initCallBack();
     }
+
 
     private void showthispersondialog() {//判断人脸识别是否查无此人
         if (getIntent().getStringExtra("thispersondialog") != null) {
@@ -130,16 +137,31 @@ public class MyloginActivity extends AppCompatActivity implements HttpCallBack {
                 password.postInvalidate();
                 break;
             case R.id.btn_login:
-                Login();
+                if (isNetworkConnected(this)){
+                    if ( identitycard.getText().toString().equals("")){
+                        Toast.makeText(context, "请输入账号", Toast.LENGTH_SHORT).show();
+                    }else if (password.getText().toString().equals("")){
+                        Toast.makeText(context, "请输入密码", Toast.LENGTH_SHORT).show();
+                    }else {
+                        Login();
+                    }
+
+                }else {
+                    Toast.makeText(this,"请检查网络连接", Toast.LENGTH_SHORT).show();
+                }
                 break;
             case R.id.ll_face_login:
                 //人脸识别
+                if (isNetworkConnected(this)){
                 int rc = ActivityCompat.checkSelfPermission(MyloginActivity.this, Manifest.permission.CAMERA);
                 if (rc == PackageManager.PERMISSION_GRANTED) {
                     Intent intent = new Intent(MyloginActivity.this, LoginFaceDetectRGBActivity.class);
                     startActivity(intent);
                 } else {
                     requestCameraPermission(RC_HANDLE_CAMERA_PERM_RGB);
+                }
+                }else {
+                    Toast.makeText(this,"请检查网络连接", Toast.LENGTH_SHORT).show();
                 }
                 //人脸识别
                 break;
@@ -285,8 +307,11 @@ public class MyloginActivity extends AppCompatActivity implements HttpCallBack {
                                     TextView update = holder.getView(R.id.version_update);//更新
                                     TextView suspendupdate = holder.getView(R.id.version_suspendupdate);//取消更新
                                     TextView tv_androidDescription = holder.getView(R.id.tv_androidDescription);//取消更新
+                                    if (mVersionBase.getAndroidForceUpdate().toString().equals("true")){
+                                        suspendupdate.setVisibility(View.GONE);
+                                    }
                                     tv_androidDescription.setText("" + mVersionBase.getAndroidDescription());
-                                    updateprogress = holder.getView(R.id.update_progress);//取消更新
+                                    updateprogress = holder.getView(R.id.update_progress);
                                     update.setOnClickListener(new View.OnClickListener() {
                                         @Override
                                         public void onClick(View v) {
@@ -518,5 +543,17 @@ public class MyloginActivity extends AppCompatActivity implements HttpCallBack {
     @Override
     public void onBackPressed() {
 
+    }
+
+    public boolean isNetworkConnected(Context context) {
+        if (context != null) {
+            ConnectivityManager mConnectivityManager = (ConnectivityManager) context
+                    .getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo mNetworkInfo = mConnectivityManager.getActiveNetworkInfo();
+            if (mNetworkInfo != null) {
+                return mNetworkInfo.isAvailable();
+            }
+        }
+        return false;
     }
 }
