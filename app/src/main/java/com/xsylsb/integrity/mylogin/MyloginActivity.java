@@ -82,7 +82,7 @@ public class MyloginActivity extends AppCompatActivity implements HttpCallBack {
     private VersionBase mVersionBase;
     private TextView updateprogress;
     private InstallUtils.DownloadCallBack downloadCallBack;
-    private String apkDownloadPath = "http://119.27.173.65:10086/xiaobaisi/picture/liugang.apk";
+    private String apkDownloadPath = "";
     private SharedPreferences sp;
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
     private static String[] PERMISSIONS_STORAGE = {
@@ -324,11 +324,9 @@ public class MyloginActivity extends AppCompatActivity implements HttpCallBack {
                                             //意思就是发送值为com.example.mymessage的这样一条广播
                                             //申请SD卡权限
                                             if (!PermissionUtils.isGrantSDCardReadPermission(context)) {
-                                                Log.e("if", "-----");
                                                 verifyStoragePermissions(MyloginActivity.this);
                                                 PermissionUtils.requestSDCardReadPermission(context, 100);
                                             } else {
-                                                Log.e("apk", "" + mVersionBase.getAndroidDownloadUrl());
                                                 InstallUtils.with(context)
                                                         //必须-下载地址
                                                         .setApkUrl("" + mVersionBase.getAndroidDownloadUrl())
@@ -374,21 +372,6 @@ public class MyloginActivity extends AppCompatActivity implements HttpCallBack {
         }
     };
 
-    /**
-     * 返回当前程序版本号
-     */
-    public static String getAppVersionCode(Context context) {
-        int versioncode = 0;
-        try {
-            PackageManager pm = context.getPackageManager();
-            PackageInfo pi = pm.getPackageInfo(context.getPackageName(), 0);
-            // versionName = pi.versionName;
-            versioncode = pi.versionCode;
-        } catch (Exception e) {
-            Log.e("VersionInfo", "Exception", e);
-        }
-        return versioncode + "";
-    }
 
     /**
      * 返回当前程序版本名
