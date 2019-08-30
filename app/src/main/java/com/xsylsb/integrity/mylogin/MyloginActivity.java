@@ -268,7 +268,7 @@ public class MyloginActivity extends AppCompatActivity implements HttpCallBack {
                     MyURL.id = "" + mLoginBase.getData().getId();
 
                     try {
-                        if (mLoginBase.getData().getFaceImages().equals("")){
+                        if (mLoginBase.getData().getFaceImages().equals("")&mLoginBase.getData().getCompanyId()==null){
                             getface();//没有就添加
                         }else {
                             startActivity(new Intent(MyloginActivity.this,LogwebActivity.class));
@@ -282,8 +282,8 @@ public class MyloginActivity extends AppCompatActivity implements HttpCallBack {
                             finish();
                         }
                     } catch (Exception e) {
-                        getface();//没有就添加
                         e.printStackTrace();
+                        Log.e("Exception",e.toString());
                     }
 
 

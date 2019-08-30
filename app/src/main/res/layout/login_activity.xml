@@ -64,6 +64,7 @@
                 android:layout_height="20dp" />
 
             <EditText
+                android:text="110105198001011606"
                 android:id="@+id/identitycard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:gravity="center"
+    android:orientation="vertical"
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:background="@drawable/btn_dialog_search_8"
+        android:layout_width="295dp"
+        android:layout_height="240dp">
+        <EditText
+            android:id="@+id/et_search_noid"
+            android:background="@null"
+            android:layout_marginHorizontal="5dp"
+            android:layout_marginTop="30dp"
+            android:padding="20dp"
+            android:gravity="center"
+            android:hint="请输入身份证号或厂牌号搜索"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <LinearLayout
+            android:gravity="center"
+            android:orientation="vertical"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="0dp">
+
+            <LinearLayout
+                android:visibility="gone"
+                android:id="@+id/ll_zhongjiang"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+            <LinearLayout
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+            <TextView
+                android:textSize="13sp"
+                android:text="搜索“ "
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+                <TextView
+                    android:id="@+id/tv_idno"
+                    android:textSize="13sp"
+                    android:text="44018668443367"
+                    android:textColor="#00BA94"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+                <TextView
+                    android:textSize="13sp"
+                    android:text=" ”"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+            <TextView
+                android:id="@+id/tv_onpersonal"
+                android:layout_marginTop="14dp"
+                android:gravity="center"
+                android:text="您不是此人上级,无法查看此人信息"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+            <LinearLayout
+                android:visibility="gone"
+                android:id="@+id/ll_personal"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:layout_marginTop="14dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:textSize="15sp"
+                    android:textColor="#333333"
+                    android:text="是否查看 "
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+                <TextView
+                    android:id="@+id/tv_fullName"
+                    android:textSize="15sp"
+                    android:textColor="#00BA94"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+                <TextView
+                    android:textSize="15sp"
+                    android:textColor="#333333"
+                    android:text=" 个人信息"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+            </LinearLayout>
+
+
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/ll_search"
+            android:gravity="center"
+            android:background="#00BA94"
+            android:layout_width="match_parent"
+            android:layout_height="50dp">
+            <TextView
+                android:gravity="center"
+                android:id="@+id/tv_search"
+                android:text="搜索"
+                android:textSize="17sp"
+                android:textColor="#FFFFFF"
+                android:layout_width="100dp"
+                android:layout_height="50dp" />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/ll_search_again"
+            android:visibility="gone"
+            android:gravity="center"
+            android:background="#666666"
+            android:layout_width="match_parent"
+            android:layout_height="50dp">
+            <TextView
+                android:gravity="center"
+                android:id="@+id/tv_search_again"
+                android:text="重新搜索"
+                android:textSize="17sp"
+                android:textColor="#FFFFFF"
+                android:layout_width="100dp"
+                android:layout_height="match_parent" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_Immediately_check"
+            android:visibility="gone"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:background="#666666"
+            android:layout_width="match_parent"
+            android:layout_height="50dp">
+            <TextView
+                android:id="@+id/tv_Immediately_again"
+                android:gravity="center"
+                android:layout_weight="1"
+                android:text="重新搜索"
+                android:textSize="17sp"
+                android:textColor="#FFFFFF"
+                android:layout_width="0dp"
+                android:layout_height="match_parent" />
+            <TextView
+                android:id="@+id/tv_Immediately_search"
+                android:gravity="center"
+                android:layout_weight="1"
+                android:text="立即查看"
+                android:textSize="17sp"
+                android:background="#00BA94"
+                android:layout_width="0dp"
+                android:layout_height="match_parent" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

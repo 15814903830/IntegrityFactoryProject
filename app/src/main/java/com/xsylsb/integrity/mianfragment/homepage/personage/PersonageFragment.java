@@ -1,12 +1,18 @@
 package com.xsylsb.integrity.mianfragment.homepage.personage;
 
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,42 +21,71 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.alibaba.fastjson.JSON;
 import com.xsylsb.integrity.Examination_Activity;
 import com.xsylsb.integrity.MainActivity;
 import com.xsylsb.integrity.PracticeMode_Activity;
+import com.xsylsb.integrity.QRCodeActivity;
 import com.xsylsb.integrity.R;
 import com.xsylsb.integrity.WebActivity;
+import com.xsylsb.integrity.face.activity.FaceDetectRGBActivity;
 import com.xsylsb.integrity.mianfragment.homepage.homepage.HomepageFragment;
 import com.xsylsb.integrity.mianfragment.homepage.notice.NoticeFragment;
 import com.xsylsb.integrity.mvp.MVPBaseFragment;
 import com.xsylsb.integrity.mylogin.MyloginActivity;
+import com.xsylsb.integrity.util.HttpCallBack;
 import com.xsylsb.integrity.util.MyURL;
+import com.xsylsb.integrity.util.OkHttpUtils;
+import com.xsylsb.integrity.util.RequestParams;
 import com.xsylsb.integrity.util.StowMainInfc;
 import com.xsylsb.integrity.util.dialog.BaseNiceDialog;
 import com.xsylsb.integrity.util.dialog.NiceDialog;
 import com.xsylsb.integrity.util.dialog.ViewConvertListener;
 import com.xsylsb.integrity.util.dialog.ViewHolder;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 个人
  */
 
-public class PersonageFragment extends MVPBaseFragment<PersonageContract.View, PersonagePresenter> implements PersonageContract.View {
+public class PersonageFragment extends MVPBaseFragment<PersonageContract.View, PersonagePresenter> implements PersonageContract.View, HttpCallBack {
 
     private static StowMainInfc stowMainInfcss;
     private View mView;
     private ProgressBar progressBar;
     private WebView webView;
-    private String mUrl = MyURL.URLL+"Worker/PersonalCenter";
+    private String mUrl = MyURL.URLL + "Worker/PersonalCenter";
     private BaseNiceDialog mBaseNiceDialog;
     public static final String KEY_URL = "url";
     public static final String KEY_TITLE = "title";
     private String mTitle = "";
-    private boolean showlading=true;
+    private boolean showlading = true;
+    private HttpCallBack mHttpCallBack;
+    private String id = "";
+    TextView onpersonal;
+    private LinearLayout llzhongjiang;
+    LinearLayout Immediately;
+    LinearLayout searchagain;
+    LinearLayout personal;
+    TextView tvfullName;
+    EditText etnoid;
+    LinearLayout search;
+    TextView tvsearch;
+    TextView tvsearchagain;
+    TextView tv_idno;
+    String idno = "";
+
     /**
      * Fragment 的构造函数。
      */
@@ -58,32 +93,33 @@ public class PersonageFragment extends MVPBaseFragment<PersonageContract.View, P
     }
 
     public static PersonageFragment newInstance(StowMainInfc stowMainInfc) {
-        stowMainInfcss=stowMainInfc;
+        stowMainInfcss = stowMainInfc;
         return new PersonageFragment();
     }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mView=inflater.inflate(R.layout.homefragment,container,false);
-        if (showlading){
+        mView = inflater.inflate(R.layout.homefragment, container, false);
+        if (showlading) {
             showLoading();
-            showlading=false;
+            showlading = false;
         }
-        mUrl=mUrl+"?id="+MyURL.id;
-        Log.e("Personageurl",mUrl);
-
+        mUrl = mUrl + "?id=" + MyURL.id;
+        Log.e("Personageurl", mUrl);
         initView();
         webView.loadUrl(mUrl);
+        mHttpCallBack = this;
         return mView;
     }
+
     private void initView() {
         progressBar = mView.findViewById(R.id.pb_web);
         webView = mView.findViewById(R.id.wv_web);
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                Log.e("urlPersonagessss",url);
-              if(url.contains("Worker/Logout")){//退出
+                if (url.contains("Worker/Logout")) {//退出
                     NiceDialog.init()
                             .setLayoutId(R.layout.exit_dialog)
                             .setConvertListener(new ViewConvertListener() {
@@ -103,8 +139,6 @@ public class PersonageFragment extends MVPBaseFragment<PersonageContract.View, P
                                         public void onClick(View v) {
                                             startActivity(new Intent(getContext(), MyloginActivity.class));
                                             stowMainInfcss.StowMainInfc();
-
-
                                         }
                                     });
                                 }
@@ -114,19 +148,21 @@ public class PersonageFragment extends MVPBaseFragment<PersonageContract.View, P
                             .setAnimStyle(R.style.PracticeModeAnimation)
                             .setOutCancel(false) //触摸外部是否取消
                             .show(getChildFragmentManager());
-                }else if (url.contains("Worker/MyCourse")){
-                  Log.e("urlssss",url);
-                  Intent intent=new Intent(getContext(), WebActivity.class);
-                  intent.putExtra(KEY_URL,url);
-                  intent.putExtra(KEY_TITLE,mTitle);
-                  startActivity(intent);
-              }  else {
-                  Log.e("else",url);
-                    Intent intent=new Intent(getContext(), WebActivity.class);
-                    intent.putExtra(KEY_URL,url);
-                    intent.putExtra(KEY_TITLE,mTitle);
+                } else if (url.contains("Worker/MyCourse")) {
+                    Log.e("urlssss", url);
+                    Intent intent = new Intent(getContext(), WebActivity.class);
+                    intent.putExtra(KEY_URL, url);
+                    intent.putExtra(KEY_TITLE, mTitle);
                     startActivity(intent);
-              }
+                } else if (url.contains("Worker/SearchSubordinate")) {
+                    searchid();
+                } else {
+                    Log.e("else", url);
+                    Intent intent = new Intent(getContext(), WebActivity.class);
+                    intent.putExtra(KEY_URL, url);
+                    intent.putExtra(KEY_TITLE, mTitle);
+                    startActivity(intent);
+                }
 
                 return true;
             }
@@ -149,7 +185,7 @@ public class PersonageFragment extends MVPBaseFragment<PersonageContract.View, P
             @Override
             public void onReceivedTitle(WebView view, String title) {
                 super.onReceivedTitle(view, title);
-                mTitle=title;
+                mTitle = title;
 
             }
 
@@ -225,6 +261,7 @@ public class PersonageFragment extends MVPBaseFragment<PersonageContract.View, P
             webView = null;
         }
     }
+
     /**
      * 显示loading
      */
@@ -244,4 +281,142 @@ public class PersonageFragment extends MVPBaseFragment<PersonageContract.View, P
                 .show(getChildFragmentManager());
     }
 
+    /**
+     * 扫一扫和人脸识别
+     */
+    public void searchid() {
+        NiceDialog.init()
+                .setLayoutId(R.layout.dialog_search)
+                .setConvertListener(new ViewConvertListener() {
+                    @Override
+                    protected void convertView(ViewHolder holder, final BaseNiceDialog dialog) {
+                        llzhongjiang = holder.getView(R.id.ll_zhongjiang);//中部
+                        search = holder.getView(R.id.ll_search);//搜索
+                        searchagain = holder.getView(R.id.ll_search_again);//重新搜索
+                        Immediately = holder.getView(R.id.ll_Immediately_check);//立即查看和重新搜索
+                        onpersonal = holder.getView(R.id.tv_onpersonal);//您不是此人上级,无法查看此人信息
+                        etnoid = holder.getView(R.id.et_search_noid);//输入内容
+                        personal = holder.getView(R.id.ll_personal);//是否查看
+                        tvfullName = holder.getView(R.id.tv_fullName);//名字
+                        tvsearch = holder.getView(R.id.tv_search);
+                        tvsearchagain = holder.getView(R.id.tv_search_again);
+                        tv_idno = holder.getView(R.id.tv_idno);
+                        tvsearch.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {//搜索
+                                Log.e("search", "search");
+                                if (etnoid.getText().toString().equals("")) {
+                                    Toast.makeText(getContext(), "请输入信息", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    idno = etnoid.getText().toString();
+                                    tv_idno.setText(idno);
+                                    getmessageid(etnoid.getText().toString());//调起接口查询
+                                }
+                            }
+                        });
+
+
+                        tvsearchagain.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {//重新搜索
+                                llzhongjiang.setVisibility(View.GONE);
+                                etnoid.setVisibility(View.VISIBLE);
+                                search.setVisibility(View.VISIBLE);
+                                searchagain.setVisibility(View.GONE);
+                                etnoid.setText("");
+                            }
+                        });
+                        TextView tvImmediatelyagain = holder.getView(R.id.tv_Immediately_search);//立即查看
+                        tvImmediatelyagain.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Intent intent = new Intent(getContext(), PersonagewebActivity.class);
+                                intent.putExtra("id", id);
+                                startActivity(intent);
+                                dialog.dismiss();
+                            }
+                        });
+                        TextView tvImmediatelysearch = holder.getView(R.id.tv_Immediately_again);//重新搜索
+                        tvImmediatelysearch.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                llzhongjiang.setVisibility(View.GONE);
+                                etnoid.setVisibility(View.VISIBLE);
+                                search.setVisibility(View.VISIBLE);
+                                searchagain.setVisibility(View.GONE);
+                                Immediately.setVisibility(View.GONE);
+                                etnoid.setText("");
+                            }
+                        });
+                    }
+                })
+                .setDimAmount(0.1f)
+                .setShowBottom(false)
+                .setAnimStyle(R.style.PracticeModeAnimation)
+                .show(getChildFragmentManager());
+    }
+
+    private void getmessageid(final String idno) {
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                List<RequestParams> list = new ArrayList<>();
+                list.add(new RequestParams("idNo", idno));
+                OkHttpUtils.doGet(MyURL.URL + "SearchSubordinate/" + MyURL.id, list, mHttpCallBack, 0);
+            }
+        }).start();
+    }
+
+    @Override
+    public void onResponse(String response, int requestId) {
+        Message message = mHandler.obtainMessage();
+        message.what = requestId;
+        message.obj = response;
+        mHandler.sendMessage(message);
+    }
+
+    @Override
+    public void onHandlerMessageCallback(String response, int requestId) {
+        JSONObject jsonObject = null;
+        try {
+            jsonObject = new JSONObject(response);
+            if (jsonObject.getString("suc").equals("false")) {
+                //没有找到您的下属人员信息
+                onpersonal.setText(jsonObject.getString("msg"));
+                onpersonal.setVisibility(View.VISIBLE);
+                llzhongjiang.setVisibility(View.VISIBLE);
+                etnoid.setVisibility(View.GONE);
+                personal.setVisibility(View.GONE);
+                search.setVisibility(View.GONE);
+                searchagain.setVisibility(View.VISIBLE);
+            } else if (jsonObject.getString("suc").equals("true")) {
+                Log.e("response", response);
+                PersonageBase personageBse = new PersonageBase();
+                personageBse = JSON.parseObject(response, PersonageBase.class);
+                id = "" + personageBse.getData().getId();
+                tvfullName.setText(personageBse.getData().getFullName());
+                Immediately.setVisibility(View.VISIBLE);
+                personal.setVisibility(View.VISIBLE);
+                llzhongjiang.setVisibility(View.VISIBLE);
+                searchagain.setVisibility(View.GONE);
+                onpersonal.setVisibility(View.GONE);
+                search.setVisibility(View.GONE);
+                etnoid.setVisibility(View.GONE);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @SuppressLint("HandlerLeak")
+    private Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            int requestId = msg.what;
+            String response = (String) msg.obj;
+            onHandlerMessageCallback(response, requestId);
+        }
+    };
 }

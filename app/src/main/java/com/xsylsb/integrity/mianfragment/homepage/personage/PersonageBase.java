@@ -1,20 +1,13 @@
-package com.xsylsb.integrity.base;
+package com.xsylsb.integrity.mianfragment.homepage.personage;
 
 import java.util.List;
 
-/**
- * @author glsite.com
- * @version $Rev$
- * @des ${TODO}
- * @updateAuthor $Author$
- * @updateDes ${TODO}
- */
-public class LoginBase {
+public class PersonageBase {
 
     /**
-     * data : {"age":26,"dengJiTag":"厂级","statusTag":"在岗","workShop":null,"company":null,"workArea":null,"workAreaNames":null,"workJob":null,"securityClassHour":0,"sanJiAnQuanPeiXunClassHour":0,"zaiJiaoYuPeiXunClassHour":0,"badRecord":null,"jurisdictionValues":null,"id":24,"role":0,"bossId":1,"userName":null,"idno":"340102199305011501","idstarTime":null,"idendTime":null,"faceImages":null,"password":"5CE22403A04C2AB1","fullName":"宋先生01测试领导","gender":0,"birthday":"1993-05-01T00:00:00","companyId":null,"workShopId":2300,"workAreaId":"2100000001","jobId":117,"dengJi":1,"safetyExamination":false,"isCompanyHead":false,"isSpecialOperator":false,"isSafetyManager":false,"totalBadRecordScore":0,"totalViolationRecord":0,"totalCompanyHour":0,"status":0,"leaveTime":null,"createTime":"2019-07-15T14:13:02.953","blacklist":null,"courseExamRecord":[],"courseSignIn":[],"forceCourseExamRecord":[],"jobRecord":[],"notice":[],"operationCertificate":[],"workAreaBoss":[],"workerJurisdiction":[]}
+     * data : {"age":47,"dengJiTag":"车间/科室级","statusTag":"在岗","workShop":null,"company":null,"workArea":null,"workAreaNames":null,"workJob":null,"securityClassHour":0,"sanJiAnQuanPeiXunClassHour":0,"zaiJiaoYuPeiXunClassHour":0,"badRecord":null,"jurisdictionValues":null,"id":36,"role":0,"bossId":2,"userName":null,"idno":"81301014","idstarTime":null,"idendTime":null,"faceImages":"UploadFiles/TenCentFaces/201908//Member36/a0430253-7fb1-4374-97dd-8f49114a178b.png","password":"EEE6856C870DE22D0F975E35ECA55E50","fullName":"彭仕军","gender":1,"birthday":"1972-02-19T00:00:00","companyId":null,"workShopId":11,"workAreaId":"11","jobId":26,"dengJi":2,"safetyExamination":false,"isCompanyHead":false,"isSpecialOperator":false,"isSafetyManager":false,"totalBadRecordScore":0,"totalViolationRecord":0,"totalCompanyHour":0,"status":0,"leaveTime":null,"createTime":"2019-07-15T16:26:33.023","blacklist":null,"workerJurisdiction":null,"courseExamRecord":[],"courseSignIn":[],"forceCourseExamRecord":[],"jobRecord":[],"notice":[],"operationCertificate":[],"workAreaBoss":[]}
      * suc : true
-     * msg : 登录成功
+     * msg : /Worker/Credit/36
      */
 
     private DataBean data;
@@ -47,8 +40,8 @@ public class LoginBase {
 
     public static class DataBean {
         /**
-         * age : 26
-         * dengJiTag : 厂级
+         * age : 47
+         * dengJiTag : 车间/科室级
          * statusTag : 在岗
          * workShop : null
          * company : null
@@ -60,23 +53,23 @@ public class LoginBase {
          * zaiJiaoYuPeiXunClassHour : 0
          * badRecord : null
          * jurisdictionValues : null
-         * id : 24
+         * id : 36
          * role : 0
-         * bossId : 1
+         * bossId : 2
          * userName : null
-         * idno : 340102199305011501
+         * idno : 81301014
          * idstarTime : null
          * idendTime : null
-         * faceImages : null
-         * password : 5CE22403A04C2AB1
-         * fullName : 宋先生01测试领导
-         * gender : 0
-         * birthday : 1993-05-01T00:00:00
+         * faceImages : UploadFiles/TenCentFaces/201908//Member36/a0430253-7fb1-4374-97dd-8f49114a178b.png
+         * password : EEE6856C870DE22D0F975E35ECA55E50
+         * fullName : 彭仕军
+         * gender : 1
+         * birthday : 1972-02-19T00:00:00
          * companyId : null
-         * workShopId : 2300
-         * workAreaId : 2100000001
-         * jobId : 117
-         * dengJi : 1
+         * workShopId : 11
+         * workAreaId : 11
+         * jobId : 26
+         * dengJi : 2
          * safetyExamination : false
          * isCompanyHead : false
          * isSpecialOperator : false
@@ -86,8 +79,9 @@ public class LoginBase {
          * totalCompanyHour : 0
          * status : 0
          * leaveTime : null
-         * createTime : 2019-07-15T14:13:02.953
+         * createTime : 2019-07-15T16:26:33.023
          * blacklist : null
+         * workerJurisdiction : null
          * courseExamRecord : []
          * courseSignIn : []
          * forceCourseExamRecord : []
@@ -95,7 +89,6 @@ public class LoginBase {
          * notice : []
          * operationCertificate : []
          * workAreaBoss : []
-         * workerJurisdiction : []
          */
 
         private int age;
@@ -118,13 +111,13 @@ public class LoginBase {
         private String idno;
         private Object idstarTime;
         private Object idendTime;
-        private Object faceImages;
+        private String faceImages;
         private String password;
         private String fullName;
         private int gender;
         private String birthday;
-        private String companyId;
-        private String workShopId;
+        private Object companyId;
+        private int workShopId;
         private String workAreaId;
         private int jobId;
         private int dengJi;
@@ -139,6 +132,7 @@ public class LoginBase {
         private Object leaveTime;
         private String createTime;
         private Object blacklist;
+        private Object workerJurisdiction;
         private List<?> courseExamRecord;
         private List<?> courseSignIn;
         private List<?> forceCourseExamRecord;
@@ -146,7 +140,6 @@ public class LoginBase {
         private List<?> notice;
         private List<?> operationCertificate;
         private List<?> workAreaBoss;
-        private List<?> workerJurisdiction;
 
         public int getAge() {
             return age;
@@ -308,11 +301,11 @@ public class LoginBase {
             this.idendTime = idendTime;
         }
 
-        public Object getFaceImages() {
+        public String getFaceImages() {
             return faceImages;
         }
 
-        public void setFaceImages(Object faceImages) {
+        public void setFaceImages(String faceImages) {
             this.faceImages = faceImages;
         }
 
@@ -348,19 +341,19 @@ public class LoginBase {
             this.birthday = birthday;
         }
 
-        public String getCompanyId() {
+        public Object getCompanyId() {
             return companyId;
         }
 
-        public void setCompanyId(String companyId) {
+        public void setCompanyId(Object companyId) {
             this.companyId = companyId;
         }
 
-        public String getWorkShopId() {
+        public int getWorkShopId() {
             return workShopId;
         }
 
-        public void setWorkShopId(String workShopId) {
+        public void setWorkShopId(int workShopId) {
             this.workShopId = workShopId;
         }
 
@@ -476,6 +469,14 @@ public class LoginBase {
             this.blacklist = blacklist;
         }
 
+        public Object getWorkerJurisdiction() {
+            return workerJurisdiction;
+        }
+
+        public void setWorkerJurisdiction(Object workerJurisdiction) {
+            this.workerJurisdiction = workerJurisdiction;
+        }
+
         public List<?> getCourseExamRecord() {
             return courseExamRecord;
         }
@@ -530,14 +531,6 @@ public class LoginBase {
 
         public void setWorkAreaBoss(List<?> workAreaBoss) {
             this.workAreaBoss = workAreaBoss;
-        }
-
-        public List<?> getWorkerJurisdiction() {
-            return workerJurisdiction;
-        }
-
-        public void setWorkerJurisdiction(List<?> workerJurisdiction) {
-            this.workerJurisdiction = workerJurisdiction;
         }
     }
 }

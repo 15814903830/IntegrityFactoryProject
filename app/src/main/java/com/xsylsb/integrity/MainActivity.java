@@ -149,66 +149,7 @@ public class MainActivity extends AppCompatActivity implements HttpCallBack , St
                 break;
             case R.id.main_ll_scan:
                 //扫一扫
-                NiceDialog.init()
-                        .setLayoutId(R.layout.sanc_dialog)
-                        .setConvertListener(new ViewConvertListener() {
-                            @Override
-                            protected void convertView(ViewHolder holder, final BaseNiceDialog dialog) {
-                                LinearLayout linearLayout = holder.getView(R.id.sanc_ll_code);
-                                LinearLayout linearLayout1 = holder.getView(R.id.sanc_ll_face);
-                                TextView textView = holder.getView(R.id.sanc_ll_close);
-                                textView.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        dialog.dismiss();
-                                    }
-                                });
-
-                                linearLayout.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        if (isNetworkConnected(MainActivity.this)){
-                                        //二维吗
-                                        startActivityForResult(new Intent(MainActivity.this, QRCodeActivity.class), 0);
-                                        dialog.dismiss();
-                                        }else {
-                                            Toast.makeText(mContext, "请检查网络链接", Toast.LENGTH_SHORT).show();
-                                            dialog.dismiss();
-                                        }
-                                    }
-                                });
-
-                                linearLayout1.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        if (isNetworkConnected(MainActivity.this)){
-                                        //人脸识别
-                                        int rc = ActivityCompat.checkSelfPermission(mContext, Manifest.permission.CAMERA);
-                                        if (rc == PackageManager.PERMISSION_GRANTED) {
-                                            Intent intent = new Intent(mContext, FaceDetectRGBActivity.class);
-                                            startActivity(intent);
-                                        } else {
-                                            requestCameraPermission(RC_HANDLE_CAMERA_PERM_RGB);
-                                        }
-                                        dialog.dismiss();
-                                        }else {
-                                            Toast.makeText(mContext, "请检查网络链接", Toast.LENGTH_SHORT).show();
-                                            dialog.dismiss();
-                                        }
-                                    }
-                                });
-
-                            }
-                        })
-                        .setDimAmount(0.1f)
-                        .setShowBottom(false)
-                        .setAnimStyle(R.style.PracticeModeAnimation)
-                        .show(getSupportFragmentManager());
-                mainTvHome.setSelected(false);
-                mainTvTrain.setSelected(false);
-                mainTvScan.setSelected(true);
-                mainTvNotice.setSelected(false);
-                mainTvPersonage.setSelected(false);
+                scan();
                 break;
             case R.id.main_ll_notice:
 //                //通知
@@ -251,6 +192,71 @@ public class MainActivity extends AppCompatActivity implements HttpCallBack , St
     }
 
 
+    /**
+     * 扫一扫和人脸识别
+     * */
+    public void scan(){
+        NiceDialog.init()
+                .setLayoutId(R.layout.sanc_dialog)
+                .setConvertListener(new ViewConvertListener() {
+                    @Override
+                    protected void convertView(ViewHolder holder, final BaseNiceDialog dialog) {
+                        LinearLayout linearLayout = holder.getView(R.id.sanc_ll_code);
+                        LinearLayout linearLayout1 = holder.getView(R.id.sanc_ll_face);
+                        TextView textView = holder.getView(R.id.sanc_ll_close);
+                        textView.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                dialog.dismiss();
+                            }
+                        });
+
+                        linearLayout.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                if (isNetworkConnected(MainActivity.this)){
+                                    //二维吗
+                                    startActivityForResult(new Intent(MainActivity.this, QRCodeActivity.class), 0);
+                                    dialog.dismiss();
+                                }else {
+                                    Toast.makeText(mContext, "请检查网络链接", Toast.LENGTH_SHORT).show();
+                                    dialog.dismiss();
+                                }
+                            }
+                        });
+
+                        linearLayout1.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                if (isNetworkConnected(MainActivity.this)){
+                                    //人脸识别
+                                    int rc = ActivityCompat.checkSelfPermission(mContext, Manifest.permission.CAMERA);
+                                    if (rc == PackageManager.PERMISSION_GRANTED) {
+                                        Intent intent = new Intent(mContext, FaceDetectRGBActivity.class);
+                                        startActivity(intent);
+                                    } else {
+                                        requestCameraPermission(RC_HANDLE_CAMERA_PERM_RGB);
+                                    }
+                                    dialog.dismiss();
+                                }else {
+                                    Toast.makeText(mContext, "请检查网络链接", Toast.LENGTH_SHORT).show();
+                                    dialog.dismiss();
+                                }
+                            }
+                        });
+
+                    }
+                })
+                .setDimAmount(0.1f)
+                .setShowBottom(false)
+                .setAnimStyle(R.style.PracticeModeAnimation)
+                .show(getSupportFragmentManager());
+        mainTvHome.setSelected(false);
+        mainTvTrain.setSelected(false);
+        mainTvScan.setSelected(true);
+        mainTvNotice.setSelected(false);
+        mainTvPersonage.setSelected(false);
+    }
         private void showFragment(Fragment fragment,String tag){
 
         if (tag.equals(mtag)){
