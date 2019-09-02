@@ -28,7 +28,7 @@ import com.xsylsb.integrity.util.dialog.ViewConvertListener;
 import com.xsylsb.integrity.util.dialog.ViewHolder;
 
 /**
- *  公告
+ *  通知
  */
 
 public class NoticeFragment extends MVPBaseFragment<NoticeContract.View, NoticePresenter> implements NoticeContract.View {

@@ -1,18 +1,15 @@
 package com.xsylsb.integrity.mianfragment.homepage.personage;
 
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.pm.PackageManager;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,15 +25,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
-import com.xsylsb.integrity.Examination_Activity;
-import com.xsylsb.integrity.MainActivity;
-import com.xsylsb.integrity.PracticeMode_Activity;
-import com.xsylsb.integrity.QRCodeActivity;
 import com.xsylsb.integrity.R;
 import com.xsylsb.integrity.WebActivity;
-import com.xsylsb.integrity.face.activity.FaceDetectRGBActivity;
-import com.xsylsb.integrity.mianfragment.homepage.homepage.HomepageFragment;
-import com.xsylsb.integrity.mianfragment.homepage.notice.NoticeFragment;
 import com.xsylsb.integrity.mvp.MVPBaseFragment;
 import com.xsylsb.integrity.mylogin.MyloginActivity;
 import com.xsylsb.integrity.util.HttpCallBack;
@@ -54,6 +44,8 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static android.content.Context.MODE_PRIVATE;
 
 /**
  * 个人
@@ -85,7 +77,7 @@ public class PersonageFragment extends MVPBaseFragment<PersonageContract.View, P
     TextView tvsearchagain;
     TextView tv_idno;
     String idno = "";
-
+    private SharedPreferences sp;
     /**
      * Fragment 的构造函数。
      */
@@ -110,6 +102,7 @@ public class PersonageFragment extends MVPBaseFragment<PersonageContract.View, P
         initView();
         webView.loadUrl(mUrl);
         mHttpCallBack = this;
+        sp = getActivity().getSharedPreferences("info", MODE_PRIVATE);
         return mView;
     }
 
@@ -139,6 +132,8 @@ public class PersonageFragment extends MVPBaseFragment<PersonageContract.View, P
                                         public void onClick(View v) {
                                             startActivity(new Intent(getContext(), MyloginActivity.class));
                                             stowMainInfcss.StowMainInfc();
+                                            sp.edit().clear().commit();
+
                                         }
                                     });
                                 }
@@ -233,14 +228,6 @@ public class PersonageFragment extends MVPBaseFragment<PersonageContract.View, P
     }
 
 
-    //    @Override
-    //    public void onBackPressed() {
-    //        if (webView.canGoBack()) {
-    //            webView.goBack();
-    //        } else {
-    //            super.onBackPressed();
-    //        }
-    //    }
 
     @Override
     public void onDestroyView() {
@@ -378,6 +365,7 @@ public class PersonageFragment extends MVPBaseFragment<PersonageContract.View, P
 
     @Override
     public void onHandlerMessageCallback(String response, int requestId) {
+        Log.e("response", "response"+response);
         JSONObject jsonObject = null;
         try {
             jsonObject = new JSONObject(response);

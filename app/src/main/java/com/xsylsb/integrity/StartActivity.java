@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
 import com.xsylsb.integrity.base.LoginBase;
+import com.xsylsb.integrity.mylogin.LogwebActivity;
 import com.xsylsb.integrity.mylogin.MyloginActivity;
 import com.xsylsb.integrity.util.HttpCallBack;
 import com.xsylsb.integrity.util.MyURL;
@@ -101,11 +102,12 @@ public class StartActivity extends AppCompatActivity implements HttpCallBack {
                         MyURL.id = "" + mLoginBase.getData().getId();
                         //登陆操作
                         //验证账号密码，跳转到主页
-                        Intent intent = new Intent();
-                        intent.putExtra("name", mLoginBase.getData().getFullName());
-                        intent.setClass(this, MainActivity.class);
-                        startActivity(intent);
-                        finish();
+                        startActivity(new Intent(StartActivity.this, LogwebActivity.class));
+//                        Intent intent = new Intent();
+//                        intent.putExtra("name", mLoginBase.getData().getFullName());
+//                        intent.setClass(this, MainActivity.class);
+//                        startActivity(intent);
+                       finish();
                     }
                     else {
                     }

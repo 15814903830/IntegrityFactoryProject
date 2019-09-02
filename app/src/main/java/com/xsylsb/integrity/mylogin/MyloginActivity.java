@@ -261,15 +261,30 @@ public class MyloginActivity extends AppCompatActivity implements HttpCallBack {
 
         switch (requestId) {
             case 0:
+                JSONObject jsonObject;
                 Log.e("responsegg",response.toString());
                 mLoginBase = JSON.parseObject(response, LoginBase.class);
-                Log.e("isSuc", "" + mLoginBase.isSuc());
+//
+//                if (true){
+//                    try {
+//                        mLoginBase.getData().getCompanyId();
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+
+
+
                 if (mLoginBase.isSuc()) {
                     MyURL.id = "" + mLoginBase.getData().getId();
-
                     try {
-                        if (mLoginBase.getData().getFaceImages().equals("")&mLoginBase.getData().getCompanyId()==null){
-                            getface();//没有就添加
+                        jsonObject = new JSONObject(response);
+                       // String companyIdss=""+jsonObject.getInt("companyId")==null?"0":"1";
+                        Log.e("companyIdss","-----"+mLoginBase.getData().getCompanyId());
+                        if (jsonObject.optString("faceImages").equals("")){
+                            if (Integer.parseInt(mLoginBase.getData().getCompanyId())>0){
+                                getface();
+                            }
                         }else {
                             startActivity(new Intent(MyloginActivity.this,LogwebActivity.class));
                             //获取Editor
@@ -282,8 +297,16 @@ public class MyloginActivity extends AppCompatActivity implements HttpCallBack {
                             finish();
                         }
                     } catch (Exception e) {
-                        e.printStackTrace();
                         Log.e("Exception",e.toString());
+                        startActivity(new Intent(MyloginActivity.this,LogwebActivity.class));
+                        //获取Editor
+                        SharedPreferences.Editor editor = sp.edit();
+                        //输入内容
+                        editor.putString("number", identitycard.getText().toString());
+                        editor.putString("password", password.getText().toString());
+                        //必须提交才会生效，也可以使用apply
+                        editor.commit();
+                        finish();
                     }
 
 
