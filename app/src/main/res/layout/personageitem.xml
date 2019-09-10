@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:id="@+id/ll_zonbuju"
+    android:orientation="vertical"
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    <TextView
+        android:id="@+id/tv_person_name_item"
+        android:layout_marginLeft="@dimen/dp_10"
+        android:layout_weight="2"
+        android:layout_marginTop="15sp"
+        android:textColor="#333333"
+        android:textSize="18sp"
+        android:text="李启明"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content" />
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_weight="6"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:layout_marginTop="15sp"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:gravity="center"
+                android:background="@drawable/personitembtn"
+                android:textColor="#00AF81"
+                android:text="厂牌"
+                android:layout_width="45dp"
+                android:layout_height="18dp" />
+            <TextView
+                android:id="@+id/tv_brand"
+                android:layout_marginLeft="@dimen/dp_10"
+                android:text="44555555555222666555"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+    </LinearLayout>
+    </LinearLayout>
+    <View
+        android:background="#E6E6E6"
+        android:layout_marginTop="15dp"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"/>
+</LinearLayout>
