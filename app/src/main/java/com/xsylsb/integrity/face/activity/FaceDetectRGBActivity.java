@@ -225,15 +225,11 @@ public final class FaceDetectRGBActivity extends AppCompatActivity implements Su
                         if (mFaceRecongitRGBBase.isSuc()){
                             succeeddialog();//成功
                         }else {
-                            if (mFaceRecongitRGBBase.getData().getFaceImages().equals("null")){
-                                getface();//没有就添加
-                            }else {
-                                Toast.makeText(this, "识别错误", Toast.LENGTH_SHORT).show();
-                            }
+                            forgive();
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
-                        // forgive();
+                         forgive();
                         Log.e("catch", e.toString());
                     }
 
@@ -277,7 +273,7 @@ public final class FaceDetectRGBActivity extends AppCompatActivity implements Su
 
     public void forgive() {//查无此人
         NiceDialog.init()
-                .setLayoutId(R.layout.thisperson_dialog)
+                .setLayoutId(R.layout.thispersons_dialog2)
                 .setConvertListener(new ViewConvertListener() {
                     @Override
                     protected void convertView(ViewHolder holder, final BaseNiceDialog dialog) {

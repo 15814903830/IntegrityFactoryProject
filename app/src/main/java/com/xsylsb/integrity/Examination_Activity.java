@@ -57,11 +57,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 /**
- * @author glsite.com
- * @version $Rev$
- * @des ${TODO}
- * @updateAuthor $Author$
- * @updateDes ${TODO}
+ * 考试
  */
 public class Examination_Activity extends AppCompatActivity implements MyTopicSum, MylistviewInterface,HttpCallBack {
     @BindView(R.id.iv_return_examination)

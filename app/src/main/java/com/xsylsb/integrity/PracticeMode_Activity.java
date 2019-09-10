@@ -55,11 +55,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 /**
- * @author glsite.com
- * @version $Rev$
- * @des ${TODO}
- * @updateAuthor $Author$
- * @updateDes ${TODO}
+ * 练习
  */
 public class PracticeMode_Activity extends AppCompatActivity implements  MyPractilistviewInterface,HttpCallBack {
     LinearLayout mLinearLayout;
@@ -102,7 +98,6 @@ public class PracticeMode_Activity extends AppCompatActivity implements  MyPract
     private List<Listuser> mListusers = new ArrayList<>();
     private CountDownTimer timer;
     private Listuser listuser;
-    private List<String> mStringList = new ArrayList<>();
     List<TopicBase> mTopicBaseList = new ArrayList<>();//假数据
     private int booleansum = 0;
     List<Fragment> mFragmentList = new ArrayList<>();
@@ -127,21 +122,12 @@ public class PracticeMode_Activity extends AppCompatActivity implements  MyPract
         workerid=s.split("&")[1].split("=")[1];
         classificationId=s.split("&")[2].split("=")[1];
 
-
         Log.e("getIntent",url);
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         homeRecyclerview = View.inflate(this, R.layout.recyclview_answer_sheet, null).findViewById(R.id.recylcview_answer_rv);
         ButterKnife.bind(this);
         mHttpCallBack=this;
         getdata();
-        for (int i = 0; i < 5; i++) {
-            mStringList.add("A" + i);//模拟5个选项
-        }
-
-       // Log.e("time",""+ mExamianBase.getCourse().getTimeLength());
-
-
-
         practicemodeViewpager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 
             @Override
