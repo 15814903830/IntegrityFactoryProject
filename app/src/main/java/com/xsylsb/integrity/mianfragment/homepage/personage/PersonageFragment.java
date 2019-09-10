@@ -344,7 +344,6 @@ public class PersonageFragment extends MVPBaseFragment<PersonageContract.View, P
     }
 
     private void getmessageid(final String idno) {
-
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -380,10 +379,9 @@ public class PersonageFragment extends MVPBaseFragment<PersonageContract.View, P
                 searchagain.setVisibility(View.VISIBLE);
             } else if (jsonObject.getString("suc").equals("true")) {
                 Log.e("response", response);
-                PersonageBase personageBse = new PersonageBase();
-                personageBse = JSON.parseObject(response, PersonageBase.class);
-                id = "" + personageBse.getData().getId();
-                tvfullName.setText(personageBse.getData().getFullName());
+                JSONObject  jsonObject1 = new JSONObject(jsonObject.getString("data"));
+                id = jsonObject1.getString("id");
+                tvfullName.setText(jsonObject1.getString("fullName"));
                 Immediately.setVisibility(View.VISIBLE);
                 personal.setVisibility(View.VISIBLE);
                 llzhongjiang.setVisibility(View.VISIBLE);

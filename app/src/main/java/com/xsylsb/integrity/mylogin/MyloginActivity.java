@@ -259,30 +259,17 @@ public class MyloginActivity extends AppCompatActivity implements HttpCallBack {
     @Override
     public void onHandlerMessageCallback(String response, int requestId) {
 
+        Log.d("responsejsonObject",response);
         switch (requestId) {
             case 0:
                 JSONObject jsonObject;
-                Log.e("responsegg",response.toString());
                 mLoginBase = JSON.parseObject(response, LoginBase.class);
-//
-//                if (true){
-//                    try {
-//                        mLoginBase.getData().getCompanyId();
-//                    } catch (Exception e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-
-
-
                 if (mLoginBase.isSuc()) {
                     MyURL.id = "" + mLoginBase.getData().getId();
                     try {
                         jsonObject = new JSONObject(response);
-                       // String companyIdss=""+jsonObject.getInt("companyId")==null?"0":"1";
-                        Log.e("companyIdss","-----"+mLoginBase.getData().getCompanyId());
-                        if (jsonObject.optString("faceImages").equals("")){
-                            if (Integer.parseInt(mLoginBase.getData().getCompanyId())>0){
+                        if (mLoginBase.getData().getFaceImages()==null){
+                            if (mLoginBase.getData().getCompanyId()!=null && Integer.parseInt(mLoginBase.getData().getCompanyId())>0){
                                 getface();
                             }
                         }else {
@@ -298,19 +285,7 @@ public class MyloginActivity extends AppCompatActivity implements HttpCallBack {
                         }
                     } catch (Exception e) {
                         Log.e("Exception",e.toString());
-                        startActivity(new Intent(MyloginActivity.this,LogwebActivity.class));
-                        //获取Editor
-                        SharedPreferences.Editor editor = sp.edit();
-                        //输入内容
-                        editor.putString("number", identitycard.getText().toString());
-                        editor.putString("password", password.getText().toString());
-                        //必须提交才会生效，也可以使用apply
-                        editor.commit();
-                        finish();
                     }
-
-
-
                 } else {
                     Toast.makeText(this, "请输入正确的用户信息", Toast.LENGTH_SHORT).show();
                 }

@@ -240,12 +240,12 @@ public final class AddFaceRGBActivity extends AppCompatActivity implements Surfa
                         mAddFaceBase = JSON.parseObject(response, AddFaceBase.class);
                         Log.e("catchssss", "catch");
                         if (mAddFaceBase.getSuc()){
-                            forgive();//添加人脸成功
+                            forgive(mAddFaceBase.getMsg());//添加人脸成功
                         }else {
-                            forgives();//添加人脸失败
+                            forgives(mAddFaceBase.getMsg());//添加人脸失败
                         }
                     } catch (Exception e) {
-                        forgives();//添加人脸失败
+                        forgives(mAddFaceBase.getMsg());//添加人脸失败
                         e.printStackTrace();
                     }
 
@@ -260,13 +260,15 @@ public final class AddFaceRGBActivity extends AppCompatActivity implements Surfa
     public void succeeddialog() {//扫描成功
     }
 
-    public void forgive() {//添加人脸成功
+    public void forgive(final String msg) {//添加人脸成功
         NiceDialog.init()
                 .setLayoutId(R.layout.thisperson_dialog)
                 .setConvertListener(new ViewConvertListener() {
                     @Override
                     protected void convertView(ViewHolder holder, final BaseNiceDialog dialog) {
                         TextView succeed = holder.getView(R.id.tv_roger);//查看详情
+                        TextView tv_thisperson_msg = holder.getView(R.id.tv_thisperson_msg);//查看详情
+                        tv_thisperson_msg.setText(msg);
                         succeed.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -285,13 +287,15 @@ public final class AddFaceRGBActivity extends AppCompatActivity implements Surfa
                 .show(getSupportFragmentManager());
     }
 
-    public void forgives() {//添加人脸失败
+    public void forgives(final String msg) {//添加人脸失败
         NiceDialog.init()
                 .setLayoutId(R.layout.thispersons_dialog)
                 .setConvertListener(new ViewConvertListener() {
                     @Override
                     protected void convertView(ViewHolder holder, final BaseNiceDialog dialog) {
                         TextView succeed = holder.getView(R.id.tv_roger);//查看详情
+                        TextView tv_thisperson_msg = holder.getView(R.id.tv_thisperson_msg);//查看详情
+                        tv_thisperson_msg.setText(msg);
                         succeed.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
