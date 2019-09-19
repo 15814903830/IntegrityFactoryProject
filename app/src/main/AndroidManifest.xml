@@ -94,9 +94,6 @@
         </receiver>
 
         <activity
-            android:name=".face.activity.FaceDetectRGBActivity"
-            android:theme="@style/Face" />
-        <activity
             android:name=".face.activity.ui.LoginFaceDetectRGBActivity"
             android:theme="@style/Face" />
 
@@ -184,12 +181,22 @@
             </intent-filter>
         </service>
 
+        <activity
+            android:name=".face.activity.FaceDetectRGBActivity"
+            android:theme="@style/Face" />
+        <!--<meta-data-->
+            <!--android:name="com.alibaba.app.appkey"-->
+            <!--android:value="27872816" /> &lt;!&ndash; 请填写你自己的- appKey &ndash;&gt;-->
+        <!--<meta-data-->
+            <!--android:name="com.alibaba.app.appsecret"-->
+            <!--android:value="6adae714480c34a07a47f50eced61070" /> &lt;!&ndash; 请填写你自己的appSecret &ndash;&gt;-->
+
         <meta-data
             android:name="com.alibaba.app.appkey"
-            android:value="27872816" /> <!-- 请填写你自己的- appKey -->
+            android:value="27861969" /> <!-- 请填写你自己的- appKey -->
         <meta-data
             android:name="com.alibaba.app.appsecret"
-            android:value="6adae714480c34a07a47f50eced61070" /> <!-- 请填写你自己的appSecret -->
+            android:value="e5840def81ef3ccf3be38f35901019d3" /> <!-- 请填写你自己的appSecret -->
     </application>
 
 </manifest>

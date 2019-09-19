@@ -1,5 +1,6 @@
 package com.xsylsb.integrity;
 
+import android.annotation.SuppressLint;
 import android.app.Application;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -38,13 +39,14 @@ public class MainApplication extends Application {
         PushServiceFactory.init(applicationContext);
         final CloudPushService pushService = PushServiceFactory.getCloudPushService();
         pushService.register(applicationContext, new CommonCallback() {
+            @SuppressLint("WrongConstant")
             @Override
             public void onSuccess(String response) {
                 Log.i(TAG, "init cloudchannel success");
                 receiveThePush("init cloudchannel success");
 
                 Intent intent = new Intent();
-                intent.setAction("org.agoo.android.intent.action.RECEIVE");
+                intent.setAction("org.agoo.android.intent.8.RECEIVE");
                 intent.setPackage("com.xsylsb.integrity");//pack为应用包名
                 intent.putExtra("type", "common-push");
                 intent.addFlags(32);
@@ -72,6 +74,7 @@ public class MainApplication extends Application {
     }
 
     public static void receiveThePush(String text) {
+        Log.e(TAG,text);
         if (mainActivity != null && text != null) {
             mainActivity.receiveThePush(text);
         }

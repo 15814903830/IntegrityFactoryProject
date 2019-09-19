@@ -54,7 +54,7 @@ import static android.content.Context.MODE_PRIVATE;
  * 个人
  */
 
-public class PersonageFragment extends MVPBaseFragment<PersonageContract.View, PersonagePresenter> implements PersonageContract.View, HttpCallBack ,PersonAdapter.defaultAddress{
+public class PersonageFragment extends MVPBaseFragment<PersonageContract.View, PersonagePresenter> implements PersonageContract.View, HttpCallBack, PersonAdapter.defaultAddress{
 
     private static StowMainInfc stowMainInfcss;
     private View mView;
@@ -366,12 +366,12 @@ public class PersonageFragment extends MVPBaseFragment<PersonageContract.View, P
         try {
                 if (response.length()>150) {
                     Log.e("response", "else");
-                    List<SeekBase> mlist=JSON.parseArray(response,SeekBase.class);
+                    List<SeekBase> mlist=JSON.parseArray(response, SeekBase.class);
                     tv_idno.setText(""+mlist.size());
                     LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(),
                             LinearLayoutManager.VERTICAL, false);
                     recyclerView.setLayoutManager(layoutManager);
-                    PersonAdapter  personAdapter= new PersonAdapter(getContext(), mlist,this);
+                    PersonAdapter personAdapter= new PersonAdapter(getContext(), mlist,this);
                     recyclerView.setAdapter(personAdapter);
                     personAdapter.notifyDataSetChanged();
                     Immediately.setVisibility(View.VISIBLE);

@@ -53,7 +53,6 @@ public class NoticeFragment extends MVPBaseFragment<NoticeContract.View, NoticeP
     }
 
     public void setMainActivity(MainActivity activity) {
-
         this.activity = activity;
     }
 

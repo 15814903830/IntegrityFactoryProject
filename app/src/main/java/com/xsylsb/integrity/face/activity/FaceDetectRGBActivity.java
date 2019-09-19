@@ -16,9 +16,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.YuvImage;
 import android.hardware.Camera;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.ActivityCompat;
@@ -39,16 +37,12 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
-import com.xsylsb.integrity.MainActivity;
 import com.xsylsb.integrity.R;
 import com.xsylsb.integrity.WebActivity;
-import com.xsylsb.integrity.base.FaceRecongitRGBBase;
 import com.xsylsb.integrity.base.LoinFaceBase;
 import com.xsylsb.integrity.face.activity.ui.FaceOverlayView;
-import com.xsylsb.integrity.face.activity.ui.LoginFaceDetectRGBActivity;
 import com.xsylsb.integrity.face.adapter.ImagePreviewAdapter;
 import com.xsylsb.integrity.face.adapter.MyFacelistviewAdapter;
 import com.xsylsb.integrity.face.model.FaceResult;
@@ -68,9 +62,6 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -225,15 +216,11 @@ public final class FaceDetectRGBActivity extends AppCompatActivity implements Su
                         if (mFaceRecongitRGBBase.isSuc()){
                             succeeddialog();//成功
                         }else {
-                            if (mFaceRecongitRGBBase.getData().getFaceImages().equals("null")){
-                                getface();//没有就添加
-                            }else {
-                                Toast.makeText(this, "识别错误", Toast.LENGTH_SHORT).show();
-                            }
+                            forgive();
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
-                        // forgive();
+                         forgive();
                         Log.e("catch", e.toString());
                     }
 
@@ -277,7 +264,7 @@ public final class FaceDetectRGBActivity extends AppCompatActivity implements Su
 
     public void forgive() {//查无此人
         NiceDialog.init()
-                .setLayoutId(R.layout.thisperson_dialog)
+                .setLayoutId(R.layout.thispersons_dialog2)
                 .setConvertListener(new ViewConvertListener() {
                     @Override
                     protected void convertView(ViewHolder holder, final BaseNiceDialog dialog) {
