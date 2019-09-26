@@ -269,7 +269,21 @@ public class MyloginActivity extends AppCompatActivity implements HttpCallBack {
                     try {
                         jsonObject = new JSONObject(response);
                         if (mLoginBase.getData().getFaceImages()==null){
-                            if (mLoginBase.getData().getCompanyId()!=null && Integer.parseInt(mLoginBase.getData().getCompanyId())>0){
+
+                            if (mLoginBase.getData().getCompanyId()==null){
+                                mLoginBase.getData().setCompanyId("0");
+                            }
+                            if (mLoginBase.getData().getCompanyId().equals("0")){
+                                startActivity(new Intent(MyloginActivity.this,LogwebActivity.class));
+                                //获取Editor
+                                SharedPreferences.Editor editor = sp.edit();
+                                //输入内容
+                                editor.putString("number", identitycard.getText().toString());
+                                editor.putString("password", password.getText().toString());
+                                //必须提交才会生效，也可以使用apply
+                                editor.commit();
+                                finish();
+                            }else {
                                 getface();
                             }
                         }else {

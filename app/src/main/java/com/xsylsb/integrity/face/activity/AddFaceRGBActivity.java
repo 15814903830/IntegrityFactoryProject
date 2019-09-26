@@ -179,23 +179,23 @@ public final class AddFaceRGBActivity extends AppCompatActivity implements Surfa
             cameraId = icicle.getInt(BUNDLE_CAMERA_ID, 0);
         }
 
-        if (MyURL.isBooleanface){
-            /** 倒计时60秒，一次1秒 */
-            timer = new CountDownTimer(50, 1000) {
-                @Override
-                public void onTick(long millisUntilFinished) {
-
-                }
-
-                @Override
-                public void onFinish() {
-                    cameraId = (cameraId + 1) % numberOfCameras;
-                    recreate();
-                    timer.cancel();
-                }
-            }.start();
-            MyURL.isBooleanface=false;
-        }
+//        if (MyURL.isBooleanface){
+//            /** 倒计时60秒，一次1秒 */
+//            timer = new CountDownTimer(50, 1000) {
+//                @Override
+//                public void onTick(long millisUntilFinished) {
+//
+//                }
+//
+//                @Override
+//                public void onFinish() {
+//                    cameraId = (cameraId + 1) % numberOfCameras;
+//                    recreate();
+//                    timer.cancel();
+//                }
+//            }.start();
+//            MyURL.isBooleanface=false;
+//        }
 
     }
     private boolean mBoolean = false;

@@ -2,7 +2,6 @@ package com.xsylsb.integrity;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -17,6 +16,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -26,6 +26,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.sdk.android.push.CloudPushService;
+import com.alibaba.sdk.android.push.CommonCallback;
+import com.alibaba.sdk.android.push.noonesdk.PushServiceFactory;
 import com.xsylsb.integrity.base.ScanCodeBase;
 import com.xsylsb.integrity.face.activity.FaceDetectRGBActivity;
 import com.xsylsb.integrity.mianfragment.homepage.homepage.HomepageFragment;
@@ -49,7 +52,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class MainActivity extends AppCompatActivity implements HttpCallBack , StowMainInfc {
+public class MainActivity extends AppCompatActivity implements HttpCallBack, StowMainInfc {
 
     @BindView(R.id.main)
     FrameLayout main;
@@ -61,6 +64,8 @@ public class MainActivity extends AppCompatActivity implements HttpCallBack , St
     TextView mainTvScan;
     @BindView(R.id.main_tv_notice)
     TextView mainTvNotice;
+    @BindView(R.id.tv_notice_dot)
+    public TextView tvNoticeDot;
     @BindView(R.id.main_tv_personage)
     TextView mainTvPersonage;
     @BindView(R.id.main_ll_home)
@@ -88,13 +93,18 @@ public class MainActivity extends AppCompatActivity implements HttpCallBack , St
     private String mtag;
 
     private Context mContext;
+
+    private CloudPushService mPushService;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         ButterKnife.bind(this);
-        mContext=this;
+        MainApplication.setMainActivity(this);
+        mPushService = PushServiceFactory.getCloudPushService();
+        mContext = this;
         mHttpCallBack = this;
         Title = "欢迎您，" + getIntent().getStringExtra("name");
         mainTvHome.setSelected(true);
@@ -111,17 +121,59 @@ public class MainActivity extends AppCompatActivity implements HttpCallBack , St
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        bindAccount();
+        getImei();
+    }
+
+    //收到推送
+    public void receiveThePush(String text) {
+        tvNoticeDot.setVisibility(View.VISIBLE);
+    }
+
+    /**
+     * 绑定账户接口:CloudPushService.bindAccount调用示例
+     * 1. 绑定账号后,可以在服务端通过账号进行推送
+     * 2. 一个设备只能绑定一个账号
+     */
+    private void bindAccount() {
+        mPushService.bindAccount(MyURL.id, new CommonCallback() {
+            @Override
+            public void onSuccess(String s) {
+                Log.i("MainActivity", "绑定账号成功：" + MyURL.id);
+            }
+
+            @Override
+            public void onFailed(String errorCode, String errorMsg) {
+
+            }
+        });
+    }
+
+    private void getImei() {
+        TelephonyManager TelephonyMgr = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(this,"请允许获取设备信息权限",Toast.LENGTH_SHORT);
+            return;
+        }
+        String szImei = TelephonyMgr.getDeviceId();
+       Log.i("MainActivity","设备ID：" + szImei);
+    }
+
     @OnClick({R.id.main_ll_home, R.id.main_ll_train, R.id.main_ll_scan, R.id.main_ll_notice, R.id.main_ll_personage})
     public void MyOnClick(View view) {
         switch (view.getId()) {
             case R.id.main_ll_home:
                 //首页
-                    homepageFragment = HomepageFragment.newInstance();
+                homepageFragment = HomepageFragment.newInstance();
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.main, homepageFragment)
                         .commit();
 
-               // showFragment(homepageFragment,"HOME");
+                // showFragment(homepageFragment,"HOME");
                 mainTvHome.setSelected(true);
                 mainTvTrain.setSelected(false);
                 mainTvScan.setSelected(false);
@@ -157,8 +209,9 @@ public class MainActivity extends AppCompatActivity implements HttpCallBack , St
 //                    mNoticeFragment = NoticeFragment.newInstance();
 //                }
 //                showFragment(mNoticeFragment,"NOTICE");
-
+//                tvNoticeDot.setVisibility(View.GONE);
                 mNoticeFragment = NoticeFragment.newInstance();
+                mNoticeFragment.setMainActivity(this);
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.main, mNoticeFragment)
                         .commit();
@@ -170,7 +223,7 @@ public class MainActivity extends AppCompatActivity implements HttpCallBack , St
                 break;
 
             case R.id.main_ll_personage:
-              //个人
+                //个人
                 //                                if (mPersonageFragment==null){
                 //                                    mPersonageFragment = PersonageFragment.newInstance(this);
                 //                                }
@@ -194,8 +247,8 @@ public class MainActivity extends AppCompatActivity implements HttpCallBack , St
 
     /**
      * 扫一扫和人脸识别
-     * */
-    public void scan(){
+     */
+    public void scan() {
         NiceDialog.init()
                 .setLayoutId(R.layout.sanc_dialog)
                 .setConvertListener(new ViewConvertListener() {
@@ -214,11 +267,11 @@ public class MainActivity extends AppCompatActivity implements HttpCallBack , St
                         linearLayout.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                if (isNetworkConnected(MainActivity.this)){
+                                if (isNetworkConnected(MainActivity.this)) {
                                     //二维吗
                                     startActivityForResult(new Intent(MainActivity.this, QRCodeActivity.class), 0);
                                     dialog.dismiss();
-                                }else {
+                                } else {
                                     Toast.makeText(mContext, "请检查网络链接", Toast.LENGTH_SHORT).show();
                                     dialog.dismiss();
                                 }
@@ -228,7 +281,7 @@ public class MainActivity extends AppCompatActivity implements HttpCallBack , St
                         linearLayout1.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                if (isNetworkConnected(MainActivity.this)){
+                                if (isNetworkConnected(MainActivity.this)) {
                                     //人脸识别
                                     int rc = ActivityCompat.checkSelfPermission(mContext, Manifest.permission.CAMERA);
                                     if (rc == PackageManager.PERMISSION_GRANTED) {
@@ -238,7 +291,7 @@ public class MainActivity extends AppCompatActivity implements HttpCallBack , St
                                         requestCameraPermission(RC_HANDLE_CAMERA_PERM_RGB);
                                     }
                                     dialog.dismiss();
-                                }else {
+                                } else {
                                     Toast.makeText(mContext, "请检查网络链接", Toast.LENGTH_SHORT).show();
                                     dialog.dismiss();
                                 }
@@ -257,25 +310,26 @@ public class MainActivity extends AppCompatActivity implements HttpCallBack , St
         mainTvNotice.setSelected(false);
         mainTvPersonage.setSelected(false);
     }
-        private void showFragment(Fragment fragment,String tag){
 
-        if (tag.equals(mtag)){
+    private void showFragment(Fragment fragment, String tag) {
+
+        if (tag.equals(mtag)) {
             return;
         }
-                  FragmentTransaction fragmentTransaction=fm.beginTransaction();
-            if (mFragment!=null){
-                fragmentTransaction.hide(mFragment);
-            }
-            if (fragment.isAdded()){
-                fragmentTransaction.show(fragment);
-            }else {
-                fragmentTransaction.add(R.id.main,fragment);
-            }
-
-            fragmentTransaction.commit();
-            mFragment=fragment;
-            mtag=tag;
+        FragmentTransaction fragmentTransaction = fm.beginTransaction();
+        if (mFragment != null) {
+            fragmentTransaction.hide(mFragment);
         }
+        if (fragment.isAdded()) {
+            fragmentTransaction.show(fragment);
+        } else {
+            fragmentTransaction.add(R.id.main, fragment);
+        }
+
+        fragmentTransaction.commit();
+        mFragment = fragment;
+        mtag = tag;
+    }
 
     public boolean isNetworkConnected(Context context) {
         if (context != null) {
@@ -288,6 +342,7 @@ public class MainActivity extends AppCompatActivity implements HttpCallBack , St
         }
         return false;
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);

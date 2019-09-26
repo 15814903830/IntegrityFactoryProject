@@ -2,6 +2,7 @@ package com.xsylsb.integrity.mianfragment.homepage.notice;
 
 
 import android.content.Intent;
+import android.opengl.Visibility;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -16,6 +17,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 
+import com.xsylsb.integrity.MainActivity;
 import com.xsylsb.integrity.R;
 import com.xsylsb.integrity.WebActivity;
 import com.xsylsb.integrity.mianfragment.homepage.homepage.HomepageFragment;
@@ -38,6 +40,8 @@ public class NoticeFragment extends MVPBaseFragment<NoticeContract.View, NoticeP
     private String mUrl = MyURL.URLL+"Worker/Announcement";
     private BaseNiceDialog mBaseNiceDialog;
     private boolean showlading=true;
+    private MainActivity activity;
+
     /**
      * Fragment 的构造函数。
      */
@@ -47,6 +51,11 @@ public class NoticeFragment extends MVPBaseFragment<NoticeContract.View, NoticeP
     public static NoticeFragment newInstance() {
         return new NoticeFragment();
     }
+
+    public void setMainActivity(MainActivity activity) {
+        this.activity = activity;
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -61,6 +70,13 @@ public class NoticeFragment extends MVPBaseFragment<NoticeContract.View, NoticeP
         webView.loadUrl(mUrl);
         return mView;
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(activity != null) activity.tvNoticeDot.setVisibility(View.GONE);
+    }
+
     private void initView() {
         progressBar = mView.findViewById(R.id.pb_web);
         webView = mView.findViewById(R.id.wv_web);
@@ -76,7 +92,6 @@ public class NoticeFragment extends MVPBaseFragment<NoticeContract.View, NoticeP
                 }else {
                     webView.loadUrl(url);
                 }
-
                 return true;
             }
             @Override
