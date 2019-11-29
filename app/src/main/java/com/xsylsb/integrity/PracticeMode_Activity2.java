@@ -406,10 +406,14 @@ public class PracticeMode_Activity2 extends AppCompatActivity implements  MyPrac
     public void onHandlerMessageCallback(String response, int requestId) {
         switch (requestId) {
             case 0:
-                Log.e("Practirequest",response);
-                atpyelist= JSON.parseArray(response, ATpyeBase.class);
+                try {
+                    Log.e("Practirequest",response);
+                    atpyelist= JSON.parseArray(response, ATpyeBase.class);
                     ViewComment(atpyelist);
                     initfragmnet();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 break;
         }
     }

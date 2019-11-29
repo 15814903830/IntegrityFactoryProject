@@ -420,26 +420,30 @@ public class PracticeMode_Activity extends AppCompatActivity implements  MyPract
     public void onHandlerMessageCallback(String response, int requestId) {
         switch (requestId) {
             case 0:
-                Log.e("Practirequest",response);
+                try {
+                    Log.e("Practirequest",response);
                     mExamianBase= JSON.parseObject(response, ExamianBase.class);
                     ViewComment(mExamianBase);
                     initfragmnet();
-                   // Toast.makeText(this, "获取数据失败", Toast.LENGTH_SHORT).show();
-                  //  finish();
-                /** 倒计时60秒，一次1秒 */
-                timer = new CountDownTimer(mExamianBase.getCourse().getTimeLength() * 1000, 1000) {
-                    @Override
-                    public void onTick(long millisUntilFinished) {
-                        // TODO Auto-generated method stub
-                        tvPrTime.setText("" + millisUntilFinished / 1000+"s");
-                    }
+                    // Toast.makeText(this, "获取数据失败", Toast.LENGTH_SHORT).show();
+                    //  finish();
+                    /** 倒计时60秒，一次1秒 */
+                    timer = new CountDownTimer(mExamianBase.getCourse().getTimeLength() * 1000, 1000) {
+                        @Override
+                        public void onTick(long millisUntilFinished) {
+                            // TODO Auto-generated method stub
+                            tvPrTime.setText("" + millisUntilFinished / 1000+"s");
+                        }
 
-                    @Override
-                    public void onFinish() {
-                        finish();
-                        startActivity(new Intent(PracticeMode_Activity.this, TranscriptFailActivity.class));//跳转到不及格
-                    }
-                }.start();
+                        @Override
+                        public void onFinish() {
+                            finish();
+                            startActivity(new Intent(PracticeMode_Activity.this, TranscriptFailActivity.class));//跳转到不及格
+                        }
+                    }.start();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 break;
         }
     }

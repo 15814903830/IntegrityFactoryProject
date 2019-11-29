@@ -36,6 +36,7 @@ import com.xsylsb.integrity.mianfragment.homepage.notice.NoticeFragment;
 import com.xsylsb.integrity.mianfragment.homepage.personage.PersonageFragment;
 import com.xsylsb.integrity.mianfragment.homepage.scan.ScanFragment;
 import com.xsylsb.integrity.mianfragment.homepage.train.TrainFragment;
+import com.xsylsb.integrity.util.DataCleanManagerUtils;
 import com.xsylsb.integrity.util.HttpCallBack;
 import com.xsylsb.integrity.util.MyURL;
 import com.xsylsb.integrity.util.OkHttpUtils;
@@ -118,7 +119,7 @@ public class MainActivity extends AppCompatActivity implements HttpCallBack, Sto
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.main, homepageFragment)
                 .commit();
-
+        DataCleanManagerUtils.clearAllCache(this);
     }
 
     @Override

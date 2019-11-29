@@ -35,6 +35,7 @@ import com.xsylsb.integrity.MainActivity;
 import com.xsylsb.integrity.R;
 import com.xsylsb.integrity.WebActivity;
 import com.xsylsb.integrity.base.VersionBase;
+import com.xsylsb.integrity.util.BaseUtils;
 import com.xsylsb.integrity.util.HttpCallBack;
 import com.xsylsb.integrity.util.MyURL;
 import com.xsylsb.integrity.util.OkHttpUtils;
@@ -189,9 +190,7 @@ public class LogwebActivity extends AppCompatActivity implements HttpCallBack {
     @Override
     public void onHandlerMessageCallback(String response, int requestId) {
         mVersionBase = JSON.parseObject(response, VersionBase.class);
-        if (getAppVersionName(this).equals(mVersionBase.getAndroidAppVersion())) {
-            Log.e("verson", "版本相同");
-        } else {
+        if (BaseUtils.checkVersion(LogwebActivity.this, "" + mVersionBase.getAndroidAppVersion())){
             Log.e("verson", "更新操作");
             NiceDialog.init()
                     .setLayoutId(R.layout.version_dialog)

@@ -40,6 +40,7 @@ import com.xsylsb.integrity.base.LoginBase;
 import com.xsylsb.integrity.base.VersionBase;
 import com.xsylsb.integrity.face.activity.AddFaceRGBActivity;
 import com.xsylsb.integrity.face.activity.ui.LoginFaceDetectRGBActivity;
+import com.xsylsb.integrity.util.BaseUtils;
 import com.xsylsb.integrity.util.HttpCallBack;
 import com.xsylsb.integrity.util.MyURL;
 import com.xsylsb.integrity.util.OkHttpUtils;
@@ -307,9 +308,8 @@ public class MyloginActivity extends AppCompatActivity implements HttpCallBack {
             case 1:
                 Log.e("response", response);
                 mVersionBase = JSON.parseObject(response, VersionBase.class);
-                if (getAppVersionName(this).equals(mVersionBase.getAndroidAppVersion())) {
-                    Log.e("verson", "版本相同");
-                } else {
+
+                if (BaseUtils.checkVersion(MyloginActivity.this, "" + mVersionBase.getAndroidAppVersion())){
                     Log.e("verson", "更新操作");
                     NiceDialog.init()
                             .setLayoutId(R.layout.version_dialog)
@@ -365,6 +365,7 @@ public class MyloginActivity extends AppCompatActivity implements HttpCallBack {
                             .setAnimStyle(R.style.PracticeModeAnimation)
                             .setOutCancel(false) //触摸外部是否取消
                             .show(getSupportFragmentManager());
+
                 }
                 break;
 

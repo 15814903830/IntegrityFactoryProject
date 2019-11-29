@@ -7,9 +7,8 @@ android {
         minSdkVersion 21
         targetSdkVersion 28
         versionCode 1
-        versionName "1.4.4"
+        versionName "1.4.5"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
         ndk {
             //选择要添加的对应cpu类型的.so库。
             abiFilters 'armeabi', 'x86'
