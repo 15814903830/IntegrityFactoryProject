@@ -27,6 +27,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
+import com.xsylsb.integrity.PracticeMode_Activity;
+import com.xsylsb.integrity.PracticeMode_Activity2;
 import com.xsylsb.integrity.R;
 import com.xsylsb.integrity.WebActivity;
 import com.xsylsb.integrity.mvp.MVPBaseFragment;
@@ -54,8 +56,9 @@ import static android.content.Context.MODE_PRIVATE;
  * 个人
  */
 
-public class PersonageFragment extends MVPBaseFragment<PersonageContract.View, PersonagePresenter> implements PersonageContract.View, HttpCallBack, PersonAdapter.defaultAddress{
+public class PersonageFragment extends MVPBaseFragment<PersonageContract.View, PersonagePresenter> implements PersonageContract.View, HttpCallBack, PersonAdapter.defaultAddress,TpyeAdapter.gettpyeid {
 
+    private String TAG="PersonageFragment";
     private static StowMainInfc stowMainInfcss;
     private View mView;
     private ProgressBar progressBar;
@@ -70,6 +73,7 @@ public class PersonageFragment extends MVPBaseFragment<PersonageContract.View, P
     private String id = "";
     TextView onpersonal;
     private LinearLayout llzhongjiang;
+    private List<TypeBase> typelist;
     LinearLayout Immediately;
     RecyclerView recyclerView;
     LinearLayout searchagain;
@@ -82,6 +86,8 @@ public class PersonageFragment extends MVPBaseFragment<PersonageContract.View, P
     TextView tv_idno;
     String idno = "";
     private SharedPreferences sp;
+    private String tpyeid="";
+
     /**
      * Fragment 的构造函数。
      */
@@ -102,7 +108,7 @@ public class PersonageFragment extends MVPBaseFragment<PersonageContract.View, P
             showlading = false;
         }
         mUrl = mUrl + "?id=" + MyURL.id;
-        Log.e("Personageurl", mUrl);
+        Log.e(TAG, mUrl);
         initView();
         webView.loadUrl(mUrl);
         mHttpCallBack = this;
@@ -116,6 +122,8 @@ public class PersonageFragment extends MVPBaseFragment<PersonageContract.View, P
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
+
+                Log.e(TAG, url);
                 if (url.contains("Worker/Logout")) {//退出
                     NiceDialog.init()
                             .setLayoutId(R.layout.exit_dialog)
@@ -148,15 +156,18 @@ public class PersonageFragment extends MVPBaseFragment<PersonageContract.View, P
                             .setOutCancel(false) //触摸外部是否取消
                             .show(getChildFragmentManager());
                 } else if (url.contains("Worker/MyCourse")) {
-                    Log.e("urlssss", url);
+                    Log.e(TAG, url);
                     Intent intent = new Intent(getContext(), WebActivity.class);
                     intent.putExtra(KEY_URL, url);
                     intent.putExtra(KEY_TITLE, mTitle);
                     startActivity(intent);
                 } else if (url.contains("Worker/SearchSubordinate")) {
-                    searchid();
+                    searchid();//搜索下属
+                } else if (url.contains("FirstQuestionClassify")) {
+                    getpracticeclassify();//获取练习分类
+                    Log.e(TAG,"FirstQuestionClassify");
                 } else {
-                    Log.e("else", url);
+                    Log.e(TAG, url);
                     Intent intent = new Intent(getContext(), WebActivity.class);
                     intent.putExtra(KEY_URL, url);
                     intent.putExtra(KEY_TITLE, mTitle);
@@ -223,14 +234,13 @@ public class PersonageFragment extends MVPBaseFragment<PersonageContract.View, P
         webSettings.setJavaScriptEnabled(true);
         webSettings.setAllowFileAccessFromFileURLs(true);
         //禁用放缩
-        webSettings.setDisplayZoomControls(false);
-        webSettings.setBuiltInZoomControls(false);
+        webSettings.setDisplayZoomControls(true);
+        webSettings.setBuiltInZoomControls(true);
         //禁用文字缩放
         webSettings.setTextZoom(100);
         //自动加载图片
         webSettings.setLoadsImagesAutomatically(true);
     }
-
 
 
     @Override
@@ -272,6 +282,111 @@ public class PersonageFragment extends MVPBaseFragment<PersonageContract.View, P
                 .show(getChildFragmentManager());
     }
 
+
+    private void getmessageid(final String idno) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                List<RequestParams> list = new ArrayList<>();
+                list.add(new RequestParams("idNo", idno));
+                list.add(new RequestParams("more", "true"));
+                OkHttpUtils.doGet(MyURL.URL + "SearchSubordinate/" + MyURL.id, list, mHttpCallBack, 0);
+            }
+        }).start();
+    }
+
+    private void getpracticeclassify() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                OkHttpUtils.doGet(MyURL.URL + "FirstQuestionClassify", mHttpCallBack, 1);
+            }
+        }).start();
+    }
+
+
+    @Override
+    public void onResponse(String response, int requestId) {
+        Message message = mHandler.obtainMessage();
+        message.what = requestId;
+        message.obj = response;
+        mHandler.sendMessage(message);
+    }
+
+    @Override
+    public void onHandlerMessageCallback(String response, int requestId) {
+        Log.e(TAG, response);
+        switch (requestId){
+            case 0:
+                onHandler0(response);
+                break;
+            case 1:
+                typelist=JSON.parseArray(response,TypeBase.class);
+                selectType(typelist);
+                break;
+        }
+    }
+
+    private void onHandler0(String response) {
+
+        JSONObject jsonObject = null;
+        try {
+            if (response.length() > 150) {
+                Log.e(TAG, "else");
+                List<SeekBase> mlist = JSON.parseArray(response, SeekBase.class);
+                tv_idno.setText("" + mlist.size());
+                LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(),
+                        LinearLayoutManager.VERTICAL, false);
+                recyclerView.setLayoutManager(layoutManager);
+                PersonAdapter personAdapter = new PersonAdapter(getContext(), mlist, this);
+                recyclerView.setAdapter(personAdapter);
+                personAdapter.notifyDataSetChanged();
+                Immediately.setVisibility(View.VISIBLE);
+                personal.setVisibility(View.VISIBLE);
+                llzhongjiang.setVisibility(View.VISIBLE);
+                searchagain.setVisibility(View.GONE);
+                onpersonal.setVisibility(View.GONE);
+                search.setVisibility(View.GONE);
+                etnoid.setVisibility(View.GONE);
+
+            } else {
+                jsonObject = new JSONObject(response);
+                if (!jsonObject.getBoolean("suc")) {
+                    //没有找到您的下属人员信息
+                    Log.e(TAG, "false");
+                    onpersonal.setText(jsonObject.getString("msg"));
+                    onpersonal.setVisibility(View.VISIBLE);
+                    llzhongjiang.setVisibility(View.VISIBLE);
+                    etnoid.setVisibility(View.GONE);
+                    personal.setVisibility(View.GONE);
+                    search.setVisibility(View.GONE);
+                    searchagain.setVisibility(View.VISIBLE);
+                }
+            }
+        } catch (JSONException e) {
+            Log.e(TAG, "response" + e.toString());
+            e.printStackTrace();
+        }
+    }
+
+    @SuppressLint("HandlerLeak")
+    private Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            int requestId = msg.what;
+            String response = (String) msg.obj;
+            onHandlerMessageCallback(response, requestId);
+        }
+    };
+
+    @Override
+    public void seeki(int i) {
+        Intent intent = new Intent(getContext(), PersonagewebActivity.class);
+        intent.putExtra("id", i + "");
+        startActivity(intent);
+    }
+
     /**
      * 查询人员下属名单
      */
@@ -289,7 +404,7 @@ public class PersonageFragment extends MVPBaseFragment<PersonageContract.View, P
                         etnoid = holder.getView(R.id.et_search_noid);//输入内容
                         personal = holder.getView(R.id.ll_personal);//是否查看
                         tvfullName = holder.getView(R.id.tv_fullName);//名字
-                        recyclerView=holder.getView(R.id.dialog_recycl);
+                        recyclerView = holder.getView(R.id.dialog_recycl);
                         tvsearch = holder.getView(R.id.tv_search);
                         tvsearchagain = holder.getView(R.id.tv_search_again);
                         tv_idno = holder.getView(R.id.tv_idno);
@@ -300,7 +415,7 @@ public class PersonageFragment extends MVPBaseFragment<PersonageContract.View, P
                                 if (etnoid.getText().toString().equals("")) {
                                     Toast.makeText(getContext(), "请输入信息", Toast.LENGTH_SHORT).show();
                                 } else {
-                                    KeyBoardUtils.closeKeybord(etnoid,getContext());
+                                    KeyBoardUtils.closeKeybord(etnoid, getContext());
                                     idno = etnoid.getText().toString();
                                     getmessageid(etnoid.getText().toString());//调起接口查询
                                 }
@@ -339,85 +454,49 @@ public class PersonageFragment extends MVPBaseFragment<PersonageContract.View, P
                 .show(getChildFragmentManager());
     }
 
-    private void getmessageid(final String idno) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                List<RequestParams> list = new ArrayList<>();
-                list.add(new RequestParams("idNo", idno));
-                list.add(new RequestParams("more", "true"));
-                OkHttpUtils.doGet(MyURL.URL + "SearchSubordinate/" + MyURL.id, list, mHttpCallBack, 0);
-            }
-        }).start();
-    }
 
-    @Override
-    public void onResponse(String response, int requestId) {
-        Message message = mHandler.obtainMessage();
-        message.what = requestId;
-        message.obj = response;
-        mHandler.sendMessage(message);
-    }
+    /**
+     * 选择分类列表
+     */
+    public void selectType(final List<TypeBase> typelist) {
+        NiceDialog.init()
+                .setLayoutId(R.layout.dialog_selectype)
+                .setConvertListener(new ViewConvertListener() {
+                    @Override
+                    protected void convertView(ViewHolder holder, final BaseNiceDialog dialog) {
+                        RecyclerView recyclerView=holder.getView(R.id.recyclerview_type);
+                        LinearLayout ll_search=holder.getView(R.id.ll_search);
+                        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+                        recyclerView.setLayoutManager(layoutManager);
+                        TpyeAdapter  tpyeAdapter = new TpyeAdapter(getContext(),typelist,PersonageFragment.this);
+                        recyclerView.setAdapter(tpyeAdapter);
 
-    @Override
-    public void onHandlerMessageCallback(String response, int requestId) {
-        Log.e("response", "response"+response.length());
-        JSONObject jsonObject = null;
-        try {
-                if (response.length()>150) {
-                    Log.e("response", "else");
-                    List<SeekBase> mlist=JSON.parseArray(response, SeekBase.class);
-                    tv_idno.setText(""+mlist.size());
-                    LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(),
-                            LinearLayoutManager.VERTICAL, false);
-                    recyclerView.setLayoutManager(layoutManager);
-                    PersonAdapter personAdapter= new PersonAdapter(getContext(), mlist,this);
-                    recyclerView.setAdapter(personAdapter);
-                    personAdapter.notifyDataSetChanged();
-                    Immediately.setVisibility(View.VISIBLE);
-                    personal.setVisibility(View.VISIBLE);
-                    llzhongjiang.setVisibility(View.VISIBLE);
-                    searchagain.setVisibility(View.GONE);
-                    onpersonal.setVisibility(View.GONE);
-                    search.setVisibility(View.GONE);
-                    etnoid.setVisibility(View.GONE);
+                        ll_search.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                if (tpyeid.equals("")){
+                                    Toast.makeText(getContext(), "请选择分类", Toast.LENGTH_SHORT).show();
+                                }else {
+                                    Intent intent=new Intent(getContext(), PracticeMode_Activity2.class);
+                                    intent.putExtra("tpyeid",tpyeid);
+                                    startActivity(intent);
+                                    dialog.dismiss();
+                                }
+                            }
+                        });
 
-            }
-           else {
-                    jsonObject = new JSONObject(response);
-                    if (!jsonObject.getBoolean("suc")){
-                        //没有找到您的下属人员信息
-                        Log.e("response", "false");
-                        onpersonal.setText(jsonObject.getString("msg"));
-                        onpersonal.setVisibility(View.VISIBLE);
-                        llzhongjiang.setVisibility(View.VISIBLE);
-                        etnoid.setVisibility(View.GONE);
-                        personal.setVisibility(View.GONE);
-                        search.setVisibility(View.GONE);
-                        searchagain.setVisibility(View.VISIBLE);
+
                     }
-            }
-        } catch (JSONException e) {
-            Log.e("responseee", "response"+e.toString());
-            e.printStackTrace();
-        }
+                })
+                .setDimAmount(0.1f)
+                .setShowBottom(false)
+                .setOutCancel(true)
+                .setAnimStyle(R.style.PracticeModeAnimation)
+                .show(getChildFragmentManager());
     }
 
-    @SuppressLint("HandlerLeak")
-    private Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            int requestId = msg.what;
-            String response = (String) msg.obj;
-            onHandlerMessageCallback(response, requestId);
-        }
-    };
-
     @Override
-    public void seeki(int i) {
-        Intent intent = new Intent(getContext(), PersonagewebActivity.class);
-        intent.putExtra("id", i+"");
-        startActivity(intent);
+    public void gettpyeid(int i) {
+        tpyeid=""+i;
     }
 }

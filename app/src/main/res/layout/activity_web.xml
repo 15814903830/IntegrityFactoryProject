@@ -34,13 +34,18 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
+        <ImageView
+            android:visibility="gone"
+            android:layout_marginRight="10dp"
+            android:layout_gravity="right"
+            android:id="@+id/iv_ewm"
+            android:src="@mipmap/zuoye06"
+            android:layout_width="@dimen/dp_40"
+            android:layout_height="25dp" />
 
     </android.support.v7.widget.Toolbar>
-
     <WebView
         android:id="@+id/wv_web"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-
-
 </LinearLayout>

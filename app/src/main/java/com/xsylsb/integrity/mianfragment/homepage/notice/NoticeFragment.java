@@ -141,8 +141,8 @@ public class NoticeFragment extends MVPBaseFragment<NoticeContract.View, NoticeP
         webSettings.setJavaScriptEnabled(true);
         webSettings.setAllowFileAccessFromFileURLs(true);
         //禁用放缩
-        webSettings.setDisplayZoomControls(false);
-        webSettings.setBuiltInZoomControls(false);
+        webSettings.setDisplayZoomControls(true);
+        webSettings.setBuiltInZoomControls(true);
         //禁用文字缩放
         webSettings.setTextZoom(100);
         //自动加载图片

@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -19,7 +20,7 @@ import com.uuzuche.lib_zxing.activity.CodeUtils;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class QRCodeActivity extends AppCompatActivity {
+public class QRCode2Activity extends AppCompatActivity {
 
     public static final String RESULT = "result";
     @BindView(R.id.tv_title_qr_code)
@@ -28,7 +29,7 @@ public class QRCodeActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_qrcode);
+        setContentView(R.layout.activity_qrcode2);
         ButterKnife.bind(this);
         initView();
         initPermission();
@@ -83,6 +84,7 @@ public class QRCodeActivity extends AppCompatActivity {
     private CodeUtils.AnalyzeCallback analyzeCallback = new CodeUtils.AnalyzeCallback() {
         @Override
         public void onAnalyzeSuccess(Bitmap mBitmap, String result) {
+            Log.e("resultresult==",result);
             Intent intent = new Intent();
             intent.putExtra(RESULT, result);
             setResult(0, intent);

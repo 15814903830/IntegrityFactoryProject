@@ -25,15 +25,14 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.xsylsb.integrity.Examination_adapter.ExUserBase;
 import com.xsylsb.integrity.Examination_adapter.ExamianBase;
 import com.xsylsb.integrity.Examination_adapter.MyExaminatioFragmentAdapter;
-import com.xsylsb.integrity.Examination_adapter.MyMultipleItem;
+import com.xsylsb.integrity.base.ATpyeBase;
 import com.xsylsb.integrity.base.CommitanswerBase;
 import com.xsylsb.integrity.practicemode_recyclview.Listuser;
-import com.xsylsb.integrity.practicemode_recyclview.MyPrTopicSum;
 import com.xsylsb.integrity.practicemode_recyclview.MyPracticeModeItem;
 import com.xsylsb.integrity.practicemode_recyclview.MyPractilistviewInterface;
-import com.xsylsb.integrity.practicemode_recyclview.PractiBase;
 import com.xsylsb.integrity.practicemode_recyclview.PracticeModeAdapter;
 import com.xsylsb.integrity.practicemode_recyclview.PracticeModeFragment;
+import com.xsylsb.integrity.practicemode_recyclview.PracticeModeFragment2;
 import com.xsylsb.integrity.userbase.TopicBase;
 import com.xsylsb.integrity.util.HttpCallBack;
 import com.xsylsb.integrity.util.MyURL;
@@ -43,9 +42,6 @@ import com.xsylsb.integrity.util.dialog.BaseNiceDialog;
 import com.xsylsb.integrity.util.dialog.NiceDialog;
 import com.xsylsb.integrity.util.dialog.ViewConvertListener;
 import com.xsylsb.integrity.util.dialog.ViewHolder;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,7 +53,7 @@ import butterknife.OnClick;
 /**
  * 练习
  */
-public class PracticeMode_Activity extends AppCompatActivity implements  MyPractilistviewInterface,HttpCallBack {
+public class PracticeMode_Activity2 extends AppCompatActivity implements  MyPractilistviewInterface,HttpCallBack {
     LinearLayout mLinearLayout;
     @BindView(R.id.practicemode_ll)
     LinearLayout mLinearLayoutll;
@@ -105,24 +101,18 @@ public class PracticeMode_Activity extends AppCompatActivity implements  MyPract
     private int vpi=0;
     private int viewp=0;
     private HttpCallBack mHttpCallBack;
-    private ExamianBase mExamianBase;
+    private List<ATpyeBase> atpyelist;
     private boolean mBoolean=true;
     List<ExUserBase> mExUserBaseList = new ArrayList<>();//记录答题数量，答题对错，题目id
     private int truesum=0;
     private String url;
     private String id,workerid,classificationId;
-
+    private String tpyeid;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.practicemode_activity);
-        url=getIntent().getStringExtra("url");
-        String s=url.split("\\?")[1];
-        id=s.split("&")[0].split("=")[1];
-        workerid=s.split("&")[1].split("=")[1];
-        classificationId=s.split("&")[2].split("=")[1];
-
-        Log.e("getIntent",url);
+        setContentView(R.layout.practicemode_activity2);
+        tpyeid=getIntent().getStringExtra("tpyeid");
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         homeRecyclerview = View.inflate(this, R.layout.recyclview_answer_sheet, null).findViewById(R.id.recylcview_answer_rv);
         ButterKnife.bind(this);
@@ -156,14 +146,13 @@ public class PracticeMode_Activity extends AppCompatActivity implements  MyPract
 
     }
     private void initfragmnet(){
-        tvScoreExaminationPr2.setText("" + mExamianBase.getData().size());//总题数
-        Log.e("getData",""+mExamianBase.getData().size());
-        for (int i = 0; i < mExamianBase.getData().size(); i++) {
-            mFragmentList.add(new PracticeModeFragment(mExamianBase.getData().get(i)));
+        tvScoreExaminationPr2.setText("" + atpyelist.size());//总题数
+        for (int i = 0; i <atpyelist.size(); i++) {
+            mFragmentList.add(new PracticeModeFragment2(atpyelist.get(i)));
         }
         MyExaminatioFragmentAdapter examinatioFragmentAdapter = new MyExaminatioFragmentAdapter(getSupportFragmentManager(), mFragmentList);
         practicemodeViewpager.setAdapter(examinatioFragmentAdapter);
-        practicemodeViewpager.setOffscreenPageLimit(mExamianBase.getData().size() - 1);
+        practicemodeViewpager.setOffscreenPageLimit(atpyelist.size() - 1);
 
     }
     @Override
@@ -177,14 +166,14 @@ public class PracticeMode_Activity extends AppCompatActivity implements  MyPract
             case R.id.iv_return_examination:
                 //返回
                     NiceDialog.init()
-                            .setLayoutId(R.layout.examination_continue_and_out_dialog)
+                            .setLayoutId(R.layout.examination_continue_and_out_dialog2)
                             .setConvertListener(new ViewConvertListener() {
                                 @Override
                                 protected void convertView(ViewHolder holder, final BaseNiceDialog dialog) {
                                     TextView textView = holder.getView(R.id.tv_exit_out);//退出
                                     TextView textView2 = holder.getView(R.id.tv_hesitate);//继续考试
                                     TextView textView1 = holder.getView(R.id.tv_sum_out);//剩下题目数量
-                                    textView1.setText("" + (mExamianBase.getData().size() - mExUserBaseList.size()));
+                                    textView1.setText("" + (atpyelist.size() - mExUserBaseList.size()));
                                     textView.setOnClickListener(new View.OnClickListener() {
                                         @Override
                                         public void onClick(View v) {
@@ -219,22 +208,22 @@ public class PracticeMode_Activity extends AppCompatActivity implements  MyPract
                                 TextView textView=holder.getView(R.id.tv_score_prcati1);
                                 textView.setText("" + sum);
                                 TextView textView2=holder.getView(R.id.tv_score__prcati2);
-                                textView2.setText("" + mExamianBase.getData().size());//总题数
+                                textView2.setText("" + atpyelist.size());//总题数
                                 TextView textView4=holder.getView(R.id.tv_recyle_true);
                                 textView4.setText(""+sumtrue);//答对
                                 TextView textView5=holder.getView(R.id.tv_recyle_flase);
                                 textView5.setText(""+sumfalse);//答错
                                 mListusers.clear();
 
-                                Log.e("getData",""+mExamianBase.getData().size());
-                                for (int i = 0; i < mExamianBase.getData().size(); i++) {
+                                Log.e("getData",""+atpyelist.size());
+                                for (int i = 0; i < atpyelist.size(); i++) {
                                     listuser = new Listuser();
                                     listuser.setSelected(i);
                                     mListusers.add(listuser);
                                 }
 
 
-                                recyclerView.setLayoutManager(new GridLayoutManager(PracticeMode_Activity.this, 6, OrientationHelper.VERTICAL, false));
+                                recyclerView.setLayoutManager(new GridLayoutManager(PracticeMode_Activity2.this, 6, OrientationHelper.VERTICAL, false));
                                 //创建适配器
                                 adapter = new PracticeModeAdapter(dast, mListusers);
                                 //给RecyclerView设置适配器
@@ -257,11 +246,11 @@ public class PracticeMode_Activity extends AppCompatActivity implements  MyPract
                 break;
             case R.id.ll_submit_examination_pr:
                 //交卷
-                if (mExamianBase.getData().size() == mExUserBaseList.size() & truesum >= (mExamianBase.getData().size() * 0.6)) {//答对等于或者大于百分之60
-                    startActivity(new Intent(PracticeMode_Activity.this, TranscriptQualifiedActivity.class));
+                if (atpyelist.size() == mExUserBaseList.size() & truesum >= (atpyelist.size() * 0.6)) {//答对等于或者大于百分之60
+                    startActivity(new Intent(PracticeMode_Activity2.this, TranscriptQualifiedActivity.class));
                     finish();
-                } else if (mExamianBase.getData().size() == mExUserBaseList.size() & truesum <= (mExamianBase.getData().size() * 0.6)){
-                    startActivity(new Intent(PracticeMode_Activity.this, TranscriptFailActivity.class));
+                } else if (atpyelist.size() == mExUserBaseList.size() & truesum <= (atpyelist.size() * 0.6)){
+                    startActivity(new Intent(PracticeMode_Activity2.this, TranscriptFailActivity.class));
                     finish();
                 }
 
@@ -273,7 +262,7 @@ public class PracticeMode_Activity extends AppCompatActivity implements  MyPract
                                 protected void convertView(ViewHolder holder, final BaseNiceDialog dialog) {
                                     TextView textView = holder.getView(R.id.tv_exit_dialog);
                                     TextView textView1 = holder.getView(R.id.tv_remain_sum);
-                                    textView1.setText("" + (mExamianBase.getData().size() - mExUserBaseList.size()));
+                                    textView1.setText("" + (atpyelist.size() - mExUserBaseList.size()));
                                     textView.setOnClickListener(new View.OnClickListener() {
                                         @Override
                                         public void onClick(View v) {
@@ -308,9 +297,9 @@ public class PracticeMode_Activity extends AppCompatActivity implements  MyPract
         }
     }
 
-    public void ViewComment(ExamianBase examianBase) {
+    public void ViewComment(List<ATpyeBase> examianBase) {
         //指定布局和传入数据,在HomeAdapter利用MyMultipleItem.FIRST_TYPE的值判断布局
-        for (int i = 0; i < examianBase.getData().size(); i++) {
+        for (int i = 0; i < examianBase.size(); i++) {
             Log.e("getData",""+i);
             this.dast.add(new MyPracticeModeItem(MyPracticeModeItem.NORMAL_TYPE, false));//待答题
         }
@@ -321,7 +310,6 @@ public class PracticeMode_Activity extends AppCompatActivity implements  MyPract
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        timer.cancel();
     }
 
 
@@ -348,8 +336,6 @@ public class PracticeMode_Activity extends AppCompatActivity implements  MyPract
             if (mBoolean) {//不存在为true
                 mExUserBaseList.add(exUserBase);
                 tvScoreExaminationPr1.setText("" + mExUserBaseList.size());//设置答题数量
-                Log.e("mExUserBaseList1",""+mExUserBaseList.size());
-                Log.e("mExUserBaseList2",""+practicemodeViewpager.getCurrentItem());
                 if (mExUserBaseList.size()>=practicemodeViewpager.getCurrentItem()+1){
                     if (mExUserBaseList.get(practicemodeViewpager.getCurrentItem()).isBoolean()){
                         dast.set(practicemodeViewpager.getCurrentItem(),new MyPracticeModeItem(MyPracticeModeItem.FIRST_TYPE, mExUserBaseList.get(practicemodeViewpager.getCurrentItem()).isBoolean()));
@@ -357,10 +343,10 @@ public class PracticeMode_Activity extends AppCompatActivity implements  MyPract
                         dast.set(practicemodeViewpager.getCurrentItem(),new MyPracticeModeItem(MyPracticeModeItem.SECOND_TYPE, mExUserBaseList.get(practicemodeViewpager.getCurrentItem()).isBoolean()));
                     }
                 }else {
+                    Toast.makeText(this, "答题", Toast.LENGTH_SHORT).show();
                 }
             }
-
-            if (mExUserBaseList.size() == mExamianBase.getData().size()) {
+            if (mExUserBaseList.size() == atpyelist.size()) {
                 initwc();
             }
 
@@ -391,19 +377,19 @@ public class PracticeMode_Activity extends AppCompatActivity implements  MyPract
         Mytoast();
     }
 
+
     private void getdata() {
         new Thread(new Runnable() {
             @Override
             public void run() {
                 List<RequestParams> list=new ArrayList<>();
-                list.add(new RequestParams("id",id));
-                list.add(new RequestParams("workerId",workerid));
-                list.add(new RequestParams("classificationId",classificationId));
-                OkHttpUtils.doGet(MyURL.URL+"CourseQuestionBank",list,mHttpCallBack,0);
+                list.add(new RequestParams("classificationId",tpyeid));
+                list.add(new RequestParams("page","1"));
+                list.add(new RequestParams("limit","100"));
+                OkHttpUtils.doGet(MyURL.URL+"Practice",list,mHttpCallBack,0);
             }
         }).start();
     }
-
 
     @Override
     public void onResponse(String response, int requestId) {
@@ -421,25 +407,9 @@ public class PracticeMode_Activity extends AppCompatActivity implements  MyPract
         switch (requestId) {
             case 0:
                 Log.e("Practirequest",response);
-                    mExamianBase= JSON.parseObject(response, ExamianBase.class);
-                    ViewComment(mExamianBase);
+                atpyelist= JSON.parseArray(response, ATpyeBase.class);
+                    ViewComment(atpyelist);
                     initfragmnet();
-                   // Toast.makeText(this, "获取数据失败", Toast.LENGTH_SHORT).show();
-                  //  finish();
-                /** 倒计时60秒，一次1秒 */
-                timer = new CountDownTimer(mExamianBase.getCourse().getTimeLength() * 1000, 1000) {
-                    @Override
-                    public void onTick(long millisUntilFinished) {
-                        // TODO Auto-generated method stub
-                        tvPrTime.setText("" + millisUntilFinished / 1000+"s");
-                    }
-
-                    @Override
-                    public void onFinish() {
-                        finish();
-                        startActivity(new Intent(PracticeMode_Activity.this, TranscriptFailActivity.class));//跳转到不及格
-                    }
-                }.start();
                 break;
         }
     }
@@ -455,5 +425,39 @@ public class PracticeMode_Activity extends AppCompatActivity implements  MyPract
         }
     };
 
-
+    @Override
+    public void onBackPressed() {
+        // super.onBackPressed();//注释掉这行,back键不退出activity
+        //返回
+        NiceDialog.init()
+                .setLayoutId(R.layout.examination_continue_and_out_dialog2)
+                .setConvertListener(new ViewConvertListener() {
+                    @Override
+                    protected void convertView(ViewHolder holder, final BaseNiceDialog dialog) {
+                        TextView textView = holder.getView(R.id.tv_exit_out);//退出
+                        TextView textView2 = holder.getView(R.id.tv_hesitate);//继续考试
+                        TextView textView1 = holder.getView(R.id.tv_sum_out);//剩下题目数量
+                        textView1.setText("" + (atpyelist.size() - mExUserBaseList.size()));
+                        textView.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                dialog.dismiss();
+                                finish();
+                                // startActivity(new Intent(PracticeMode_Activity.this, TranscriptFailActivity.class));//跳转到不及格
+                            }
+                        });
+                        textView2.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                dialog.dismiss();
+                            }
+                        });
+                    }
+                })
+                .setDimAmount(0.3f)
+                .setShowBottom(false)
+                .setAnimStyle(R.style.PracticeModeAnimation)
+                .setOutCancel(false) //触摸外部是否取消
+                .show(getSupportFragmentManager());
+    }
 }

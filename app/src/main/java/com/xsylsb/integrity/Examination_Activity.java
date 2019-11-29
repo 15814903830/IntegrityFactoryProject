@@ -222,6 +222,9 @@ public class Examination_Activity extends AppCompatActivity implements MyTopicSu
                 break;
             case R.id.ll_submit_examination:
                 //交卷
+                llSubmitExamination.setClickable(false);
+                llSubmitExamination.setFocusable(false);
+                llSubmitExamination.setFocusableInTouchMode(false);
                 commitanswer();
                 break;
 
@@ -463,6 +466,9 @@ public class Examination_Activity extends AppCompatActivity implements MyTopicSu
                 } catch (Exception e) {
                     e.printStackTrace();
                     Toast.makeText(this, "提交失败", Toast.LENGTH_SHORT).show();
+                    llSubmitExamination.setClickable(true);
+                    llSubmitExamination.setFocusable(true);
+                    llSubmitExamination.setFocusableInTouchMode(true);
                 }
                 break;
         }

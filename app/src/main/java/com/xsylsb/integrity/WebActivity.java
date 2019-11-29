@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.webkit.WebBackForwardList;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
@@ -34,13 +35,17 @@ public class WebActivity extends AppCompatActivity {
     ImageView wedActivity;
     @BindView(R.id.wed_title_activity)
     TextView wedTitleActivity;
+    @BindView(R.id.iv_ewm)
+    ImageView iv_ewm;
+
+
     private ProgressBar progressBar;
     private WebView webView;
     public static final String KEY_URL = "url";
     public static final String KEY_TITLE = "title";
     private String mUrl = "";
     private String mTitle = "";
-    private boolean mBoolean=false;
+    private boolean mBoolean = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,12 +56,40 @@ public class WebActivity extends AppCompatActivity {
         initData();
         mUrl = getIntent().getStringExtra("url");
         Log.e("mUrl", mUrl);
+
+        if (mUrl.contains("Permit/MyJob")) {
+            iv_ewm.setVisibility(View.VISIBLE);
+        } else if (mUrl.contains("Permit/MySecurityOfficer")) {
+            iv_ewm.setVisibility(View.VISIBLE);
+        } else if (mUrl.contains("Permit/MyCompanyCustody")) {
+            iv_ewm.setVisibility(View.VISIBLE);
+        } else if (mUrl.contains("Permit/MyResponsible")) {
+            iv_ewm.setVisibility(View.VISIBLE);
+        } else if (mUrl.contains("Permit/MyCustody")) {
+            iv_ewm.setVisibility(View.VISIBLE);
+        }
+
         initView();
         webView.loadUrl(mUrl);
         wedActivity.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
+                //获取webView的浏览记录
+                WebBackForwardList mWebBackForwardList = webView.copyBackForwardList();
+                //这里的判断是为了让页面在有上一个页面的情况下，跳转到上一个html页面，而不是退出当前activity
+                if (mWebBackForwardList.getCurrentIndex() > 0) {
+                    String historyUrl = mWebBackForwardList.getItemAtIndex(mWebBackForwardList.getCurrentIndex() - 1).getUrl();
+                    webView.goBack();
+                } else {
+                    finish();
+                }
+            }
+        });
+
+        iv_ewm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivityForResult(new Intent(WebActivity.this, QRCode2Activity.class), 0);
             }
         });
 
@@ -65,10 +98,10 @@ public class WebActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (mBoolean){
+        if (mBoolean) {
             webView.loadUrl(mUrl);
         }
-        mBoolean=true;
+        mBoolean = true;
     }
 
 
@@ -80,39 +113,55 @@ public class WebActivity extends AppCompatActivity {
     private void initView() {
         progressBar = findViewById(R.id.pb_web);
         webView = findViewById(R.id.wv_web);
-            wedTitleActivity.setText(mTitle);
+        wedTitleActivity.setText(mTitle);
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 Log.e("rideUrlLoading", url);
-                if (url.contains("Account/CourseQuestionBank")&&url.contains("type=1")) {
+                if (url.contains("Account/CourseQuestionBank") && url.contains("type=1")) {
+                    iv_ewm.setVisibility(View.GONE);
                     Log.e("urlPersonage考试", url);
-                    Intent intent=new Intent(WebActivity.this, Examination_Activity.class);
-                    intent.putExtra("url",url);
+                    Intent intent = new Intent(WebActivity.this, Examination_Activity.class);
+                    intent.putExtra("url", url);
                     startActivity(intent);
                     //startActivity(new Intent(WebActivity.this, Examination_Activity.class));
-                } else if (url.contains("Account/CourseQuestionBank")&&url.contains("type=0")) {
+                } else if (url.contains("Account/CourseQuestionBank") && url.contains("type=0")) {
                     Log.e("urlPersonage练习", url);
-                    Intent intent=new Intent(WebActivity.this, PracticeMode_Activity.class);
-                    intent.putExtra("url",url);
+                    iv_ewm.setVisibility(View.GONE);
+                    Intent intent = new Intent(WebActivity.this, PracticeMode_Activity.class);
+                    intent.putExtra("url", url);
                     startActivity(intent);
-                } else if (url.contains("Worker/UpdatePwd")){
+                } else if (url.contains("Worker/UpdatePwd")) {
+                    iv_ewm.setVisibility(View.GONE);
                     Toast.makeText(WebActivity.this, "修改成功", Toast.LENGTH_SHORT).show();
                     finish();
-                }else {
+                } else if (url.contains("Permit/MyJob")) {
+                    webView.loadUrl(url);
+                    iv_ewm.setVisibility(View.VISIBLE);
+                } else if (url.contains("Permit/MySecurityOfficer")) {
+                    webView.loadUrl(url);
+                    iv_ewm.setVisibility(View.VISIBLE);
+                } else if (url.contains("Permit/MyCompanyCustody")) {
+                    webView.loadUrl(url);
+                    iv_ewm.setVisibility(View.VISIBLE);
+                } else if (url.contains("Permit/MyResponsible")) {
+                    webView.loadUrl(url);
+                    iv_ewm.setVisibility(View.VISIBLE);
+                } else if (url.contains("Permit/MyCustody")) {
+                    webView.loadUrl(url);
+                    iv_ewm.setVisibility(View.VISIBLE);
+                } else {
+                    iv_ewm.setVisibility(View.GONE);
                     Log.e("else", "--------else");
                     webView.loadUrl(url);
                 }
-
-
-
-
                 return true;
             }
+
             @Override
             public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
                 int code = errorCode / 100;
-                if (code == 2){
+                if (code == 2) {
                     super.onReceivedError(view, errorCode, description, failingUrl);
                 } else {
                     showEmpty();
@@ -159,8 +208,8 @@ public class WebActivity extends AppCompatActivity {
         webSettings.setJavaScriptEnabled(true);
         webSettings.setAllowFileAccessFromFileURLs(true);
         //禁用放缩
-        webSettings.setDisplayZoomControls(false);
-        webSettings.setBuiltInZoomControls(false);
+        webSettings.setDisplayZoomControls(true);
+        webSettings.setBuiltInZoomControls(true);
         //禁用文字缩放
         webSettings.setTextZoom(100);
         //自动加载图片

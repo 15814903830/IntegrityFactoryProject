@@ -851,9 +851,7 @@ public final class AddFaceRGBActivity extends AppCompatActivity implements Surfa
                                     handler.post(new Runnable() {
                                         public void run() {
                                             if (mBooleanfetect) {
-                                                textimg.setImageBitmap(faceCroped);
-                                                Log.e("textimg:",bitmaptoString(convertViewToBitmap(textimg)));
-                                                getdata(bitmaptoString(convertViewToBitmap(textimg)));
+                                                getface(faceCroped);
                                                 imagePreviewAdapter.add(faceCroped);
                                                 mBooleanfetect = false;
                                             }
@@ -888,6 +886,47 @@ public final class AddFaceRGBActivity extends AppCompatActivity implements Surfa
             });
         }
     }
+
+
+    public void getface(final Bitmap bitmap) {//采集人脸数据
+        NiceDialog.init()
+                .setLayoutId(R.layout.selectface_dialog)
+                .setConvertListener(new ViewConvertListener() {
+                    @Override
+                    protected void convertView(ViewHolder holder, final BaseNiceDialog dialog) {
+                        TextView tv_confirm = holder.getView(R.id.tv_confirm);//查看详情
+                        TextView tv_cancel = holder.getView(R.id.tv_cancel);//查看详情
+                        final ImageView iv_myface = holder.getView(R.id.iv_myface);//查看详情
+                        iv_myface.setImageBitmap(bitmap);
+                        tv_cancel.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                //取消
+                                dialog.dismiss();
+                                mBooleanfetect = true;
+                            }
+
+                        });
+                        tv_confirm.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                //确定
+                                textimg.setImageBitmap(bitmap);
+                                getdata(bitmaptoString(convertViewToBitmap(iv_myface)));
+                                dialog.dismiss();
+                            }
+
+                        });
+
+                    }
+                })
+                .setDimAmount(0.3f)
+                .setShowBottom(false)
+                .setAnimStyle(R.style.PracticeModeAnimation)
+                .setOutCancel(false) //触摸外部是否取消
+                .show(getSupportFragmentManager());
+    }
+
 
 
     public Bitmap convertViewToBitmap(View view){

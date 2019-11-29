@@ -140,9 +140,9 @@ public class HomepageFragment extends MVPBaseFragment<HomepageContract.View, Hom
         //允许js代码
         webSettings.setJavaScriptEnabled(true);
         webSettings.setAllowFileAccessFromFileURLs(true);
-        //禁用放缩
-        webSettings.setDisplayZoomControls(false);
-        webSettings.setBuiltInZoomControls(false);
+//        //禁用放缩
+        webSettings.setDisplayZoomControls(true);
+        webSettings.setBuiltInZoomControls(true);
         //禁用文字缩放
         webSettings.setTextZoom(100);
         //自动加载图片

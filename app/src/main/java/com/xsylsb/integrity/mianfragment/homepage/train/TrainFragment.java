@@ -35,7 +35,7 @@ public class TrainFragment extends MVPBaseFragment<TrainContract.View, TrainPres
     private View mView;
     private ProgressBar progressBar;
     private WebView webView;
-    private String mUrl = MyURL.URLL+"Worker/CourseIndex";
+    private String mUrl = MyURL.URLL+"Permit/Index";
     private BaseNiceDialog mBaseNiceDialog;
     private boolean showlading=true;
     /**
@@ -56,7 +56,6 @@ public class TrainFragment extends MVPBaseFragment<TrainContract.View, TrainPres
             showlading=false;
         }
         mUrl=mUrl+"?id="+MyURL.id+"&page=1&limit=2147483647";
-        Log.e("Trainurl",mUrl);
         initView();
         webView.loadUrl(mUrl);
         return mView;
@@ -69,14 +68,16 @@ public class TrainFragment extends MVPBaseFragment<TrainContract.View, TrainPres
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 Log.e("urkkk",url);
-                if (url.contains("Worker/CourseDetail")){
+            //    if (url.contains("Worker/CourseDetail")){
+//                    Intent intent=new Intent(getContext(), WebActivity.class);
+//                    intent.putExtra("url",url);
+//                    startActivity(intent);
+//                }else {
+//                    webView.loadUrl(url);
+//                }
                     Intent intent=new Intent(getContext(), WebActivity.class);
                     intent.putExtra("url",url);
                     startActivity(intent);
-                }else {
-                    webView.loadUrl(url);
-                }
-
                 return true;
 
             }
@@ -127,8 +128,8 @@ public class TrainFragment extends MVPBaseFragment<TrainContract.View, TrainPres
         webSettings.setJavaScriptEnabled(true);
         webSettings.setAllowFileAccessFromFileURLs(true);
         //禁用放缩
-        webSettings.setDisplayZoomControls(false);
-        webSettings.setBuiltInZoomControls(false);
+        webSettings.setDisplayZoomControls(true);
+        webSettings.setBuiltInZoomControls(true);
         //禁用文字缩放
         webSettings.setTextZoom(100);
         //自动加载图片

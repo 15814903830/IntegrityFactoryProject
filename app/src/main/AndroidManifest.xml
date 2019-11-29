@@ -68,6 +68,7 @@
             android:resource="@xml/actions" />
 
         <activity android:name=".QRCodeActivity" />
+        <activity android:name=".QRCode2Activity" />
         <activity
             android:name=".TranscriptQualifiedActivity"
             android:launchMode="singleTask" />
@@ -82,6 +83,7 @@
             android:name=".Examination_Activity"
             android:theme="@style/TranslucentStatusTheme" />
         <activity android:name=".PracticeMode_Activity" />
+        <activity android:name=".PracticeMode_Activity2" />
         <activity android:name=".WebActivity" />
         <activity android:name=".mylogin.MyloginActivity"></activity>
 
@@ -185,11 +187,11 @@
             android:name=".face.activity.FaceDetectRGBActivity"
             android:theme="@style/Face" />
         <!--<meta-data-->
-            <!--android:name="com.alibaba.app.appkey"-->
-            <!--android:value="27872816" /> &lt;!&ndash; 请填写你自己的- appKey &ndash;&gt;-->
+        <!--android:name="com.alibaba.app.appkey"-->
+        <!--android:value="27872816" /> &lt;!&ndash; 请填写你自己的- appKey &ndash;&gt;-->
         <!--<meta-data-->
-            <!--android:name="com.alibaba.app.appsecret"-->
-            <!--android:value="6adae714480c34a07a47f50eced61070" /> &lt;!&ndash; 请填写你自己的appSecret &ndash;&gt;-->
+        <!--android:name="com.alibaba.app.appsecret"-->
+        <!--android:value="6adae714480c34a07a47f50eced61070" /> &lt;!&ndash; 请填写你自己的appSecret &ndash;&gt;-->
 
         <meta-data
             android:name="com.alibaba.app.appkey"
