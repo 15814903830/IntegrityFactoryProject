@@ -186,6 +186,13 @@
         <activity
             android:name=".face.activity.FaceDetectRGBActivity"
             android:theme="@style/Face" />
+        <activity
+            android:name=".face.activity.LeadFaceDetectRGBActivity"
+            android:theme="@style/Face" />
+
+
+
+
         <!--<meta-data-->
         <!--android:name="com.alibaba.app.appkey"-->
         <!--android:value="27872816" /> &lt;!&ndash; 请填写你自己的- appKey &ndash;&gt;-->

@@ -32,6 +32,7 @@ import android.widget.Toast;
 import com.alibaba.fastjson.JSON;
 import com.maning.updatelibrary.InstallUtils;
 import com.xsylsb.integrity.MainActivity;
+import com.xsylsb.integrity.MainApplication;
 import com.xsylsb.integrity.R;
 import com.xsylsb.integrity.WebActivity;
 import com.xsylsb.integrity.base.VersionBase;
@@ -79,8 +80,8 @@ public class LogwebActivity extends AppCompatActivity implements HttpCallBack {
         setContentView(R.layout.activity_logweb);//http://liugangapi.gx11.cn/Worker/Credit?id=24
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         initView();
-        webView.loadUrl("http://liugangapi.gx11.cn/Worker/Credit?id="+ MyURL.id);
-        MyURL.isBooleanface=true;
+        webView.loadUrl("http://liugangapi.gx11.cn/Worker/Credit?id="+ MainApplication.id);
+        MainApplication.isBooleanface=true;
         context = this;
         mHttpCallBack = this;
         if (isNetworkConnected(this)){

@@ -39,6 +39,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.alibaba.fastjson.JSON;
+import com.xsylsb.integrity.MainApplication;
 import com.xsylsb.integrity.R;
 import com.xsylsb.integrity.WebActivity;
 import com.xsylsb.integrity.base.LoinFaceBase;
@@ -186,7 +187,7 @@ public final class FaceDetectRGBActivity extends AppCompatActivity implements Su
                     JSONObject jsonObject = new JSONObject();
                     jsonObject.put("memberId", "0");//id
                     jsonObject.put("fileData", img);//人脸数据
-                  OkHttpUtils.doPostJson(MyURL.URL + "SearchFaces/" + MyURL.id, jsonObject.toString(), mHttpCallBack, 0);
+                  OkHttpUtils.doPostJson(MyURL.URL + "SearchFaces/" + MainApplication.id, jsonObject.toString(), mHttpCallBack, 0);
                    // OkHttpUtils.doPostJson("http://192.168.0.46/GY.API/api/account/" + "SearchFaces/" + MyURL.id, jsonObject.toString(), mHttpCallBack, 0);
                 } catch (JSONException e) {
                     e.printStackTrace();

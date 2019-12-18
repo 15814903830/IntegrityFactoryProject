@@ -20,7 +20,8 @@ import com.alibaba.sdk.android.push.noonesdk.PushServiceFactory;
 public class MainApplication extends Application {
     private static final String TAG = "MainApplication";
     private static MainActivity mainActivity = null;
-
+    public static String id = "0";
+    public static boolean isBooleanface = true;
     @Override
     public void onCreate() {
         super.onCreate();

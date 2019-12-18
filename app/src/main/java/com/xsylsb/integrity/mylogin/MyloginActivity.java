@@ -35,6 +35,7 @@ import android.widget.Toast;
 import com.alibaba.fastjson.JSON;
 import com.maning.updatelibrary.InstallUtils;
 import com.xsylsb.integrity.MainActivity;
+import com.xsylsb.integrity.MainApplication;
 import com.xsylsb.integrity.R;
 import com.xsylsb.integrity.base.LoginBase;
 import com.xsylsb.integrity.base.VersionBase;
@@ -173,7 +174,7 @@ public class MyloginActivity extends AppCompatActivity implements HttpCallBack {
     @Override
     protected void onResume() {
         super.onResume();
-        MyURL.isBooleanface=true;
+        MainApplication.isBooleanface=true;
     }
 
     private void requestCameraPermission(final int RC_HANDLE_CAMERA_PERM) {
@@ -266,7 +267,7 @@ public class MyloginActivity extends AppCompatActivity implements HttpCallBack {
                 JSONObject jsonObject;
                 mLoginBase = JSON.parseObject(response, LoginBase.class);
                 if (mLoginBase.isSuc()) {
-                    MyURL.id = "" + mLoginBase.getData().getId();
+                    MainApplication.id = "" + mLoginBase.getData().getId();
                     try {
                         jsonObject = new JSONObject(response);
                         if (mLoginBase.getData().getFaceImages()==null){

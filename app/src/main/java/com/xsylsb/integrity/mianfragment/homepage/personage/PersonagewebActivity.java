@@ -13,6 +13,7 @@ import android.webkit.WebViewClient;
 import android.widget.ImageView;
 
 import com.xsylsb.integrity.MainActivity;
+import com.xsylsb.integrity.MainApplication;
 import com.xsylsb.integrity.R;
 import com.xsylsb.integrity.util.MyURL;
 
@@ -25,7 +26,7 @@ public class PersonagewebActivity extends AppCompatActivity {
         setContentView(R.layout.activity_logweb2);//http://liugangapi.gx11.cn/Worker/Credit?id=24
         initView();
         webView.loadUrl("http://liugangapi.gx11.cn/Worker/Credit?id="+ getIntent().getStringExtra("id"));
-        MyURL.isBooleanface=true;
+        MainApplication.isBooleanface=true;
         imageView=findViewById(R.id.wed_activity);
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override

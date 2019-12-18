@@ -27,6 +27,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
+import com.xsylsb.integrity.MainApplication;
 import com.xsylsb.integrity.PracticeMode_Activity;
 import com.xsylsb.integrity.PracticeMode_Activity2;
 import com.xsylsb.integrity.R;
@@ -107,7 +108,7 @@ public class PersonageFragment extends MVPBaseFragment<PersonageContract.View, P
             showLoading();
             showlading = false;
         }
-        mUrl = mUrl + "?id=" + MyURL.id;
+        mUrl = mUrl + "?id=" + MainApplication.id;
         Log.e(TAG, mUrl);
         initView();
         webView.loadUrl(mUrl);
@@ -290,7 +291,7 @@ public class PersonageFragment extends MVPBaseFragment<PersonageContract.View, P
                 List<RequestParams> list = new ArrayList<>();
                 list.add(new RequestParams("idNo", idno));
                 list.add(new RequestParams("more", "true"));
-                OkHttpUtils.doGet(MyURL.URL + "SearchSubordinate/" + MyURL.id, list, mHttpCallBack, 0);
+                OkHttpUtils.doGet(MyURL.URL + "SearchSubordinate/" + MainApplication.id, list, mHttpCallBack, 0);
             }
         }).start();
     }

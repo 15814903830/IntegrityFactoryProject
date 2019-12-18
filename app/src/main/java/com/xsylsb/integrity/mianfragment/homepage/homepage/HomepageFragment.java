@@ -17,6 +17,7 @@ import android.webkit.WebViewClient;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
+import com.xsylsb.integrity.MainApplication;
 import com.xsylsb.integrity.R;
 import com.xsylsb.integrity.WebActivity;
 import com.xsylsb.integrity.mvp.MVPBaseFragment;
@@ -65,7 +66,7 @@ public class HomepageFragment extends MVPBaseFragment<HomepageContract.View, Hom
             showLoading();
             showlading = false;
         }
-        mUrl = mUrl + "?id=" + MyURL.id + "&newsType=13&bulletinType=11&page=1&limit=10000";
+        mUrl = mUrl + "?id=" + MainApplication.id + "&newsType=13&bulletinType=11&page=1&limit=10000";
         Log.e("url", mUrl);
         initView();
         webView.loadUrl(mUrl);

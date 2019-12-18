@@ -29,8 +29,10 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.sdk.android.push.CloudPushService;
 import com.alibaba.sdk.android.push.CommonCallback;
 import com.alibaba.sdk.android.push.noonesdk.PushServiceFactory;
+import com.xsylsb.integrity.base.OperativesSignBase;
 import com.xsylsb.integrity.base.ScanCodeBase;
 import com.xsylsb.integrity.face.activity.FaceDetectRGBActivity;
+import com.xsylsb.integrity.face.activity.LeadFaceDetectRGBActivity;
 import com.xsylsb.integrity.mianfragment.homepage.homepage.HomepageFragment;
 import com.xsylsb.integrity.mianfragment.homepage.notice.NoticeFragment;
 import com.xsylsb.integrity.mianfragment.homepage.personage.PersonageFragment;
@@ -48,6 +50,11 @@ import com.xsylsb.integrity.util.dialog.ViewHolder;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -140,10 +147,10 @@ public class MainActivity extends AppCompatActivity implements HttpCallBack, Sto
      * 2. 一个设备只能绑定一个账号
      */
     private void bindAccount() {
-        mPushService.bindAccount(MyURL.id, new CommonCallback() {
+        mPushService.bindAccount(MainApplication.id, new CommonCallback() {
             @Override
             public void onSuccess(String s) {
-                Log.i("MainActivity", "绑定账号成功：" + MyURL.id);
+                Log.i("MainActivity", "绑定账号成功：" + MainApplication.id);
             }
 
             @Override
@@ -287,6 +294,7 @@ public class MainActivity extends AppCompatActivity implements HttpCallBack, Sto
                                     int rc = ActivityCompat.checkSelfPermission(mContext, Manifest.permission.CAMERA);
                                     if (rc == PackageManager.PERMISSION_GRANTED) {
                                         Intent intent = new Intent(mContext, FaceDetectRGBActivity.class);
+                           //             Intent intent = new Intent(mContext, LeadFaceDetectRGBActivity.class);
                                         startActivity(intent);
                                     } else {
                                         requestCameraPermission(RC_HANDLE_CAMERA_PERM_RGB);
@@ -349,11 +357,57 @@ public class MainActivity extends AppCompatActivity implements HttpCallBack, Sto
         super.onActivityResult(requestCode, resultCode, data);
         if (data != null) {
             //扫码获得的信息
-            Log.e("data", data.getStringExtra(QRCodeActivity.RESULT));
-            ScanCodes(data.getStringExtra(QRCodeActivity.RESULT));
+            String mycodedata=toURLDecoder(data.getStringExtra(QRCodeActivity.RESULT));
+            Log.e("data", mycodedata);
+            if (mycodedata.contains("Account/OperativesSign")){
+                List<OperativesSignBase> list=new ArrayList<>();
+                String[] split = mycodedata.split("\\?")[1].split("&");
+                for (int i=0;i<split.length;i++){
+                    OperativesSignBase operativesSignBase=new OperativesSignBase();
+                    operativesSignBase.setKey(split[i].split("=")[0]);
+                    operativesSignBase.setValue(split[i].split("=")[1]);
+                    if (operativesSignBase.getKey().equals("workerId")){
+                        operativesSignBase.setValue(""+MainApplication.id);
+                    }
+                    list.add(operativesSignBase);
+                }
+                OperativesSign(mycodedata.split("\\?")[0],list);
+            }else if (mycodedata.contains("Account/OperativesFacesSign")){
+                List<OperativesSignBase> list=new ArrayList<>();
+                String[] split = mycodedata.split("\\?")[1].split("&");
+                for (int i=0;i<split.length;i++){
+                    OperativesSignBase operativesSignBase=new OperativesSignBase();
+                    operativesSignBase.setKey(split[i].split("=")[0]);
+                    operativesSignBase.setValue(split[i].split("=")[1]);
+                    if (operativesSignBase.getKey().equals("workerId")){
+                        operativesSignBase.setValue(""+MainApplication.id);
+                    }
+                    list.add(operativesSignBase);
+                }
+                OperativesFacesSign(mycodedata.split("\\?")[0],list);
+            }else {
+                ScanCodes(data.getStringExtra(QRCodeActivity.RESULT));
+            }
+
+
         }
     }
-
+    /**
+     * URLDecoder解码
+     */
+    public static String toURLDecoder(String paramString) {
+        if (paramString == null || paramString.equals("")) {
+            return "";
+        }
+        try {
+            String url = new String(paramString.getBytes(), "UTF-8");
+            url = URLDecoder.decode(url, "UTF-8");
+            return url;
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
     private void ScanCodes(final String courseId) {
         new Thread(new Runnable() {
             @Override
@@ -361,7 +415,7 @@ public class MainActivity extends AppCompatActivity implements HttpCallBack, Sto
                 try {
                     JSONObject jsonObject = new JSONObject();
                     jsonObject.put("courseId", courseId);
-                    jsonObject.put("workerId", MyURL.id);
+                    jsonObject.put("workerId", MainApplication.id);
                     OkHttpUtils.doPostJson(MyURL.URL + "CourseSignIn", jsonObject.toString(), mHttpCallBack, 0);
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -370,6 +424,40 @@ public class MainActivity extends AppCompatActivity implements HttpCallBack, Sto
         }).start();
     }
 
+
+    private void OperativesFacesSign(final String url, final List<OperativesSignBase> list) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    JSONObject jsonObject = new JSONObject();
+                    for (int i=0;i<list.size();i++){
+                        jsonObject.put(list.get(i).getKey(), list.get(i).getValue());
+                    }
+                    OkHttpUtils.doPostJson(url, jsonObject.toString(), mHttpCallBack, 2);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
+    private void OperativesSign(final String url, final List<OperativesSignBase> list) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    JSONObject jsonObject = new JSONObject();
+                    for (int i=0;i<list.size();i++){
+                        jsonObject.put(list.get(i).getKey(), list.get(i).getValue());
+                    }
+                    OkHttpUtils.doPostJson(url, jsonObject.toString(), mHttpCallBack, 1);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
 
     @Override
     public void onResponse(String response, int requestId) {
@@ -381,12 +469,38 @@ public class MainActivity extends AppCompatActivity implements HttpCallBack, Sto
 
     @Override
     public void onHandlerMessageCallback(String response, int requestId) {
-        mScanCodeBase = JSON.parseObject(response, ScanCodeBase.class);
-        Log.e("mScanCodeBase", "" + mScanCodeBase.isSuc());
-        if (mScanCodeBase.isSuc()) {//签到成功
-            Toast.makeText(this, "签到成功", Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(this, mScanCodeBase.getMsg(), Toast.LENGTH_SHORT).show();
+
+        Log.e("response","requestId:"+requestId+"--response:"+response);
+        switch (requestId){
+            case 0:
+                try {
+                    mScanCodeBase = JSON.parseObject(response, ScanCodeBase.class);
+                    Log.e("mScanCodeBase", "" + mScanCodeBase.isSuc());
+                    if (mScanCodeBase.isSuc()) {//签到成功
+                        Toast.makeText(this, "签到成功", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(this, mScanCodeBase.getMsg(), Toast.LENGTH_SHORT).show();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                break;
+            case 1:
+                try {
+                    JSONObject jsonObject=new JSONObject(response);
+                    Toast.makeText(this, jsonObject.getString("msg"), Toast.LENGTH_SHORT).show();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                break;
+            case 2:
+                try {
+                    JSONObject jsonObject=new JSONObject(response);
+                    Toast.makeText(this, jsonObject.getString("msg"), Toast.LENGTH_SHORT).show();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                break;
         }
     }
 

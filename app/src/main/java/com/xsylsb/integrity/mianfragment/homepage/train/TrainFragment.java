@@ -16,6 +16,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 
+import com.xsylsb.integrity.MainApplication;
 import com.xsylsb.integrity.R;
 import com.xsylsb.integrity.WebActivity;
 import com.xsylsb.integrity.mianfragment.homepage.homepage.HomepageFragment;
@@ -55,7 +56,7 @@ public class TrainFragment extends MVPBaseFragment<TrainContract.View, TrainPres
             showLoading();
             showlading=false;
         }
-        mUrl=mUrl+"?id="+MyURL.id+"&page=1&limit=2147483647";
+        mUrl=mUrl+"?id="+ MainApplication.id+"&page=1&limit=2147483647";
         initView();
         webView.loadUrl(mUrl);
         return mView;

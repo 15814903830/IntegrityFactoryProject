@@ -1,9 +1,11 @@
-package com.xsylsb.integrity.face.activity.ui;
+package com.xsylsb.integrity.face.activity;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -14,12 +16,10 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.YuvImage;
 import android.hardware.Camera;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.CountDownTimer;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -40,25 +40,21 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
-import com.xsylsb.integrity.MainActivity;
 import com.xsylsb.integrity.MainApplication;
 import com.xsylsb.integrity.R;
 import com.xsylsb.integrity.WebActivity;
-import com.xsylsb.integrity.base.FaceFalseBase;
-import com.xsylsb.integrity.base.FaceRecongitRGBBase;
 import com.xsylsb.integrity.base.LoinFaceBase;
+import com.xsylsb.integrity.base.OperativesSignBase;
+import com.xsylsb.integrity.face.activity.ui.FaceOverlayView;
 import com.xsylsb.integrity.face.adapter.ImagePreviewAdapter;
 import com.xsylsb.integrity.face.adapter.MyFacelistviewAdapter;
 import com.xsylsb.integrity.face.model.FaceResult;
 import com.xsylsb.integrity.face.utils.CameraErrorCallback;
 import com.xsylsb.integrity.face.utils.ImageUtils;
 import com.xsylsb.integrity.face.utils.Util;
-import com.xsylsb.integrity.mylogin.LogwebActivity;
-import com.xsylsb.integrity.mylogin.MyloginActivity;
 import com.xsylsb.integrity.util.HttpCallBack;
 import com.xsylsb.integrity.util.MyURL;
 import com.xsylsb.integrity.util.OkHttpUtils;
-import com.xsylsb.integrity.util.RequestParams;
 import com.xsylsb.integrity.util.dialog.BaseNiceDialog;
 import com.xsylsb.integrity.util.dialog.NiceDialog;
 import com.xsylsb.integrity.util.dialog.ViewConvertListener;
@@ -69,9 +65,6 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -88,13 +81,14 @@ import java.util.List;
  */
 
 
-public final class LoginFaceDetectRGBActivity extends AppCompatActivity implements SurfaceHolder.Callback, Camera.PreviewCallback, HttpCallBack {
+public final class LeadFaceDetectRGBActivity extends AppCompatActivity implements SurfaceHolder.Callback, Camera.PreviewCallback, HttpCallBack {
 
     // Number of Cameras in device.
     private int numberOfCameras;
     public static final String KEY_URL = "url";
-    public static final String TAG = LoginFaceDetectRGBActivity.class.getSimpleName();
-
+    public static final String TAG = LeadFaceDetectRGBActivity.class.getSimpleName();
+    private boolean mBooleanfetect = true;
+    ;
     private Camera mCamera;
     private int cameraId = 0;
 
@@ -117,7 +111,6 @@ public final class LoginFaceDetectRGBActivity extends AppCompatActivity implemen
     private HttpCallBack mHttpCallBack;
     private LoinFaceBase mFaceRecongitRGBBase;
 
-    private boolean mBoolean = true;//是否采集
     private static final int MAX_FACE = 10;
     private boolean isThreadWorking = false;
     private Handler handler;
@@ -129,17 +122,17 @@ public final class LoginFaceDetectRGBActivity extends AppCompatActivity implemen
     private FaceResult faces_previous[];
     private int Id = 0;
 
-    private FaceFalseBase mFaceFalseBase;
     private String BUNDLE_CAMERA_ID = "camera";
 
-    private CountDownTimer timer;
+    private static final int RC_HANDLE_CAMERA_PERM_RGB = 1;
     //RecylerView face image
     private HashMap<Integer, Integer> facesCount = new HashMap<>();
     private RecyclerView recyclerView;
     private ImagePreviewAdapter imagePreviewAdapter;
     private ArrayList<Bitmap> facesBitmap;
+
     private ImageView textimg;
-    private boolean isBooleanface = true;
+    private String url;
 
     /**
      * Initializes the UI and initiates the creation of a face detector.
@@ -149,12 +142,10 @@ public final class LoginFaceDetectRGBActivity extends AppCompatActivity implemen
         super.onCreate(icicle);
         setContentView(R.layout.activity_camera_viewer);
         mView = (SurfaceView) findViewById(R.id.surfaceview);
-
-
-
-
-
         textimg = findViewById(R.id.textimg);
+
+        url = getIntent().getStringExtra("url");
+
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         mHttpCallBack = this;
         // Now create the OverlayView:
@@ -167,7 +158,6 @@ public final class LoginFaceDetectRGBActivity extends AppCompatActivity implemen
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-
 
         handler = new Handler();
         faces = new FaceResult[MAX_FACE];
@@ -186,87 +176,47 @@ public final class LoginFaceDetectRGBActivity extends AppCompatActivity implemen
         if (icicle != null)
             cameraId = icicle.getInt(BUNDLE_CAMERA_ID, 0);
 
-        if (MainApplication.isBooleanface) {
-            /** 倒计时60秒，一次1秒 */
-            timer = new CountDownTimer(50, 1000) {
-                @Override
-                public void onTick(long millisUntilFinished) {
-
-                }
-
-                @Override
-                public void onFinish() {
-                    cameraId = (cameraId + 1) % numberOfCameras;
-                    recreate();
-                    timer.cancel();
-                }
-            }.start();
-            MainApplication.isBooleanface = false;
-        }
 
     }
 
-
-    public void userdialogdialog(final List<String> list) {//查无此人
-        NiceDialog.init()
-                .setLayoutId(R.layout.userdialog_dialog)
-                .setConvertListener(new ViewConvertListener() {
-                    @Override
-                    protected void convertView(ViewHolder holder, final BaseNiceDialog dialog) {
-                        TextView textView = holder.getView(R.id.userdialog_title_tv);//标题
-                        TextView entrance = holder.getView(R.id.tv_entrance_main);//进入首页
-                        TextView particular = holder.getView(R.id.tv_particular);//查看详情
-                        ListView listView = holder.getView(R.id.listview_face);
-                        MyFacelistviewAdapter myFacelistviewAdapter = new MyFacelistviewAdapter(LoginFaceDetectRGBActivity.this, list);
-                        listView.setAdapter(myFacelistviewAdapter);
-                        textView.setText(list.get(0));
-                        entrance.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                //进入首页
-                                dialog.dismiss();
-                                MainApplication.id = "" + mFaceRecongitRGBBase.getData().getId();
-                                //登陆操作
-                                //验证账号密码，跳转到主页
-                                Intent intent = new Intent();
-                                intent.setClass(LoginFaceDetectRGBActivity.this, MainActivity.class);
-                                startActivity(intent);
-                            }
-                        });
-                        particular.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                String particularurl = "http://liugangapi.gx11.cn/Worker/Credit?id=" + mFaceRecongitRGBBase.getData().getId();
-                                //查看详情
-                                Intent intent = new Intent(LoginFaceDetectRGBActivity.this, WebActivity.class);
-                                intent.putExtra(KEY_URL, particularurl);
-                                startActivity(intent);
-
-                            }
-                        });
-
-
-                    }
-                })
-                .setDimAmount(0.3f)
-                .setShowBottom(false)
-                .setAnimStyle(R.style.PracticeModeAnimation)
-                .setOutCancel(false) //触摸外部是否取消
-                .show(getSupportFragmentManager());
-    }
-
+    private boolean mBoolean = false;
 
     private void getdata(final String img) {
-        new Thread(new Runnable() {
+        if (mBoolean) {
+            return;
+        }
+        mBoolean = true;
+        List<OperativesSignBase> list = new ArrayList<>();
+        Log.e("jsonObject","url:"+url);
+        String[] split = url.split("\\?")[1].split("&");
+        for (int i = 0; i < split.length; i++) {
+            OperativesSignBase operativesSignBase = new OperativesSignBase();
+            operativesSignBase.setKey(split[i].split("=")[0]);
+            operativesSignBase.setValue(split[i].split("=")[1]);
+            if (operativesSignBase.getKey().equals("workerId")) {
+                operativesSignBase.setValue("" + MainApplication.id);
+            }
+            if (operativesSignBase.getKey().equals("workerFullName")){
+                operativesSignBase.setValue(img);
+            }
+            list.add(operativesSignBase);
+            Log.e("jsonObject","list:"+JSON.toJSONString(list));
+        }
+        OperativesFacesSign(url.split("\\?")[0], list);
+    }
 
+
+    private void OperativesFacesSign(final String url, final List<OperativesSignBase> list) {
+        new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
                     JSONObject jsonObject = new JSONObject();
-                    jsonObject.put("memberId", "0");//id
-                    jsonObject.put("fileData", img);//人脸数据
-                    OkHttpUtils.doPostJson(MyURL.URL + "SearchFaces/" + "0", jsonObject.toString(), mHttpCallBack, 0);
-
+                    for (int i = 0; i < list.size(); i++) {
+                        jsonObject.put(list.get(i).getKey(), list.get(i).getValue());
+                    }
+                    OkHttpUtils.doPostJson(url, jsonObject.toString(), mHttpCallBack, 283);
+                    Log.e("jsonObject:",jsonObject.toString());
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -284,47 +234,76 @@ public final class LoginFaceDetectRGBActivity extends AppCompatActivity implemen
 
     }
 
-
-    @SuppressLint("HandlerLeak")
-    private Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            int requestId = msg.what;
-            String response = (String) msg.obj;
-            onHandlerMessageCallback(response, requestId);
-        }
-    };
-
     @Override
     public void onHandlerMessageCallback(String response, int requestId) {
-        Log.e("response-----", response);
+        Log.e("responsesss", response);
         switch (requestId) {
             case 0:
                 if (response != null) {
                     try {
-                        //识别成功
                         mFaceRecongitRGBBase = JSON.parseObject(response, LoinFaceBase.class);
-                        if (mFaceRecongitRGBBase.isSuc()) {//人脸识别成功  //扫描成功
-                            MainApplication.id = "" + mFaceRecongitRGBBase.getData().getId();
-                            //                            startActivity(new Intent(LoginFaceDetectRGBActivity.this, MainActivity.class));
-                            startActivity(new Intent(LoginFaceDetectRGBActivity.this, LogwebActivity.class));
-                            finish();
+                        if (mFaceRecongitRGBBase.isSuc()) {
+                            succeeddialog();//成功
+                        } else {
+                            forgive();
                         }
                     } catch (Exception e) {
-                        Toast.makeText(this, "未成功识别", Toast.LENGTH_SHORT).show();
-                        Log.e("Exception", e.toString());
-                        mBoolean=true;
                         e.printStackTrace();
+                        forgive();
+                        Log.e("catch", e.toString());
                     }
+
                 }
                 break;
+            case 283:
+                try {
+                    JSONObject jsonObject=new JSONObject(response);
+                    Toast.makeText(this, jsonObject.getString("msg"), Toast.LENGTH_SHORT).show();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                finish();
+                break;
+
+
+
         }
+    }
+
+
+    public void succeeddialog() {//扫描成功
+        NiceDialog.init()
+                .setLayoutId(R.layout.succeed_dialog)
+                .setConvertListener(new ViewConvertListener() {
+                    @Override
+                    protected void convertView(ViewHolder holder, final BaseNiceDialog dialog) {
+                        TextView succeed = holder.getView(R.id.tv_succeed);//查看详情
+                        succeed.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                //查看详情
+                                String particularurl = "http://liugangapi.gx11.cn/Worker/Credit?id=" + mFaceRecongitRGBBase.getData().getId();
+                                Intent intent = new Intent(LeadFaceDetectRGBActivity.this, WebActivity.class);
+                                intent.putExtra(KEY_URL, particularurl);
+                                startActivity(intent);
+                                dialog.dismiss();
+                                finish();
+                            }
+                        });
+
+
+                    }
+                })
+                .setDimAmount(0.3f)
+                .setShowBottom(false)
+                .setAnimStyle(R.style.PracticeModeAnimation)
+                .setOutCancel(false) //触摸外部是否取消
+                .show(getSupportFragmentManager());
     }
 
     public void forgive() {//查无此人
         NiceDialog.init()
-                .setLayoutId(R.layout.thisperson_dialog)
+                .setLayoutId(R.layout.thispersons_dialog2)
                 .setConvertListener(new ViewConvertListener() {
                     @Override
                     protected void convertView(ViewHolder holder, final BaseNiceDialog dialog) {
@@ -345,6 +324,201 @@ public final class LoginFaceDetectRGBActivity extends AppCompatActivity implemen
                 .setAnimStyle(R.style.PracticeModeAnimation)
                 .setOutCancel(false) //触摸外部是否取消
                 .show(getSupportFragmentManager());
+    }
+
+    public void getface() {//采集人脸数据
+        NiceDialog.init()
+                .setLayoutId(R.layout.getface_dialog)
+                .setConvertListener(new ViewConvertListener() {
+                    @Override
+                    protected void convertView(ViewHolder holder, final BaseNiceDialog dialog) {
+                        TextView succeed = holder.getView(R.id.tv_roger);//查看详情
+                        succeed.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                addface();
+                                finish();
+                            }
+
+                        });
+
+
+                    }
+                })
+                .setDimAmount(0.3f)
+                .setShowBottom(false)
+                .setAnimStyle(R.style.PracticeModeAnimation)
+                .setOutCancel(false) //触摸外部是否取消
+                .show(getSupportFragmentManager());
+    }
+
+    private void addface() {//添加人脸
+        //人脸识别
+        int rc = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
+        if (rc == PackageManager.PERMISSION_GRANTED) {
+            Intent intent = new Intent(this, AddFaceRGBActivity.class);
+            startActivity(intent);
+        } else {
+            requestCameraPermission(RC_HANDLE_CAMERA_PERM_RGB);
+        }
+    }
+
+    private void requestCameraPermission(final int RC_HANDLE_CAMERA_PERM) {
+
+        final String[] permissions = new String[]{Manifest.permission.CAMERA};
+
+        ActivityCompat.requestPermissions(this, permissions, RC_HANDLE_CAMERA_PERM);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+
+        if (grantResults.length != 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED && requestCode == RC_HANDLE_CAMERA_PERM_RGB) {
+            Intent intent = new Intent(this, LeadFaceDetectRGBActivity.class);
+            startActivity(intent);
+            return;
+        }
+    }
+
+    public void usertwodialog(final List<String> list) {//查无此人
+        NiceDialog.init()
+                .setLayoutId(R.layout.usertwodialog_dialog)
+                .setConvertListener(new ViewConvertListener() {
+                    @Override
+                    protected void convertView(ViewHolder holder, final BaseNiceDialog dialog) {
+                        TextView textView = holder.getView(R.id.userdialog_title_tv_detect);//标题
+                        TextView entrance = holder.getView(R.id.tv_entrance_main_detect);//知道了
+                        TextView particular = holder.getView(R.id.tv_particular_detect);//查看详情
+                        ListView listView = holder.getView(R.id.listview_face_detect);
+                        MyFacelistviewAdapter myFacelistviewAdapter = new MyFacelistviewAdapter(LeadFaceDetectRGBActivity.this, list);
+                        listView.setAdapter(myFacelistviewAdapter);
+                        if (list != null) {
+                            textView.setText(list.get(0));
+                        }
+                        entrance.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                //知道了
+                                dialog.dismiss();
+                                finish();
+                            }
+                        });
+                        particular.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                String particularurl = "http://liugangapi.gx11.cn/Worker/Credit?id=" + mFaceRecongitRGBBase.getData().getId();
+                                //查看详情
+                                Intent intent = new Intent(LeadFaceDetectRGBActivity.this, WebActivity.class);
+                                intent.putExtra(KEY_URL, particularurl);
+                                startActivity(intent);
+                            }
+                        });
+
+
+                    }
+                })
+                .setDimAmount(0.3f)
+                .setShowBottom(false)
+                .setAnimStyle(R.style.PracticeModeAnimation)
+                .setOutCancel(false) //触摸外部是否取消
+                .show(getSupportFragmentManager());
+    }
+
+
+    @SuppressLint("HandlerLeak")
+    private Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            int requestId = msg.what;
+            String response = (String) msg.obj;
+            onHandlerMessageCallback(response, requestId);
+        }
+    };
+
+
+    /**
+     * 获取一个 View 的缓存视图
+     * (前提是这个View已经渲染完成显示在页面上)
+     *
+     * @param view
+     * @return
+     */
+    public static Bitmap getCacheBitmapFromView(View view) {
+        final boolean drawingCacheEnabled = true;
+        view.setDrawingCacheEnabled(drawingCacheEnabled);
+        view.buildDrawingCache(drawingCacheEnabled);
+        final Bitmap drawingCache = view.getDrawingCache();
+        Bitmap bitmap;
+        if (drawingCache != null) {
+            bitmap = Bitmap.createBitmap(drawingCache);
+            view.setDrawingCacheEnabled(false);
+        } else {
+            bitmap = null;
+        }
+        return bitmap;
+    }
+
+
+    public String bitmaptoString(Bitmap bitmap) {
+        //将Bitmap转换成字符串
+        String string = null;
+        ByteArrayOutputStream bStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 20, bStream);
+        byte[] bytes = bStream.toByteArray();
+        string = Base64.encodeToString(bytes, Base64.DEFAULT);
+        return string;
+    }
+
+    /*
+     * bitmap转base64
+     * */
+    private static String bitmapToBase64(Bitmap bitmap) {
+        String result = null;
+        ByteArrayOutputStream baos = null;
+        try {
+            if (bitmap != null) {
+                baos = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 50, baos);
+                baos.flush();
+                baos.close();
+
+                byte[] bitmapBytes = baos.toByteArray();
+                result = Base64.encodeToString(bitmapBytes, Base64.DEFAULT);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (baos != null) {
+                    baos.flush();
+                    baos.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return result;
+    }
+
+
+    /**
+     * view转bitmap
+     */
+    public Bitmap viewConversionBitmap(View v) {
+        int w = v.getWidth();
+        int h = v.getHeight();
+
+        Bitmap bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+        Canvas c = new Canvas(bmp);
+
+        c.drawColor(Color.WHITE);
+        /** 如果不设置canvas画布为白色，则生成透明 */
+
+        v.layout(0, 0, w, h);
+        v.draw(c);
+
+        return bmp;
     }
 
 
@@ -429,6 +603,17 @@ public final class LoginFaceDetectRGBActivity extends AppCompatActivity implemen
         resetData();
     }
 
+    private void opposst() {
+        if (numberOfCameras == 1) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Switch Camera").setMessage("Your device have one camera").setNeutralButton("Close", null);
+            AlertDialog alert = builder.create();
+            alert.show();
+        }
+
+        cameraId = (cameraId + 1) % numberOfCameras;
+        recreate();
+    }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -497,7 +682,7 @@ public final class LoginFaceDetectRGBActivity extends AppCompatActivity implemen
 
     private void setDisplayOrientation() {
         // Now set the display orientation:
-        mDisplayRotation = Util.getDisplayRotation(LoginFaceDetectRGBActivity.this);
+        mDisplayRotation = Util.getDisplayRotation(LeadFaceDetectRGBActivity.this);
         mDisplayOrientation = Util.getDisplayOrientation(mDisplayRotation, cameraId);
 
         mCamera.setDisplayOrientation(mDisplayOrientation);
@@ -510,15 +695,10 @@ public final class LoginFaceDetectRGBActivity extends AppCompatActivity implemen
     private void configureCamera(int width, int height) {
         Camera.Parameters parameters = mCamera.getParameters();
         // Set the PreviewSize and AutoFocus:
-        ViewGroup.LayoutParams layoutParams= mView.getLayoutParams();
-
-        layoutParams.width=width;
-        layoutParams.height=height;
         setOptimalPreviewSize(parameters, width, height);
         setAutoFocus(parameters);
         // And set the parameters:
         mCamera.setParameters(parameters);
-
     }
 
     private void setOptimalPreviewSize(Camera.Parameters cameraParameters, int width, int height) {
@@ -551,7 +731,6 @@ public final class LoginFaceDetectRGBActivity extends AppCompatActivity implemen
             prevSettingHeight = 120;
         }
 
-        int size = previewWidth > previewHeight ? previewHeight : previewWidth;
         cameraParameters.setPreviewSize(previewSize.width, previewSize.height);
 
         mFaceView.setPreviewWidth(previewWidth);
@@ -697,7 +876,6 @@ public final class LoginFaceDetectRGBActivity extends AppCompatActivity implemen
             }
 
             fdet = new android.media.FaceDetector(bmp.getWidth(), bmp.getHeight(), MAX_FACE);
-
             android.media.FaceDetector.Face[] fullResults = new android.media.FaceDetector.Face[MAX_FACE];
             fdet.findFaces(bmp, fullResults);
 
@@ -769,12 +947,12 @@ public final class LoginFaceDetectRGBActivity extends AppCompatActivity implemen
                                 if (faceCroped != null) {
                                     handler.post(new Runnable() {
                                         public void run() {
-                                            if (mBoolean) {
-                                                //人脸
+                                            if (mBooleanfetect) {
                                                 textimg.setImageBitmap(faceCroped);
+                                                Log.e("faceCroped:", bitmaptoString(convertViewToBitmap(textimg)));
                                                 getdata(bitmaptoString(convertViewToBitmap(textimg)));
                                                 imagePreviewAdapter.add(faceCroped);
-                                                mBoolean = false;
+                                                mBooleanfetect = false;
                                             }
                                         }
                                     });
@@ -808,6 +986,7 @@ public final class LoginFaceDetectRGBActivity extends AppCompatActivity implemen
         }
     }
 
+
     public Bitmap convertViewToBitmap(View view) {
 
         view.setDrawingCacheEnabled(true);
@@ -820,23 +999,13 @@ public final class LoginFaceDetectRGBActivity extends AppCompatActivity implemen
 
     }
 
-    public String bitmaptoString(Bitmap bitmap) {
-        //将Bitmap转换成字符串
-        String string = null;
-        ByteArrayOutputStream bStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 20, bStream);
-        byte[] bytes = bStream.toByteArray();
-        string = Base64.encodeToString(bytes, Base64.DEFAULT);
-        return string;
-    }
-
     /**
      * Release Memory
      */
     private void resetData() {
         if (imagePreviewAdapter == null) {
             facesBitmap = new ArrayList<>();
-            imagePreviewAdapter = new ImagePreviewAdapter(LoginFaceDetectRGBActivity.this, facesBitmap, new ImagePreviewAdapter.ViewHolder.OnItemClickListener() {
+            imagePreviewAdapter = new ImagePreviewAdapter(LeadFaceDetectRGBActivity.this, facesBitmap, new ImagePreviewAdapter.ViewHolder.OnItemClickListener() {
                 @Override
                 public void onClick(View v, int position) {
                     imagePreviewAdapter.setCheck(position);

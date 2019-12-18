@@ -43,6 +43,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
+import com.xsylsb.integrity.MainApplication;
 import com.xsylsb.integrity.R;
 import com.xsylsb.integrity.WebActivity;
 import com.xsylsb.integrity.base.AddFaceBase;
@@ -209,7 +210,7 @@ public final class AddFaceRGBActivity extends AppCompatActivity implements Surfa
             public void run() {
                 try {
                     JSONObject jsonObject = new JSONObject();
-                    jsonObject.put("workerId", MyURL.id);//id
+                    jsonObject.put("workerId", MainApplication.id);//id
                     jsonObject.put("fileName", "png");//人脸数据
                     jsonObject.put("fileData", img);//人脸数据
                     OkHttpUtils.doPostJson(MyURL.URL + "UpdateTenCentFaces", jsonObject.toString(), mHttpCallBack, 0);
@@ -272,7 +273,7 @@ public final class AddFaceRGBActivity extends AppCompatActivity implements Surfa
                         succeed.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                MyURL.isBooleanface=true;
+                                MainApplication.isBooleanface=true;
                                 startActivity(new Intent(AddFaceRGBActivity.this, LogwebActivity.class));
                                 dialog.dismiss();
                                 finish();
@@ -299,7 +300,7 @@ public final class AddFaceRGBActivity extends AppCompatActivity implements Surfa
                         succeed.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                MyURL.isBooleanface=true;
+                                MainApplication.isBooleanface=true;
                                 dialog.dismiss();
                                 finish();
                             }

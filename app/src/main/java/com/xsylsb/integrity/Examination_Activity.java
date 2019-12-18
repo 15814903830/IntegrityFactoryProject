@@ -393,7 +393,7 @@ public class Examination_Activity extends AppCompatActivity implements MyTopicSu
                 try {
                     JSONObject jsonObject=new JSONObject();
                     jsonObject.put("courseId",id);//培训id
-                    jsonObject.put("workerId",MyURL.id);//登录传来的id
+                    jsonObject.put("workerId",MainApplication.id);//登录传来的id
                     jsonObject.put("startTime",startTime);//开始时间
                     jsonObject.put("takeUpTime",takeUpTime);//考试时长
                     jsonObject.put("correctNumber",truesum);//答对数量

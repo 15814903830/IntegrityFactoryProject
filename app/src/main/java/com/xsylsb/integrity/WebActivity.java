@@ -1,8 +1,14 @@
 package com.xsylsb.integrity;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -17,12 +23,18 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.xsylsb.integrity.base.OperativesSignBase;
+import com.xsylsb.integrity.face.activity.FaceDetectRGBActivity;
+import com.xsylsb.integrity.face.activity.LeadFaceDetectRGBActivity;
 import com.xsylsb.integrity.mylogin.MyloginActivity;
 import com.xsylsb.integrity.util.MyURL;
 import com.xsylsb.integrity.util.dialog.BaseNiceDialog;
 import com.xsylsb.integrity.util.dialog.NiceDialog;
 import com.xsylsb.integrity.util.dialog.ViewConvertListener;
 import com.xsylsb.integrity.util.dialog.ViewHolder;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -38,7 +50,7 @@ public class WebActivity extends AppCompatActivity {
     @BindView(R.id.iv_ewm)
     ImageView iv_ewm;
 
-
+    private static final int RC_HANDLE_CAMERA_PERM_RGB = 1;
     private ProgressBar progressBar;
     private WebView webView;
     public static final String KEY_URL = "url";
@@ -117,7 +129,7 @@ public class WebActivity extends AppCompatActivity {
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                Log.e("rideUrlLoading", url);
+                Log.e("setWebViewClient", url);
                 if (url.contains("Account/CourseQuestionBank") && url.contains("type=1")) {
                     iv_ewm.setVisibility(View.GONE);
                     Log.e("urlPersonage考试", url);
@@ -150,7 +162,26 @@ public class WebActivity extends AppCompatActivity {
                 } else if (url.contains("Permit/MyCustody")) {
                     webView.loadUrl(url);
                     iv_ewm.setVisibility(View.VISIBLE);
-                } else {
+                } else if (url.contains("OperativesFacesSign")) {
+                    if (isNetworkConnected(WebActivity.this)) {
+                        //人脸识别
+                        int rc = ActivityCompat.checkSelfPermission(WebActivity.this, Manifest.permission.CAMERA);
+                        if (rc == PackageManager.PERMISSION_GRANTED) {
+                          //  Intent intent = new Intent(WebActivity.this, FaceDetectRGBActivity.class);
+                                       Intent intent = new Intent(WebActivity.this, LeadFaceDetectRGBActivity.class);
+                            intent.putExtra("url",url);
+                            startActivity(intent);
+                        } else {
+                            requestCameraPermission(RC_HANDLE_CAMERA_PERM_RGB);
+                        }
+                    } else {
+                        Toast.makeText(WebActivity.this, "请检查网络链接", Toast.LENGTH_SHORT).show();
+                    }
+
+                    webView.loadUrl(url);
+                    iv_ewm.setVisibility(View.VISIBLE);
+                }
+                else {
                     iv_ewm.setVisibility(View.GONE);
                     Log.e("else", "--------else");
                     webView.loadUrl(url);
@@ -190,8 +221,33 @@ public class WebActivity extends AppCompatActivity {
         });
         initWebSettings();
     }
+    public boolean isNetworkConnected(Context context) {
+        if (context != null) {
+            ConnectivityManager mConnectivityManager = (ConnectivityManager) context
+                    .getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo mNetworkInfo = mConnectivityManager.getActiveNetworkInfo();
+            if (mNetworkInfo != null) {
+                return mNetworkInfo.isAvailable();
+            }
+        }
+        return false;
+    }
+    private void requestCameraPermission(final int RC_HANDLE_CAMERA_PERM) {
 
+        final String[] permissions = new String[]{Manifest.permission.CAMERA};
 
+        ActivityCompat.requestPermissions(this, permissions, RC_HANDLE_CAMERA_PERM);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+
+        if (grantResults.length != 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED && requestCode == RC_HANDLE_CAMERA_PERM_RGB) {
+            Intent intent = new Intent(WebActivity.this, LeadFaceDetectRGBActivity.class);
+            startActivity(intent);
+            return;
+        }
+    }
     private void showEmpty() {
         webView.setVisibility(View.GONE);
     }
