@@ -61,14 +61,13 @@ public class SafetyDtailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     @Override
     public void onBindViewHolder(@NonNull final RecyclerView.ViewHolder viewHolder, final int i) {
         ((ViewHolder) viewHolder).tv_name.setText(bookListBase.get(i).getName());
+        if (bookListBase.get(i).getIsselise().equals("ABC")) {
+            ((ViewHolder) viewHolder).iv_exit.setSelected(true);
+        } else {
+            ((ViewHolder) viewHolder).iv_exit.setSelected(false);
+        }
 
         if (send.equals("")) {
-            if (bookListBase.get(i).getIsselise().equals("ABC")) {
-                ((ViewHolder) viewHolder).iv_exit.setSelected(true);
-            } else {
-                ((ViewHolder) viewHolder).iv_exit.setSelected(false);
-            }
-
             ((ViewHolder) viewHolder).ll_select.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -88,6 +87,20 @@ public class SafetyDtailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             }else {
                 ((ViewHolder) viewHolder).ll_select.setVisibility(View.GONE);
             }
+
+            ((ViewHolder) viewHolder).ll_select.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (bookListBase.get(i).getIsselise().equals("ABC")) {
+                        ((ViewHolder) viewHolder).iv_exit.setSelected(false);
+                        bookListBase.get(i).setIsselise("SSS");
+                    } else {
+                        ((ViewHolder) viewHolder).iv_exit.setSelected(true);
+                        bookListBase.get(i).setIsselise("ABC");
+                    }
+                    getItemid.GetItemid();
+                }
+            });
         }
 
     }
