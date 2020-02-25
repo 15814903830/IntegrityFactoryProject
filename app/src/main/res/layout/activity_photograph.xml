@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFF5F5F5"
+    android:orientation="vertical"
+    tools:context=".PhotographActivity">
+
+<com.xsylsb.integrity.view.StatusBarHeightView
+    app:use_type="use_height"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"></com.xsylsb.integrity.view.StatusBarHeightView>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="50dp">
+
+        <ImageView
+            android:id="@+id/iv_return"
+            android:padding="15dp"
+            android:src="@mipmap/fanhui"
+            android:layout_width="50dp"
+            android:layout_height="50dp" />
+
+        <TextView
+            android:layout_marginRight="50dp"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:textColor="#FF333333"
+            android:text="审批"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_marginBottom="5dp"
+        android:layout_weight="1"
+        android:layout_width="match_parent"
+        android:layout_height="0dp">
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_weight="1"
+        android:layout_width="match_parent"
+        android:layout_height="0dp">
+    <TextView
+        android:layout_marginVertical="15dp"
+        android:layout_marginHorizontal="15dp"
+        android:text="选择审批信息"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <LinearLayout
+        android:background="@drawable/photograph_shape"
+        android:orientation="vertical"
+        android:layout_marginHorizontal="15dp"
+        android:layout_width="match_parent"
+        android:layout_height="150dp">
+        <LinearLayout
+            android:id="@+id/ll_shenghe1"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="49dp">
+
+            <TextView
+                android:layout_width="341dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="15dp"
+                android:layout_weight="1"
+                android:text="审批通过" />
+            <ImageView
+                android:id="@+id/iv_shenghe1"
+                android:src="@mipmap/xuanzheyes"
+                android:layout_marginRight="15dp"
+                android:layout_width="18dp"
+                android:layout_height="18dp" />
+        </LinearLayout>
+        <View
+            android:background="#FFF5F5F5"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"/>
+        <LinearLayout
+            android:id="@+id/ll_shenghe2"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="49dp">
+            <TextView
+                android:layout_marginLeft="15dp"
+                android:layout_weight="1"
+                android:text="审批不通过"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content" />
+            <ImageView
+                android:id="@+id/iv_shenghe2"
+                android:src="@mipmap/xuanzhetrue"
+                android:layout_marginRight="15dp"
+                android:layout_width="18dp"
+                android:layout_height="18dp" />
+        </LinearLayout>
+        <View
+            android:background="#FFF5F5F5"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"/>
+        <LinearLayout
+            android:id="@+id/ll_shenghe3"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="49dp">
+            <TextView
+                android:layout_marginLeft="15dp"
+                android:layout_weight="1"
+                android:text="终止审核"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content" />
+            <ImageView
+                android:id="@+id/iv_shenghe3"
+                android:src="@mipmap/xuanzhetrue"
+                android:layout_marginRight="15dp"
+                android:layout_width="18dp"
+                android:layout_height="18dp" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+       <LinearLayout
+           android:visibility="gone"
+           android:id="@+id/ll_xmzg"
+           android:layout_marginTop="15dp"
+           android:gravity="center_vertical"
+           android:orientation="horizontal"
+           android:layout_marginHorizontal="15dp"
+           android:background="@drawable/photograph_shape"
+           android:layout_width="match_parent"
+           android:layout_height="80dp">
+           <TextView
+               android:layout_marginLeft="15dp"
+               android:text="项目主管科室"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content" />
+           <TextView
+               android:layout_marginRight="@dimen/dp_10"
+               android:id="@+id/tv_xmzg_text"
+               android:gravity="right"
+               android:layout_marginLeft="15dp"
+               android:layout_weight="1"
+               android:layout_width="0dp"
+               android:layout_height="wrap_content" />
+           <ImageView
+               android:layout_marginRight="15dp"
+               android:src="@mipmap/youjt"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content" />
+       </LinearLayout>
+
+        <LinearLayout
+            android:visibility="gone"
+            android:id="@+id/ll_getworkerxm_select"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+        <TextView
+            android:layout_marginVertical="15dp"
+            android:layout_marginHorizontal="15dp"
+            android:text="施工单位现场监护人（多选）"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+            <android.support.v7.widget.RecyclerView
+                android:layout_marginHorizontal="15dp"
+                android:id="@+id/rv_getworkerxm_select"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"></android.support.v7.widget.RecyclerView>
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/ll_safetyworkpermitsign_dtail"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_marginVertical="15dp"
+                android:layout_marginHorizontal="15dp"
+                android:text="属地单位监护人（多选）"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <LinearLayout
+                android:id="@+id/ll_shudidanwei_xuanzhe"
+                android:background="@drawable/photograph_shape"
+                android:gravity="center_vertical"
+                android:layout_marginHorizontal="15dp"
+                android:layout_width="match_parent"
+                android:layout_height="80dp">
+                <TextView
+                    android:text="请选择属地单位监护人"
+                    android:id="@+id/tv_shudiname"
+                    android:layout_marginHorizontal="@dimen/dp_10"
+                    android:gravity="center_vertical"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"/>
+                <ImageView
+                    android:layout_marginRight="15dp"
+                    android:src="@mipmap/youjt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+    <TextView
+        android:layout_marginVertical="15dp"
+        android:layout_marginHorizontal="15dp"
+        android:text="填写签署意见(非必填)"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <EditText
+        android:id="@+id/et_yijiang"
+        android:padding="@dimen/dp_10"
+        android:gravity="top"
+        android:hint="点击输入签署意见"
+        android:layout_marginHorizontal="15dp"
+        android:background="@drawable/photograph_shape"
+        android:layout_width="match_parent"
+        android:layout_height="135dp" />
+    <TextView
+        android:layout_marginVertical="15dp"
+        android:layout_marginHorizontal="15dp"
+        android:text="上传图片(非必填)"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+
+    <LinearLayout
+        android:background="@drawable/photograph_shape"
+        android:layout_marginHorizontal="15dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_tupian"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+        </android.support.v7.widget.RecyclerView>
+    </LinearLayout>
+    </LinearLayout>
+    </ScrollView>
+    <LinearLayout
+        android:gravity="center_vertical"
+        android:layout_width="match_parent"
+        android:layout_height="60dp">
+        <Button
+            android:id="@+id/btn_lijisp"
+            android:background="@drawable/lijisp"
+            android:textColor="#FFFFFF"
+            android:text="立即审批"
+            android:textStyle="bold"
+            android:layout_marginHorizontal="15dp"
+            android:layout_width="match_parent"
+            android:layout_height="44dp" />
+    </LinearLayout>
+</LinearLayout>

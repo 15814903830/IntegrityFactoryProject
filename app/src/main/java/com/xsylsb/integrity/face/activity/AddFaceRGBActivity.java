@@ -8,18 +8,14 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.ImageFormat;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.YuvImage;
 import android.hardware.Camera;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.ActivityCompat;
@@ -38,28 +34,24 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
 import com.xsylsb.integrity.MainApplication;
 import com.xsylsb.integrity.R;
 import com.xsylsb.integrity.WebActivity;
 import com.xsylsb.integrity.base.AddFaceBase;
-import com.xsylsb.integrity.base.FaceRecongitRGBBase;
 import com.xsylsb.integrity.face.activity.ui.FaceOverlayView;
 import com.xsylsb.integrity.face.adapter.ImagePreviewAdapter;
-import com.xsylsb.integrity.face.adapter.MyFacelistviewAdapter;
 import com.xsylsb.integrity.face.model.FaceResult;
 import com.xsylsb.integrity.face.utils.CameraErrorCallback;
 import com.xsylsb.integrity.face.utils.ImageUtils;
 import com.xsylsb.integrity.face.utils.Util;
 import com.xsylsb.integrity.mylogin.LogwebActivity;
-import com.xsylsb.integrity.mylogin.MyloginActivity;
 import com.xsylsb.integrity.util.HttpCallBack;
 import com.xsylsb.integrity.util.MyURL;
 import com.xsylsb.integrity.util.OkHttpUtils;
+import com.xsylsb.integrity.util.SharedPrefUtil;
 import com.xsylsb.integrity.util.dialog.BaseNiceDialog;
 import com.xsylsb.integrity.util.dialog.NiceDialog;
 import com.xsylsb.integrity.util.dialog.ViewConvertListener;
@@ -70,9 +62,6 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -141,6 +130,8 @@ public final class AddFaceRGBActivity extends AppCompatActivity implements Surfa
     private ImageView textimg;
     private Context mContext;
     private CountDownTimer timer;
+
+    private String noid;
     /**
      * Initializes the UI and initiates the creation of a face detector.
      */
@@ -148,6 +139,8 @@ public final class AddFaceRGBActivity extends AppCompatActivity implements Surfa
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
         setContentView(R.layout.activity_camera_viewer);
+        noid=getIntent().getStringExtra("noid");
+
         mView = (SurfaceView) findViewById(R.id.surfaceview);
         textimg=findViewById(R.id.textimg);
         mContext=this;
@@ -205,20 +198,38 @@ public final class AddFaceRGBActivity extends AppCompatActivity implements Surfa
             return;
         }
         mBoolean = true;
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    JSONObject jsonObject = new JSONObject();
-                    jsonObject.put("workerId", MainApplication.id);//id
-                    jsonObject.put("fileName", "png");//人脸数据
-                    jsonObject.put("fileData", img);//人脸数据
-                    OkHttpUtils.doPostJson(MyURL.URL + "UpdateTenCentFaces", jsonObject.toString(), mHttpCallBack, 0);
-                } catch (JSONException e) {
-                    e.printStackTrace();
+        if (!noid.equals("123")){
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        JSONObject jsonObject = new JSONObject();
+                        jsonObject.put("workerId", noid);//id
+                        jsonObject.put("fileName", "png");//人脸数据
+                        jsonObject.put("fileData", img);//人脸数据
+                        OkHttpUtils.doPostJson(MyURL.URL + "UpdateTenCentFaces", jsonObject.toString(), mHttpCallBack, 0);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
-        }).start();
+            }).start();
+        }else {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        JSONObject jsonObject = new JSONObject();
+                        jsonObject.put("workerId", SharedPrefUtil.getString(SharedPrefUtil.ID));//id
+                        jsonObject.put("fileName", "png");//人脸数据
+                        jsonObject.put("fileData", img);//人脸数据
+                        OkHttpUtils.doPostJson(MyURL.URL + "UpdateTenCentFaces", jsonObject.toString(), mHttpCallBack, 0);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
+        }
+
     }
 
 
@@ -274,7 +285,13 @@ public final class AddFaceRGBActivity extends AppCompatActivity implements Surfa
                             @Override
                             public void onClick(View v) {
                                 MainApplication.isBooleanface=true;
-                                startActivity(new Intent(AddFaceRGBActivity.this, LogwebActivity.class));
+                                if (!noid.equals("123")){
+                                    Intent intent=new Intent(AddFaceRGBActivity.this,WebActivity.class);
+                                    intent.putExtra("url",MyURL.URLL+"Worker/Credit?id="+noid);
+                                    startActivity(intent);
+                                }else {
+                                    startActivity(new Intent(AddFaceRGBActivity.this, LogwebActivity.class));
+                                }
                                 dialog.dismiss();
                                 finish();
                             }
@@ -284,7 +301,7 @@ public final class AddFaceRGBActivity extends AppCompatActivity implements Surfa
                 .setDimAmount(0.3f)
                 .setShowBottom(false)
                 .setAnimStyle(R.style.PracticeModeAnimation)
-                .setOutCancel(false) //触摸外部是否取消
+                .setOutCancel(true) //触摸外部是否取消
                 .show(getSupportFragmentManager());
     }
 
@@ -310,34 +327,17 @@ public final class AddFaceRGBActivity extends AppCompatActivity implements Surfa
                 .setDimAmount(0.3f)
                 .setShowBottom(false)
                 .setAnimStyle(R.style.PracticeModeAnimation)
-                .setOutCancel(false) //触摸外部是否取消
+                .setOutCancel(true) //触摸外部是否取消
                 .show(getSupportFragmentManager());
     }
 
-
-    private void addface() {//添加人脸
-        //人脸识别
-        int rc = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
-        if (rc == PackageManager.PERMISSION_GRANTED) {
-            Intent intent = new Intent(this, AddFaceRGBActivity.class);
-            startActivity(intent);
-        } else {
-            requestCameraPermission(RC_HANDLE_CAMERA_PERM_RGB);
-        }
-    }
-
-    private void requestCameraPermission(final int RC_HANDLE_CAMERA_PERM) {
-
-        final String[] permissions = new String[]{Manifest.permission.CAMERA};
-
-        ActivityCompat.requestPermissions(this, permissions, RC_HANDLE_CAMERA_PERM);
-    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
 
         if (grantResults.length != 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED && requestCode == RC_HANDLE_CAMERA_PERM_RGB) {
             Intent intent = new Intent(this, AddFaceRGBActivity.class);
+            intent.putExtra("noid", "123");
             startActivity(intent);
             return;
         }
@@ -924,7 +924,7 @@ public final class AddFaceRGBActivity extends AppCompatActivity implements Surfa
                 .setDimAmount(0.3f)
                 .setShowBottom(false)
                 .setAnimStyle(R.style.PracticeModeAnimation)
-                .setOutCancel(false) //触摸外部是否取消
+                .setOutCancel(true) //触摸外部是否取消
                 .show(getSupportFragmentManager());
     }
 

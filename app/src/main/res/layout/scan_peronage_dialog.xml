@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:gravity="center"
+    android:orientation="vertical"
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:background="@drawable/btn_dialog_search_8"
+        android:layout_width="295dp"
+        android:layout_height="wrap_content">
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_scan"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"></android.support.v7.widget.RecyclerView>
+        <EditText
+            android:hint="请输入施工单位现场监护人信息"
+            android:id="@+id/et_scan"
+            android:gravity="center"
+            android:background="@null"
+            android:layout_width="match_parent"
+            android:layout_height="200dp" />
+        <LinearLayout
+            android:id="@+id/ll_search"
+            android:gravity="center"
+            android:background="#00BA94"
+            android:layout_width="match_parent"
+            android:layout_height="50dp">
+            <TextView
+                android:gravity="center"
+                android:id="@+id/tv_search"
+                android:text="搜索"
+                android:textSize="17sp"
+                android:textColor="#FFFFFF"
+                android:layout_width="100dp"
+                android:layout_height="50dp" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

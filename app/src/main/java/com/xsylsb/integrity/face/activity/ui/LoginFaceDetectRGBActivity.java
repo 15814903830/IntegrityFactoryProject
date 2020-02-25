@@ -6,18 +6,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.ImageFormat;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.YuvImage;
 import android.hardware.Camera;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
@@ -45,7 +41,6 @@ import com.xsylsb.integrity.MainApplication;
 import com.xsylsb.integrity.R;
 import com.xsylsb.integrity.WebActivity;
 import com.xsylsb.integrity.base.FaceFalseBase;
-import com.xsylsb.integrity.base.FaceRecongitRGBBase;
 import com.xsylsb.integrity.base.LoinFaceBase;
 import com.xsylsb.integrity.face.adapter.ImagePreviewAdapter;
 import com.xsylsb.integrity.face.adapter.MyFacelistviewAdapter;
@@ -54,11 +49,10 @@ import com.xsylsb.integrity.face.utils.CameraErrorCallback;
 import com.xsylsb.integrity.face.utils.ImageUtils;
 import com.xsylsb.integrity.face.utils.Util;
 import com.xsylsb.integrity.mylogin.LogwebActivity;
-import com.xsylsb.integrity.mylogin.MyloginActivity;
 import com.xsylsb.integrity.util.HttpCallBack;
 import com.xsylsb.integrity.util.MyURL;
 import com.xsylsb.integrity.util.OkHttpUtils;
-import com.xsylsb.integrity.util.RequestParams;
+import com.xsylsb.integrity.util.SharedPrefUtil;
 import com.xsylsb.integrity.util.dialog.BaseNiceDialog;
 import com.xsylsb.integrity.util.dialog.NiceDialog;
 import com.xsylsb.integrity.util.dialog.ViewConvertListener;
@@ -69,10 +63,6 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -225,7 +215,7 @@ public final class LoginFaceDetectRGBActivity extends AppCompatActivity implemen
                             public void onClick(View v) {
                                 //进入首页
                                 dialog.dismiss();
-                                MainApplication.id = "" + mFaceRecongitRGBBase.getData().getId();
+                                SharedPrefUtil.putString(SharedPrefUtil.ID,"" + mFaceRecongitRGBBase.getData().getId());
                                 //登陆操作
                                 //验证账号密码，跳转到主页
                                 Intent intent = new Intent();
@@ -236,7 +226,7 @@ public final class LoginFaceDetectRGBActivity extends AppCompatActivity implemen
                         particular.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                String particularurl = "http://liugangapi.gx11.cn/Worker/Credit?id=" + mFaceRecongitRGBBase.getData().getId();
+                                String particularurl = MyURL.URLL+"Worker/Credit?id=" + mFaceRecongitRGBBase.getData().getId();
                                 //查看详情
                                 Intent intent = new Intent(LoginFaceDetectRGBActivity.this, WebActivity.class);
                                 intent.putExtra(KEY_URL, particularurl);
@@ -306,7 +296,7 @@ public final class LoginFaceDetectRGBActivity extends AppCompatActivity implemen
                         //识别成功
                         mFaceRecongitRGBBase = JSON.parseObject(response, LoinFaceBase.class);
                         if (mFaceRecongitRGBBase.isSuc()) {//人脸识别成功  //扫描成功
-                            MainApplication.id = "" + mFaceRecongitRGBBase.getData().getId();
+                            SharedPrefUtil.putString(SharedPrefUtil.ID,"" + mFaceRecongitRGBBase.getData().getId());
                             //                            startActivity(new Intent(LoginFaceDetectRGBActivity.this, MainActivity.class));
                             startActivity(new Intent(LoginFaceDetectRGBActivity.this, LogwebActivity.class));
                             finish();

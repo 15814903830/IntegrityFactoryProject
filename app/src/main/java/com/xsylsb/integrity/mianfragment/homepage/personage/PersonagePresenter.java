@@ -1,7 +1,5 @@
 package com.xsylsb.integrity.mianfragment.homepage.personage;
 
-import android.content.Context;
-
 import com.xsylsb.integrity.mvp.BasePresenterImpl;
 
 /**

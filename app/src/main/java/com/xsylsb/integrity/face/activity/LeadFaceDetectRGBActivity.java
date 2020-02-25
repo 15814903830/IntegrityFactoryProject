@@ -55,6 +55,7 @@ import com.xsylsb.integrity.face.utils.Util;
 import com.xsylsb.integrity.util.HttpCallBack;
 import com.xsylsb.integrity.util.MyURL;
 import com.xsylsb.integrity.util.OkHttpUtils;
+import com.xsylsb.integrity.util.SharedPrefUtil;
 import com.xsylsb.integrity.util.dialog.BaseNiceDialog;
 import com.xsylsb.integrity.util.dialog.NiceDialog;
 import com.xsylsb.integrity.util.dialog.ViewConvertListener;
@@ -187,21 +188,24 @@ public final class LeadFaceDetectRGBActivity extends AppCompatActivity implement
         }
         mBoolean = true;
         List<OperativesSignBase> list = new ArrayList<>();
-        Log.e("jsonObject","url:"+url);
+        Log.e("jsonObject", "url:" + url);
         String[] split = url.split("\\?")[1].split("&");
         for (int i = 0; i < split.length; i++) {
             OperativesSignBase operativesSignBase = new OperativesSignBase();
             operativesSignBase.setKey(split[i].split("=")[0]);
             operativesSignBase.setValue(split[i].split("=")[1]);
-            if (operativesSignBase.getKey().equals("workerId")) {
-                operativesSignBase.setValue("" + MainApplication.id);
-            }
-            if (operativesSignBase.getKey().equals("workerFullName")){
-                operativesSignBase.setValue(img);
-            }
             list.add(operativesSignBase);
-            Log.e("jsonObject","list:"+JSON.toJSONString(list));
+            Log.e("jsonObject", "list:" + JSON.toJSONString(list));
         }
+        OperativesSignBase operativesSignBase = new OperativesSignBase();
+        operativesSignBase.setKey("workerId");
+        operativesSignBase.setValue("" + SharedPrefUtil.getString(SharedPrefUtil.ID));
+        list.add(operativesSignBase);
+
+        OperativesSignBase operativesSignBase2 = new OperativesSignBase();
+        operativesSignBase2.setKey("workerFullName");
+        operativesSignBase2.setValue(img);
+        list.add(operativesSignBase2);
         OperativesFacesSign(url.split("\\?")[0], list);
     }
 
@@ -216,7 +220,7 @@ public final class LeadFaceDetectRGBActivity extends AppCompatActivity implement
                         jsonObject.put(list.get(i).getKey(), list.get(i).getValue());
                     }
                     OkHttpUtils.doPostJson(url, jsonObject.toString(), mHttpCallBack, 283);
-                    Log.e("jsonObject:",jsonObject.toString());
+                    Log.e("jsonObject:", jsonObject.toString());
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -257,14 +261,17 @@ public final class LeadFaceDetectRGBActivity extends AppCompatActivity implement
                 break;
             case 283:
                 try {
-                    JSONObject jsonObject=new JSONObject(response);
-                    Toast.makeText(this, jsonObject.getString("msg"), Toast.LENGTH_SHORT).show();
+                    JSONObject jsonObject = new JSONObject(response);
+                    Intent intent2 = new Intent();
+                    intent2.setAction("ADD_CREATIONG_GROUP");
+                    intent2.putExtra("msg", jsonObject.getString("msg"));
+                    //发送广播
+                    sendBroadcast(intent2);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
                 finish();
                 break;
-
 
 
         }
@@ -282,7 +289,7 @@ public final class LeadFaceDetectRGBActivity extends AppCompatActivity implement
                             @Override
                             public void onClick(View v) {
                                 //查看详情
-                                String particularurl = "http://liugangapi.gx11.cn/Worker/Credit?id=" + mFaceRecongitRGBBase.getData().getId();
+                                String particularurl = MyURL.URLL + "Worker/Credit?id=" + mFaceRecongitRGBBase.getData().getId();
                                 Intent intent = new Intent(LeadFaceDetectRGBActivity.this, WebActivity.class);
                                 intent.putExtra(KEY_URL, particularurl);
                                 startActivity(intent);
@@ -357,6 +364,7 @@ public final class LeadFaceDetectRGBActivity extends AppCompatActivity implement
         int rc = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
         if (rc == PackageManager.PERMISSION_GRANTED) {
             Intent intent = new Intent(this, AddFaceRGBActivity.class);
+            intent.putExtra("noid", "123");
             startActivity(intent);
         } else {
             requestCameraPermission(RC_HANDLE_CAMERA_PERM_RGB);
@@ -406,7 +414,7 @@ public final class LeadFaceDetectRGBActivity extends AppCompatActivity implement
                         particular.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                String particularurl = "http://liugangapi.gx11.cn/Worker/Credit?id=" + mFaceRecongitRGBBase.getData().getId();
+                                String particularurl = MyURL.URLL+"Worker/Credit?id=" + mFaceRecongitRGBBase.getData().getId();
                                 //查看详情
                                 Intent intent = new Intent(LeadFaceDetectRGBActivity.this, WebActivity.class);
                                 intent.putExtra(KEY_URL, particularurl);

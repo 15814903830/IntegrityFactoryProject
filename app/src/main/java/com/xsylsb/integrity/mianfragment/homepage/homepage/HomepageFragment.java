@@ -22,12 +22,12 @@ import com.xsylsb.integrity.R;
 import com.xsylsb.integrity.WebActivity;
 import com.xsylsb.integrity.mvp.MVPBaseFragment;
 import com.xsylsb.integrity.util.MyURL;
+import com.xsylsb.integrity.util.SharedPrefUtil;
 import com.xsylsb.integrity.util.dialog.BaseNiceDialog;
 import com.xsylsb.integrity.util.dialog.NiceDialog;
 import com.xsylsb.integrity.util.dialog.ViewConvertListener;
 import com.xsylsb.integrity.util.dialog.ViewHolder;
 
-import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
@@ -66,7 +66,7 @@ public class HomepageFragment extends MVPBaseFragment<HomepageContract.View, Hom
             showLoading();
             showlading = false;
         }
-        mUrl = mUrl + "?id=" + MainApplication.id + "&newsType=13&bulletinType=11&page=1&limit=10000";
+        mUrl = mUrl + "?id=" + SharedPrefUtil.getString(SharedPrefUtil.ID) + "&newsType=13&bulletinType=11&page=1&limit=10000";
         Log.e("url", mUrl);
         initView();
         webView.loadUrl(mUrl);
@@ -129,6 +129,11 @@ public class HomepageFragment extends MVPBaseFragment<HomepageContract.View, Hom
         initWebSettings();
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        webView.reload();
+    }
 
     private void initWebSettings() {
         WebSettings webSettings = webView.getSettings();

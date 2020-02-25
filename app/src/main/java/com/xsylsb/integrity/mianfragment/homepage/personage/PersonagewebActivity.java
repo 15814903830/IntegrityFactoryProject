@@ -5,7 +5,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -23,9 +22,9 @@ public class PersonagewebActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_logweb2);//http://liugangapi.gx11.cn/Worker/Credit?id=24
+        setContentView(R.layout.activity_logweb2);
         initView();
-        webView.loadUrl("http://liugangapi.gx11.cn/Worker/Credit?id="+ getIntent().getStringExtra("id"));
+        webView.loadUrl(MyURL.URLL+"Worker/Credit?id="+ getIntent().getStringExtra("id"));
         MainApplication.isBooleanface=true;
         imageView=findViewById(R.id.wed_activity);
         imageView.setOnClickListener(new View.OnClickListener() {

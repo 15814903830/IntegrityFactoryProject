@@ -12,20 +12,16 @@ import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
-import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.webkit.JsResult;
 import android.webkit.WebChromeClient;
-import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,6 +37,7 @@ import com.xsylsb.integrity.util.HttpCallBack;
 import com.xsylsb.integrity.util.MyURL;
 import com.xsylsb.integrity.util.OkHttpUtils;
 import com.xsylsb.integrity.util.RequestParams;
+import com.xsylsb.integrity.util.SharedPrefUtil;
 import com.xsylsb.integrity.util.dialog.BaseNiceDialog;
 import com.xsylsb.integrity.util.dialog.NiceDialog;
 import com.xsylsb.integrity.util.dialog.ViewConvertListener;
@@ -50,9 +47,6 @@ import com.xsylsb.integrity.versionupdating.PermissionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
 
 import static com.xsylsb.integrity.mylogin.MyloginActivity.verifyStoragePermissions;
 
@@ -77,10 +71,10 @@ public class LogwebActivity extends AppCompatActivity implements HttpCallBack {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_logweb);//http://liugangapi.gx11.cn/Worker/Credit?id=24
+        setContentView(R.layout.activity_logweb);
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         initView();
-        webView.loadUrl("http://liugangapi.gx11.cn/Worker/Credit?id="+ MainApplication.id);
+        webView.loadUrl(MyURL.URLL+"Worker/Credit?id="+ SharedPrefUtil.getString(SharedPrefUtil.ID));
         MainApplication.isBooleanface=true;
         context = this;
         mHttpCallBack = this;
@@ -191,6 +185,9 @@ public class LogwebActivity extends AppCompatActivity implements HttpCallBack {
     @Override
     public void onHandlerMessageCallback(String response, int requestId) {
         mVersionBase = JSON.parseObject(response, VersionBase.class);
+        Log.e("verson", "："+response);
+        Log.e("verson", "："+ BaseUtils.getVersionName(context));
+
         if (BaseUtils.checkVersion(LogwebActivity.this, "" + mVersionBase.getAndroidAppVersion())){
             Log.e("verson", "更新操作");
             NiceDialog.init()
@@ -352,5 +349,11 @@ public class LogwebActivity extends AppCompatActivity implements HttpCallBack {
                 //tv_info.setText("安装失败:" + e.toString());
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        webView.reload();
     }
 }

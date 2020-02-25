@@ -21,6 +21,7 @@ import com.xsylsb.integrity.mylogin.MyloginActivity;
 import com.xsylsb.integrity.util.HttpCallBack;
 import com.xsylsb.integrity.util.MyURL;
 import com.xsylsb.integrity.util.OkHttpUtils;
+import com.xsylsb.integrity.util.SharedPrefUtil;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -98,7 +99,7 @@ public class StartActivity extends AppCompatActivity implements HttpCallBack {
                     mLoginBase = JSON.parseObject(response, LoginBase.class);
                     if (mLoginBase.isSuc()) {
                         mBoolean = false;
-                        MainApplication.id = "" + mLoginBase.getData().getId();
+                        SharedPrefUtil.putString(SharedPrefUtil.ID,"" + mLoginBase.getData().getId());
                         //登陆操作
                         //验证账号密码，跳转到主页
                         startActivity(new Intent(StartActivity.this, LogwebActivity.class));

@@ -2,7 +2,6 @@ package com.xsylsb.integrity.mianfragment.homepage.notice;
 
 
 import android.content.Intent;
-import android.opengl.Visibility;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -21,10 +20,9 @@ import com.xsylsb.integrity.MainActivity;
 import com.xsylsb.integrity.MainApplication;
 import com.xsylsb.integrity.R;
 import com.xsylsb.integrity.WebActivity;
-import com.xsylsb.integrity.mianfragment.homepage.homepage.HomepageFragment;
-import com.xsylsb.integrity.mianfragment.homepage.train.TrainFragment;
 import com.xsylsb.integrity.mvp.MVPBaseFragment;
 import com.xsylsb.integrity.util.MyURL;
+import com.xsylsb.integrity.util.SharedPrefUtil;
 import com.xsylsb.integrity.util.dialog.BaseNiceDialog;
 import com.xsylsb.integrity.util.dialog.NiceDialog;
 import com.xsylsb.integrity.util.dialog.ViewConvertListener;
@@ -65,7 +63,7 @@ public class NoticeFragment extends MVPBaseFragment<NoticeContract.View, NoticeP
             showLoading();
             showlading=false;
         }
-        mUrl=mUrl+"?id="+ MainApplication.id+"&page=1&limit=2147483647";
+        mUrl=mUrl+"?id="+ SharedPrefUtil.getString(SharedPrefUtil.ID)+"&page=1&limit=2147483647";
         Log.e("NOticeurl",mUrl);
         initView();
         webView.loadUrl(mUrl);
@@ -76,6 +74,7 @@ public class NoticeFragment extends MVPBaseFragment<NoticeContract.View, NoticeP
     public void onResume() {
         super.onResume();
         if(activity != null) activity.tvNoticeDot.setVisibility(View.GONE);
+        webView.reload();
     }
 
     private void initView() {

@@ -1,15 +1,18 @@
 package com.xsylsb.integrity.mianfragment.homepage.personage;
 
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -27,11 +30,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
+import com.xsylsb.integrity.ControlActivity;
+import com.xsylsb.integrity.MainActivity;
 import com.xsylsb.integrity.MainApplication;
-import com.xsylsb.integrity.PracticeMode_Activity;
 import com.xsylsb.integrity.PracticeMode_Activity2;
 import com.xsylsb.integrity.R;
 import com.xsylsb.integrity.WebActivity;
+import com.xsylsb.integrity.base.ScanAddFaceBase;
+import com.xsylsb.integrity.face.activity.AddFaceRGBActivity;
+import com.xsylsb.integrity.mianfragment.homepage.ScanAddFacePersonAdapter;
 import com.xsylsb.integrity.mvp.MVPBaseFragment;
 import com.xsylsb.integrity.mylogin.MyloginActivity;
 import com.xsylsb.integrity.util.HttpCallBack;
@@ -39,6 +46,7 @@ import com.xsylsb.integrity.util.KeyBoardUtils;
 import com.xsylsb.integrity.util.MyURL;
 import com.xsylsb.integrity.util.OkHttpUtils;
 import com.xsylsb.integrity.util.RequestParams;
+import com.xsylsb.integrity.util.SharedPrefUtil;
 import com.xsylsb.integrity.util.StowMainInfc;
 import com.xsylsb.integrity.util.dialog.BaseNiceDialog;
 import com.xsylsb.integrity.util.dialog.NiceDialog;
@@ -57,9 +65,9 @@ import static android.content.Context.MODE_PRIVATE;
  * 个人
  */
 
-public class PersonageFragment extends MVPBaseFragment<PersonageContract.View, PersonagePresenter> implements PersonageContract.View, HttpCallBack, PersonAdapter.defaultAddress,TpyeAdapter.gettpyeid {
+public class PersonageFragment extends MVPBaseFragment<PersonageContract.View, PersonagePresenter> implements PersonageContract.View, HttpCallBack, PersonAdapter.defaultAddress, TpyeAdapter.gettpyeid, ScanAddFacePersonAdapter.AddFacefot {
 
-    private String TAG="PersonageFragment";
+    private String TAG = "PersonageFragment";
     private static StowMainInfc stowMainInfcss;
     private View mView;
     private ProgressBar progressBar;
@@ -87,7 +95,8 @@ public class PersonageFragment extends MVPBaseFragment<PersonageContract.View, P
     TextView tv_idno;
     String idno = "";
     private SharedPreferences sp;
-    private String tpyeid="";
+    private String tpyeid = "";
+    private static final int RC_HANDLE_CAMERA_PERM_RGB = 1;
 
     /**
      * Fragment 的构造函数。
@@ -108,13 +117,19 @@ public class PersonageFragment extends MVPBaseFragment<PersonageContract.View, P
             showLoading();
             showlading = false;
         }
-        mUrl = mUrl + "?id=" + MainApplication.id;
+        mUrl = mUrl + "?id=" + SharedPrefUtil.getString(SharedPrefUtil.ID);
         Log.e(TAG, mUrl);
         initView();
         webView.loadUrl(mUrl);
         mHttpCallBack = this;
         sp = getActivity().getSharedPreferences("info", MODE_PRIVATE);
         return mView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        webView.reload();
     }
 
     private void initView() {
@@ -163,10 +178,15 @@ public class PersonageFragment extends MVPBaseFragment<PersonageContract.View, P
                     intent.putExtra(KEY_TITLE, mTitle);
                     startActivity(intent);
                 } else if (url.contains("Worker/SearchSubordinate")) {
-                    searchid();//搜索下属
+                    searchid(0);//搜索下属
+                } else if (url.contains("Worker/InputWorker")) {
+                    searchid(1);//搜索下属
                 } else if (url.contains("FirstQuestionClassify")) {
                     getpracticeclassify();//获取练习分类
-                    Log.e(TAG,"FirstQuestionClassify");
+                    Log.e(TAG, "FirstQuestionClassify");
+                } else if (url.contains("Home/ChangingOver")) {
+
+                    startActivity(new Intent(getContext(), ControlActivity.class));
                 } else {
                     Log.e(TAG, url);
                     Intent intent = new Intent(getContext(), WebActivity.class);
@@ -284,16 +304,28 @@ public class PersonageFragment extends MVPBaseFragment<PersonageContract.View, P
     }
 
 
-    private void getmessageid(final String idno) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                List<RequestParams> list = new ArrayList<>();
-                list.add(new RequestParams("idNo", idno));
-                list.add(new RequestParams("more", "true"));
-                OkHttpUtils.doGet(MyURL.URL + "SearchSubordinate/" + MainApplication.id, list, mHttpCallBack, 0);
-            }
-        }).start();
+    private void getmessageid(final String idno, int type) {
+        if (type == 0) {//搜索下属
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    List<RequestParams> list = new ArrayList<>();
+                    list.add(new RequestParams("idNo", idno));
+                    list.add(new RequestParams("more", "true"));
+                    OkHttpUtils.doGet(MyURL.URL + "SearchSubordinate/" + SharedPrefUtil.getString(SharedPrefUtil.ID), list, mHttpCallBack, 0);
+                }
+            }).start();
+        } else {//搜索人员添加人脸或替换
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    List<RequestParams> list = new ArrayList<>();
+                    list.add(new RequestParams("q", idno));
+                    OkHttpUtils.doGet(MyURL.URL + "SearchInputWorker/" + SharedPrefUtil.getString(SharedPrefUtil.ID), list, mHttpCallBack, 2);
+                }
+            }).start();
+
+        }
     }
 
     private void getpracticeclassify() {
@@ -317,22 +349,24 @@ public class PersonageFragment extends MVPBaseFragment<PersonageContract.View, P
     @Override
     public void onHandlerMessageCallback(String response, int requestId) {
         Log.e(TAG, response);
-        switch (requestId){
+        switch (requestId) {
             case 0:
-                onHandler0(response);
+                onHandler0(response, 0);
                 break;
             case 1:
-                typelist=JSON.parseArray(response,TypeBase.class);
+                typelist = JSON.parseArray(response, TypeBase.class);
                 selectType(typelist);
+                break;
+            case 2:
+                onHandler0(response, 1);
                 break;
         }
     }
 
-    private void onHandler0(String response) {
-
+    private void onHandler0(String response, int tpye) {
         JSONObject jsonObject = null;
         try {
-            if (response.length() > 150) {
+            if (tpye == 0) {
                 Log.e(TAG, "else");
                 List<SeekBase> mlist = JSON.parseArray(response, SeekBase.class);
                 tv_idno.setText("" + mlist.size());
@@ -351,6 +385,23 @@ public class PersonageFragment extends MVPBaseFragment<PersonageContract.View, P
                 etnoid.setVisibility(View.GONE);
 
             } else {
+                ScanAddFaceBase scanAddFaceBase = JSON.parseObject(response, ScanAddFaceBase.class);
+                tv_idno.setText("" + scanAddFaceBase.getData().size());
+                LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(),
+                        LinearLayoutManager.VERTICAL, false);
+                recyclerView.setLayoutManager(layoutManager);
+                ScanAddFacePersonAdapter personAdapter = new ScanAddFacePersonAdapter(getContext(), scanAddFaceBase.getData(), this);
+                recyclerView.setAdapter(personAdapter);
+                personAdapter.notifyDataSetChanged();
+                Immediately.setVisibility(View.VISIBLE);
+                personal.setVisibility(View.VISIBLE);
+                llzhongjiang.setVisibility(View.VISIBLE);
+                searchagain.setVisibility(View.GONE);
+                onpersonal.setVisibility(View.GONE);
+                search.setVisibility(View.GONE);
+                etnoid.setVisibility(View.GONE);
+            }
+            {
                 jsonObject = new JSONObject(response);
                 if (!jsonObject.getBoolean("suc")) {
                     //没有找到您的下属人员信息
@@ -391,7 +442,7 @@ public class PersonageFragment extends MVPBaseFragment<PersonageContract.View, P
     /**
      * 查询人员下属名单
      */
-    public void searchid() {
+    public void searchid(final int type) {
         NiceDialog.init()
                 .setLayoutId(R.layout.dialog_search)
                 .setConvertListener(new ViewConvertListener() {
@@ -418,7 +469,7 @@ public class PersonageFragment extends MVPBaseFragment<PersonageContract.View, P
                                 } else {
                                     KeyBoardUtils.closeKeybord(etnoid, getContext());
                                     idno = etnoid.getText().toString();
-                                    getmessageid(etnoid.getText().toString());//调起接口查询
+                                    getmessageid(etnoid.getText().toString(), type);//调起接口查询
                                 }
                             }
                         });
@@ -455,6 +506,22 @@ public class PersonageFragment extends MVPBaseFragment<PersonageContract.View, P
                 .show(getChildFragmentManager());
     }
 
+    private void addface(String noid) {//添加人脸
+        //人脸识别
+        int rc = ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA);
+        if (rc == PackageManager.PERMISSION_GRANTED) {
+            Intent intent = new Intent(getContext(), AddFaceRGBActivity.class);//noid
+            intent.putExtra("noid", noid);
+            getContext().startActivity(intent);
+        } else {
+            requestCameraPermission(RC_HANDLE_CAMERA_PERM_RGB);
+        }
+    }
+
+    private void requestCameraPermission(final int RC_HANDLE_CAMERA_PERM) {
+        final String[] permissions = new String[]{Manifest.permission.CAMERA};
+        ActivityCompat.requestPermissions(getActivity(), permissions, RC_HANDLE_CAMERA_PERM);
+    }
 
     /**
      * 选择分类列表
@@ -465,21 +532,21 @@ public class PersonageFragment extends MVPBaseFragment<PersonageContract.View, P
                 .setConvertListener(new ViewConvertListener() {
                     @Override
                     protected void convertView(ViewHolder holder, final BaseNiceDialog dialog) {
-                        RecyclerView recyclerView=holder.getView(R.id.recyclerview_type);
-                        LinearLayout ll_search=holder.getView(R.id.ll_search);
+                        RecyclerView recyclerView = holder.getView(R.id.recyclerview_type);
+                        LinearLayout ll_search = holder.getView(R.id.ll_search);
                         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
                         recyclerView.setLayoutManager(layoutManager);
-                        TpyeAdapter  tpyeAdapter = new TpyeAdapter(getContext(),typelist,PersonageFragment.this);
+                        TpyeAdapter tpyeAdapter = new TpyeAdapter(getContext(), typelist, PersonageFragment.this);
                         recyclerView.setAdapter(tpyeAdapter);
 
                         ll_search.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                if (tpyeid.equals("")){
+                                if (tpyeid.equals("")) {
                                     Toast.makeText(getContext(), "请选择分类", Toast.LENGTH_SHORT).show();
-                                }else {
-                                    Intent intent=new Intent(getContext(), PracticeMode_Activity2.class);
-                                    intent.putExtra("tpyeid",tpyeid);
+                                } else {
+                                    Intent intent = new Intent(getContext(), PracticeMode_Activity2.class);
+                                    intent.putExtra("tpyeid", tpyeid);
                                     startActivity(intent);
                                     dialog.dismiss();
                                 }
@@ -498,6 +565,11 @@ public class PersonageFragment extends MVPBaseFragment<PersonageContract.View, P
 
     @Override
     public void gettpyeid(int i) {
-        tpyeid=""+i;
+        tpyeid = "" + i;
+    }
+
+    @Override
+    public void AddFacefot(String id) {
+        addface(id);
     }
 }

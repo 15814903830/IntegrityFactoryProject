@@ -61,7 +61,6 @@
                 android:id="@+id/tv_onpersonal"
                 android:layout_marginTop="14dp"
                 android:gravity="center"
-                android:text="您不是此人上级,无法查看此人信息"
                 android:layout_width="match_parent"
                 android:layout_height="100dp" />
 
@@ -136,8 +135,8 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/ll_Immediately_check"
             android:visibility="gone"
+            android:id="@+id/ll_Immediately_check"
             android:orientation="horizontal"
             android:gravity="center"
             android:background="#666666"
@@ -148,6 +147,16 @@
                 android:gravity="center"
                 android:layout_weight="1"
                 android:text="重新搜索"
+                android:textSize="17sp"
+                android:textColor="#FFFFFF"
+                android:layout_width="0dp"
+                android:layout_height="match_parent" />
+            <TextView
+                android:background="#00BA94"
+                android:id="@+id/tv_qudin"
+                android:gravity="center"
+                android:layout_weight="1"
+                android:text="确定"
                 android:textSize="17sp"
                 android:textColor="#FFFFFF"
                 android:layout_width="0dp"

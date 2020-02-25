@@ -3,6 +3,7 @@ package com.xsylsb.integrity.util;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
@@ -14,6 +15,8 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import rx.Observable;
+import rx.Subscriber;
 
 /**
  * okhttp请求工具
@@ -145,6 +148,58 @@ public class OkHttpUtils {
 
     }
 
+//    /**
+//     * post请求上传文件
+//     * 参数1 url
+//     * 参数2 回调Callback
+//     */
+//    public static void uploadFile(String url,   final Map<String, String> params, final String pic_key, final List<File> files,final HttpCallBack callback, final int requestId) {
+//        //创建OkHttpClient请求对象
+//        OkHttpClient okHttpClient = getInstance();
+//        //创建RequestBody 封装file参数
+//      //  RequestBody fileBody = RequestBody.create(MediaType.parse("application/octet-stream"), file);
+//        //创建RequestBody 设置类型等
+//        MultipartBody.Builder multipartBodyBuilder = new MultipartBody.Builder();
+//        multipartBodyBuilder.setType(MultipartBody.FORM);
+//
+//        //遍历map中所有参数到builder
+//        if (params != null){
+//            for (String key : params.keySet()) {
+//                multipartBodyBuilder.addFormDataPart(key, params.get(key));
+//            }
+//        }
+//        //遍历paths中所有图片绝对路径到builder，并约定key如“upload”作为后台接受多张图片的key
+//        if (files != null){
+//            for (File file : files) {
+//                multipartBodyBuilder.addFormDataPart(pic_key, file.getName(), RequestBody.create(MEDIA_TYPE_PNG, file));
+//            }
+//        }
+//
+//        RequestBody requestBody = multipartBodyBuilder.build();
+//
+//        Request.Builder RequestBuilder = new Request.Builder();
+//        RequestBuilder.url(url);// 添加URL地址
+//        RequestBuilder.post(requestBody);
+//        Request request = RequestBuilder.build();
+//
+//        //得到Call
+//        Call call = okHttpClient.newCall(request);
+//        //执行请求
+//        call.enqueue(new Callback() {
+//            @Override
+//            public void onFailure(Call call, IOException e) {
+//                callback.onResponse(e.toString(), requestId);
+//            }
+//
+//            @Override
+//            public void onResponse(Call call, Response response) throws IOException {
+//                callback.onResponse(response.body().string(), requestId);
+//            }
+//        });
+//
+//    }
+
+
     /**
      * post请求上传文件
      * 参数1 url
@@ -200,4 +255,56 @@ public class OkHttpUtils {
         });
     }
 
+
+
+
+    private static final MediaType MEDIA_TYPE_PNG = MediaType.parse("image/png");
+
+    /**
+     * 上传多张图片及参数
+     * @param reqUrl URL地址
+     * @param params 参数
+     * @param pic_key 上传图片的关键字
+     * @param // 图片路径
+     */
+    public static Observable<String> sendMultipart(final String reqUrl, final Map<String, String> params, final String pic_key, final List<File> files, final HttpCallBack callback, final int requestId){
+        return Observable.create(new Observable.OnSubscribe<String>(){
+
+            @Override
+            public void call(final Subscriber<? super String> subscriber) {
+                MultipartBody.Builder multipartBodyBuilder = new MultipartBody.Builder();
+                multipartBodyBuilder.setType(MultipartBody.FORM);
+                //遍历map中所有参数到builder
+                if (params != null){
+                    for (String key : params.keySet()) {
+                        multipartBodyBuilder.addFormDataPart(key, params.get(key));
+                    }
+                }
+                //遍历paths中所有图片绝对路径到builder，并约定key如“upload”作为后台接受多张图片的key
+                if (files != null){
+                    for (File file : files) {
+                        multipartBodyBuilder.addFormDataPart(pic_key, file.getName(), RequestBody.create(MEDIA_TYPE_PNG, file));
+                    }
+                }
+                //构建请求体
+                RequestBody requestBody = multipartBodyBuilder.build();
+                OkHttpClient okHttpClient = getInstance();
+                Request.Builder RequestBuilder = new Request.Builder();
+                RequestBuilder.url(reqUrl);// 添加URL地址
+                RequestBuilder.post(requestBody);
+                Request request = RequestBuilder.build();
+                okHttpClient.newCall(request).enqueue(new Callback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+                        callback.onResponse(e.toString(), requestId);
+                    }
+
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        callback.onResponse(response.body().string(), requestId);
+                    }
+                });
+            }
+        });
+    }
 }

@@ -53,6 +53,7 @@ import com.xsylsb.integrity.face.utils.Util;
 import com.xsylsb.integrity.util.HttpCallBack;
 import com.xsylsb.integrity.util.MyURL;
 import com.xsylsb.integrity.util.OkHttpUtils;
+import com.xsylsb.integrity.util.SharedPrefUtil;
 import com.xsylsb.integrity.util.dialog.BaseNiceDialog;
 import com.xsylsb.integrity.util.dialog.NiceDialog;
 import com.xsylsb.integrity.util.dialog.ViewConvertListener;
@@ -187,7 +188,7 @@ public final class FaceDetectRGBActivity extends AppCompatActivity implements Su
                     JSONObject jsonObject = new JSONObject();
                     jsonObject.put("memberId", "0");//id
                     jsonObject.put("fileData", img);//人脸数据
-                  OkHttpUtils.doPostJson(MyURL.URL + "SearchFaces/" + MainApplication.id, jsonObject.toString(), mHttpCallBack, 0);
+                  OkHttpUtils.doPostJson(MyURL.URL + "SearchFaces/" + SharedPrefUtil.getString(SharedPrefUtil.ID), jsonObject.toString(), mHttpCallBack, 0);
                    // OkHttpUtils.doPostJson("http://192.168.0.46/GY.API/api/account/" + "SearchFaces/" + MyURL.id, jsonObject.toString(), mHttpCallBack, 0);
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -226,8 +227,6 @@ public final class FaceDetectRGBActivity extends AppCompatActivity implements Su
                     }
 
                 }
-
-
                 break;
         }
     }
@@ -244,7 +243,7 @@ public final class FaceDetectRGBActivity extends AppCompatActivity implements Su
                             @Override
                             public void onClick(View v) {
                                 //查看详情
-                                String particularurl = "http://liugangapi.gx11.cn/Worker/Credit?id=" + mFaceRecongitRGBBase.getData().getId();
+                                String particularurl = MyURL.URLL+"Worker/Credit?id=" + mFaceRecongitRGBBase.getData().getId();
                                 Intent intent = new Intent(FaceDetectRGBActivity.this, WebActivity.class);
                                 intent.putExtra(KEY_URL, particularurl);
                                 startActivity(intent);
@@ -318,6 +317,7 @@ public final class FaceDetectRGBActivity extends AppCompatActivity implements Su
         int rc = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
         if (rc == PackageManager.PERMISSION_GRANTED) {
             Intent intent = new Intent(this, AddFaceRGBActivity.class);
+            intent.putExtra("noid", "123");
             startActivity(intent);
         } else {
             requestCameraPermission(RC_HANDLE_CAMERA_PERM_RGB);
@@ -366,7 +366,7 @@ public final class FaceDetectRGBActivity extends AppCompatActivity implements Su
                         particular.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                String particularurl = "http://liugangapi.gx11.cn/Worker/Credit?id=" + mFaceRecongitRGBBase.getData().getId();
+                                String particularurl = MyURL.URLL+"Worker/Credit?id=" + mFaceRecongitRGBBase.getData().getId();
                                 //查看详情
                                 Intent intent = new Intent(FaceDetectRGBActivity.this, WebActivity.class);
                                 intent.putExtra(KEY_URL, particularurl);

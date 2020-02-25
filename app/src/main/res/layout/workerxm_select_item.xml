@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <FrameLayout
+        android:id="@+id/fl_ase"
+        android:layout_margin="5dp"
+        android:background="@drawable/lijisp"
+        android:layout_width="80dp"
+        android:layout_height="@dimen/dp_40">
+        <TextView
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:id="@+id/tv_name"
+            android:gravity="center"
+            android:textColor="#FFFFFF"
+            android:textSize="12sp"
+            android:layout_width="80dp"
+            android:layout_height="match_parent" />
+        <ImageView
+            android:id="@+id/iv_exit"
+            android:layout_marginTop="2dp"
+            android:layout_marginRight="2dp"
+            android:layout_gravity="right"
+            android:background="@mipmap/shenpiy12"
+            android:layout_width="15dp"
+            android:layout_height="15dp" />
+    </FrameLayout>
+
+    <LinearLayout
+        android:visibility="gone"
+        android:id="@+id/ll_add"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:background="#FFFFFF"
+        android:layout_margin="5dp"
+        android:layout_width="80dp"
+        android:layout_height="@dimen/dp_40">
+        <TextView
+            android:layout_weight="1"
+            android:text="添加"
+            android:gravity="center"
+            android:textColor="#000000"
+            android:textSize="12sp"
+            android:layout_width="0dp"
+            android:layout_height="match_parent" />
+        <ImageView
+            android:layout_marginRight="15dp"
+            android:background="@mipmap/youjt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+</LinearLayout>

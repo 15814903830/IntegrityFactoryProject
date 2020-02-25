@@ -15,7 +15,6 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
@@ -24,7 +23,6 @@ import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -34,7 +32,6 @@ import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
 import com.maning.updatelibrary.InstallUtils;
-import com.xsylsb.integrity.MainActivity;
 import com.xsylsb.integrity.MainApplication;
 import com.xsylsb.integrity.R;
 import com.xsylsb.integrity.base.LoginBase;
@@ -46,6 +43,7 @@ import com.xsylsb.integrity.util.HttpCallBack;
 import com.xsylsb.integrity.util.MyURL;
 import com.xsylsb.integrity.util.OkHttpUtils;
 import com.xsylsb.integrity.util.RequestParams;
+import com.xsylsb.integrity.util.SharedPrefUtil;
 import com.xsylsb.integrity.util.dialog.BaseNiceDialog;
 import com.xsylsb.integrity.util.dialog.NiceDialog;
 import com.xsylsb.integrity.util.dialog.ViewConvertListener;
@@ -107,7 +105,6 @@ public class MyloginActivity extends AppCompatActivity implements HttpCallBack {
         if (isNetworkConnected(this)){
             getVersion();
         }
-        Log.e("codename", getAppVersionName(this));
         initCallBack();
     }
 
@@ -178,9 +175,7 @@ public class MyloginActivity extends AppCompatActivity implements HttpCallBack {
     }
 
     private void requestCameraPermission(final int RC_HANDLE_CAMERA_PERM) {
-
         final String[] permissions = new String[]{Manifest.permission.CAMERA};
-
         ActivityCompat.requestPermissions(this, permissions, RC_HANDLE_CAMERA_PERM);
     }
 
@@ -228,12 +223,14 @@ public class MyloginActivity extends AppCompatActivity implements HttpCallBack {
         int rc = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
         if (rc == PackageManager.PERMISSION_GRANTED) {
             Intent intent = new Intent(this, AddFaceRGBActivity.class);
+            intent.putExtra("noid", "123");
             startActivity(intent);
         } else {
             requestCameraPermission(RC_HANDLE_CAMERA_PERM_RGB);
         }
     }
-    public void getface() {//采集人脸数据
+    public void getface() {
+        //采集人脸数据
         NiceDialog.init()
                 .setLayoutId(R.layout.getface_dialog)
                 .setConvertListener(new ViewConvertListener() {
@@ -248,8 +245,6 @@ public class MyloginActivity extends AppCompatActivity implements HttpCallBack {
                             }
 
                         });
-
-
                     }
                 })
                 .setDimAmount(0.3f)
@@ -260,22 +255,34 @@ public class MyloginActivity extends AppCompatActivity implements HttpCallBack {
     }
     @Override
     public void onHandlerMessageCallback(String response, int requestId) {
-
         Log.d("responsejsonObject",response);
         switch (requestId) {
             case 0:
-                JSONObject jsonObject;
-                mLoginBase = JSON.parseObject(response, LoginBase.class);
-                if (mLoginBase.isSuc()) {
-                    MainApplication.id = "" + mLoginBase.getData().getId();
-                    try {
-                        jsonObject = new JSONObject(response);
-                        if (mLoginBase.getData().getFaceImages()==null){
-
-                            if (mLoginBase.getData().getCompanyId()==null){
-                                mLoginBase.getData().setCompanyId("0");
-                            }
-                            if (mLoginBase.getData().getCompanyId().equals("0")){
+                try {
+                    JSONObject jsonObject;
+                    mLoginBase = JSON.parseObject(response, LoginBase.class);
+                    if (mLoginBase.isSuc()) {
+                        SharedPrefUtil.putString(SharedPrefUtil.ID,"" + mLoginBase.getData().getId());
+                        try {
+                            jsonObject = new JSONObject(response);
+                            if (mLoginBase.getData().getFaceImages()==null){
+                                if (mLoginBase.getData().getCompanyId()==null){
+                                    mLoginBase.getData().setCompanyId("0");
+                                }
+                                if (mLoginBase.getData().getCompanyId().equals("0")){
+                                    startActivity(new Intent(MyloginActivity.this,LogwebActivity.class));
+                                    //获取Editor
+                                    SharedPreferences.Editor editor = sp.edit();
+                                    //输入内容
+                                    editor.putString("number", identitycard.getText().toString());
+                                    editor.putString("password", password.getText().toString());
+                                    //必须提交才会生效，也可以使用apply
+                                    editor.commit();
+                                    finish();
+                                }else {
+                                    getface();
+                                }
+                            }else {
                                 startActivity(new Intent(MyloginActivity.this,LogwebActivity.class));
                                 //获取Editor
                                 SharedPreferences.Editor editor = sp.edit();
@@ -285,31 +292,24 @@ public class MyloginActivity extends AppCompatActivity implements HttpCallBack {
                                 //必须提交才会生效，也可以使用apply
                                 editor.commit();
                                 finish();
-                            }else {
-                                getface();
                             }
-                        }else {
-                            startActivity(new Intent(MyloginActivity.this,LogwebActivity.class));
-                            //获取Editor
-                            SharedPreferences.Editor editor = sp.edit();
-                            //输入内容
-                            editor.putString("number", identitycard.getText().toString());
-                            editor.putString("password", password.getText().toString());
-                            //必须提交才会生效，也可以使用apply
-                            editor.commit();
-                            finish();
+                        } catch (Exception e) {
+                            Log.e("Exception",e.toString());
                         }
-                    } catch (Exception e) {
-                        Log.e("Exception",e.toString());
+                    } else {
+                        Toast.makeText(this, "请输入正确的用户信息", Toast.LENGTH_SHORT).show();
                     }
-                } else {
-                    Toast.makeText(this, "请输入正确的用户信息", Toast.LENGTH_SHORT).show();
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
                 break;
             case 1:
                 Log.e("response", response);
-                mVersionBase = JSON.parseObject(response, VersionBase.class);
-
+                try {
+                    mVersionBase = JSON.parseObject(response, VersionBase.class);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 if (BaseUtils.checkVersion(MyloginActivity.this, "" + mVersionBase.getAndroidAppVersion())){
                     Log.e("verson", "更新操作");
                     NiceDialog.init()

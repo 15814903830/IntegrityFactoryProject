@@ -7,7 +7,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 28
         versionCode 1
-        versionName "1.4.6"
+        versionName "1.6.3"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         ndk {
             //选择要添加的对应cpu类型的.so库。
@@ -50,7 +50,7 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation (name:'alicloud-android-push-3.1.4', ext: 'aar')
+    implementation(name: 'alicloud-android-push-3.1.4', ext: 'aar')
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:appcompat-v7:28.0.0'
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'
@@ -85,6 +85,5 @@ dependencies {
     implementation 'com.alibaba:fastjson:1.1.71.android'
     implementation 'com.github.maning0303:MNUpdateAPK:V2.0.3'//版本更新
 
-
-
+    implementation 'com.airsaid.library:pickerview:1.0.3'
 }

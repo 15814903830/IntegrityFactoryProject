@@ -2,8 +2,10 @@ package com.xsylsb.integrity;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -15,11 +17,13 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -32,7 +36,6 @@ import com.alibaba.sdk.android.push.noonesdk.PushServiceFactory;
 import com.xsylsb.integrity.base.OperativesSignBase;
 import com.xsylsb.integrity.base.ScanCodeBase;
 import com.xsylsb.integrity.face.activity.FaceDetectRGBActivity;
-import com.xsylsb.integrity.face.activity.LeadFaceDetectRGBActivity;
 import com.xsylsb.integrity.mianfragment.homepage.homepage.HomepageFragment;
 import com.xsylsb.integrity.mianfragment.homepage.notice.NoticeFragment;
 import com.xsylsb.integrity.mianfragment.homepage.personage.PersonageFragment;
@@ -42,6 +45,7 @@ import com.xsylsb.integrity.util.DataCleanManagerUtils;
 import com.xsylsb.integrity.util.HttpCallBack;
 import com.xsylsb.integrity.util.MyURL;
 import com.xsylsb.integrity.util.OkHttpUtils;
+import com.xsylsb.integrity.util.SharedPrefUtil;
 import com.xsylsb.integrity.util.StowMainInfc;
 import com.xsylsb.integrity.util.dialog.BaseNiceDialog;
 import com.xsylsb.integrity.util.dialog.NiceDialog;
@@ -87,6 +91,12 @@ public class MainActivity extends AppCompatActivity implements HttpCallBack, Sto
     @BindView(R.id.main_ll_personage)
     LinearLayout mainLlPersonage;
     private static final int RC_HANDLE_CAMERA_PERM_RGB = 1;
+    @BindView(R.id.iv_api_test)
+    TextView ivApiTest;
+    @BindView(R.id.btn_zhengshi)
+    Button btnZhengshi;
+    @BindView(R.id.btn_ceisi)
+    Button btnCeisi;
     private HomepageFragment homepageFragment;
     private NoticeFragment mNoticeFragment;
     private PersonageFragment mPersonageFragment;
@@ -99,10 +109,13 @@ public class MainActivity extends AppCompatActivity implements HttpCallBack, Sto
     private FragmentManager fm = getSupportFragmentManager();
     private Fragment mFragment;
     private String mtag;
-
     private Context mContext;
-
     private CloudPushService mPushService;
+    private static final int CROP_PHOTO = 2;
+    private static final int PICK_PIC = 3;
+
+    private static final int MY_PERMISSIONS_REQUEST_CALL_PHONE1 = 4;
+    private static final int MY_PERMISSIONS_REQUEST_CALL_PHONE2 = 5;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,6 +129,7 @@ public class MainActivity extends AppCompatActivity implements HttpCallBack, Sto
         mHttpCallBack = this;
         Title = "欢迎您，" + getIntent().getStringExtra("name");
         mainTvHome.setSelected(true);
+        ivApiTest.setText(""+MyURL.URL);
         //首页
 //        if (homepageFragment == null) {
 //            homepageFragment = HomepageFragment.newInstance();
@@ -127,6 +141,28 @@ public class MainActivity extends AppCompatActivity implements HttpCallBack, Sto
                 .replace(R.id.main, homepageFragment)
                 .commit();
         DataCleanManagerUtils.clearAllCache(this);
+
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat
+                    .requestPermissions(
+                            this,
+                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                            MY_PERMISSIONS_REQUEST_CALL_PHONE2);
+
+        } else {
+            if (ContextCompat.checkSelfPermission(this,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat
+                        .requestPermissions(
+                                this,
+                                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                                MY_PERMISSIONS_REQUEST_CALL_PHONE2);
+
+            } else {
+            }
+        }
+
     }
 
     @Override
@@ -134,6 +170,13 @@ public class MainActivity extends AppCompatActivity implements HttpCallBack, Sto
         super.onResume();
         bindAccount();
         getImei();
+        // 1. 实例化BroadcastReceiver子类 &  IntentFilter
+        LocatiopnBroadcast locatiopnBroadcast = new LocatiopnBroadcast();
+        IntentFilter intentFilter = new IntentFilter();
+        // 2. 设置接收广播的类型
+        intentFilter.addAction("ADD_CREATIONG_GROUP");// 只有持有相同的action的接受者才能接收此广播
+        // 3. 动态注册：调用Context的registerReceiver（）方法
+        registerReceiver(locatiopnBroadcast, intentFilter);
     }
 
     //收到推送
@@ -147,10 +190,10 @@ public class MainActivity extends AppCompatActivity implements HttpCallBack, Sto
      * 2. 一个设备只能绑定一个账号
      */
     private void bindAccount() {
-        mPushService.bindAccount(MainApplication.id, new CommonCallback() {
+        mPushService.bindAccount(SharedPrefUtil.getString(SharedPrefUtil.ID), new CommonCallback() {
             @Override
             public void onSuccess(String s) {
-                Log.i("MainActivity", "绑定账号成功：" + MainApplication.id);
+                Log.i("MainActivity", "绑定账号成功：" + SharedPrefUtil.getString(SharedPrefUtil.ID));
             }
 
             @Override
@@ -164,14 +207,14 @@ public class MainActivity extends AppCompatActivity implements HttpCallBack, Sto
         TelephonyManager TelephonyMgr = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-            Toast.makeText(this,"请允许获取设备信息权限",Toast.LENGTH_SHORT);
+            Toast.makeText(this, "请允许获取设备信息权限", Toast.LENGTH_SHORT);
             return;
         }
         String szImei = TelephonyMgr.getDeviceId();
-       Log.i("MainActivity","设备ID：" + szImei);
+        Log.i("MainActivity", "设备ID：" + szImei);
     }
 
-    @OnClick({R.id.main_ll_home, R.id.main_ll_train, R.id.main_ll_scan, R.id.main_ll_notice, R.id.main_ll_personage})
+    @OnClick({R.id.main_ll_home, R.id.main_ll_train, R.id.main_ll_scan, R.id.main_ll_notice, R.id.main_ll_personage,R.id.btn_zhengshi,R.id.btn_ceisi})
     public void MyOnClick(View view) {
         switch (view.getId()) {
             case R.id.main_ll_home:
@@ -199,8 +242,6 @@ public class MainActivity extends AppCompatActivity implements HttpCallBack, Sto
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.main, mTrainFragment)
                         .commit();
-
-
                 mainTvHome.setSelected(false);
                 mainTvTrain.setSelected(true);
                 mainTvScan.setSelected(false);
@@ -246,6 +287,16 @@ public class MainActivity extends AppCompatActivity implements HttpCallBack, Sto
                 mainTvScan.setSelected(false);
                 mainTvNotice.setSelected(false);
                 mainTvPersonage.setSelected(true);
+                break;
+            case R.id.btn_zhengshi:
+                MyURL.URL="http://liugangapitest.gx11.cn/Api/Account/";
+                MyURL.URLL = "http://liugangapitest.gx11.cn/";
+                ivApiTest.setText(""+ MyURL.URL);
+                break;
+            case R.id.btn_ceisi:
+                MyURL.URL="http://testapi.liugang.gx11.cn/Api/Account/";
+                MyURL.URLL = "http://testapi.liugang.gx11.cn/";
+                ivApiTest.setText(""+ MyURL.URL);
                 break;
             default:
                 break;
@@ -294,7 +345,7 @@ public class MainActivity extends AppCompatActivity implements HttpCallBack, Sto
                                     int rc = ActivityCompat.checkSelfPermission(mContext, Manifest.permission.CAMERA);
                                     if (rc == PackageManager.PERMISSION_GRANTED) {
                                         Intent intent = new Intent(mContext, FaceDetectRGBActivity.class);
-                           //             Intent intent = new Intent(mContext, LeadFaceDetectRGBActivity.class);
+                                        //             Intent intent = new Intent(mContext, LeadFaceDetectRGBActivity.class);
                                         startActivity(intent);
                                     } else {
                                         requestCameraPermission(RC_HANDLE_CAMERA_PERM_RGB);
@@ -357,41 +408,47 @@ public class MainActivity extends AppCompatActivity implements HttpCallBack, Sto
         super.onActivityResult(requestCode, resultCode, data);
         if (data != null) {
             //扫码获得的信息
-            String mycodedata=toURLDecoder(data.getStringExtra(QRCodeActivity.RESULT));
-            Log.e("data", mycodedata);
-            if (mycodedata.contains("Account/OperativesSign")){
-                List<OperativesSignBase> list=new ArrayList<>();
+            String mycodedata = toURLDecoder(data.getStringExtra(QRCodeActivity.RESULT));
+            Log.e("datacodes", mycodedata);
+            if (mycodedata.contains("Account/OperativesSign")) {
+                List<OperativesSignBase> list = new ArrayList<>();
                 String[] split = mycodedata.split("\\?")[1].split("&");
-                for (int i=0;i<split.length;i++){
-                    OperativesSignBase operativesSignBase=new OperativesSignBase();
+                for (int i = 0; i < split.length; i++) {
+                    OperativesSignBase operativesSignBase = new OperativesSignBase();
                     operativesSignBase.setKey(split[i].split("=")[0]);
                     operativesSignBase.setValue(split[i].split("=")[1]);
-                    if (operativesSignBase.getKey().equals("workerId")){
-                        operativesSignBase.setValue(""+MainApplication.id);
+                    if (operativesSignBase.getKey().equals("workerId")) {
+                        operativesSignBase.setValue("" + SharedPrefUtil.getString(SharedPrefUtil.ID));
                     }
                     list.add(operativesSignBase);
                 }
-                OperativesSign(mycodedata.split("\\?")[0],list);
-            }else if (mycodedata.contains("Account/OperativesFacesSign")){
-                List<OperativesSignBase> list=new ArrayList<>();
+                OperativesSign(mycodedata.split("\\?")[0], list);
+            } else if (mycodedata.contains("Account/OperativesFacesSign")) {
+                List<OperativesSignBase> list = new ArrayList<>();
                 String[] split = mycodedata.split("\\?")[1].split("&");
-                for (int i=0;i<split.length;i++){
-                    OperativesSignBase operativesSignBase=new OperativesSignBase();
+                for (int i = 0; i < split.length; i++) {
+                    OperativesSignBase operativesSignBase = new OperativesSignBase();
                     operativesSignBase.setKey(split[i].split("=")[0]);
                     operativesSignBase.setValue(split[i].split("=")[1]);
-                    if (operativesSignBase.getKey().equals("workerId")){
-                        operativesSignBase.setValue(""+MainApplication.id);
+                    if (operativesSignBase.getKey().equals("workerId")) {
+                        operativesSignBase.setValue("" + SharedPrefUtil.getString(SharedPrefUtil.ID));
                     }
                     list.add(operativesSignBase);
                 }
-                OperativesFacesSign(mycodedata.split("\\?")[0],list);
-            }else {
+                OperativesFacesSign(mycodedata.split("\\?")[0], list);
+            } else if (mycodedata.contains("Permit/MyVerifyDetial")) {
+                Intent intent = new Intent(MainActivity.this, WebActivity.class);
+                intent.putExtra("url", mycodedata + "&workerId=" + SharedPrefUtil.getString(SharedPrefUtil.ID));
+                startActivity(intent);
+                Log.e("MyVerifyDetial", mycodedata + "&workerId=" + SharedPrefUtil.getString(SharedPrefUtil.ID));
+            } else {
                 ScanCodes(data.getStringExtra(QRCodeActivity.RESULT));
             }
 
 
         }
     }
+
     /**
      * URLDecoder解码
      */
@@ -408,6 +465,7 @@ public class MainActivity extends AppCompatActivity implements HttpCallBack, Sto
         }
         return "";
     }
+
     private void ScanCodes(final String courseId) {
         new Thread(new Runnable() {
             @Override
@@ -415,7 +473,7 @@ public class MainActivity extends AppCompatActivity implements HttpCallBack, Sto
                 try {
                     JSONObject jsonObject = new JSONObject();
                     jsonObject.put("courseId", courseId);
-                    jsonObject.put("workerId", MainApplication.id);
+                    jsonObject.put("workerId", SharedPrefUtil.getString(SharedPrefUtil.ID));
                     OkHttpUtils.doPostJson(MyURL.URL + "CourseSignIn", jsonObject.toString(), mHttpCallBack, 0);
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -431,10 +489,12 @@ public class MainActivity extends AppCompatActivity implements HttpCallBack, Sto
             public void run() {
                 try {
                     JSONObject jsonObject = new JSONObject();
-                    for (int i=0;i<list.size();i++){
+                    for (int i = 0; i < list.size(); i++) {
                         jsonObject.put(list.get(i).getKey(), list.get(i).getValue());
                     }
                     OkHttpUtils.doPostJson(url, jsonObject.toString(), mHttpCallBack, 2);
+                    Log.e("OperativesFacesSign", "jsonObject:" + jsonObject.toString());
+                    Log.e("OperativesFacesSign", "url:" + url);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -448,10 +508,14 @@ public class MainActivity extends AppCompatActivity implements HttpCallBack, Sto
             public void run() {
                 try {
                     JSONObject jsonObject = new JSONObject();
-                    for (int i=0;i<list.size();i++){
+                    for (int i = 0; i < list.size(); i++) {
                         jsonObject.put(list.get(i).getKey(), list.get(i).getValue());
                     }
+                    jsonObject.put("workerId", "" + SharedPrefUtil.getString(SharedPrefUtil.ID));
+
                     OkHttpUtils.doPostJson(url, jsonObject.toString(), mHttpCallBack, 1);
+                    Log.e("OperativesSign", "jsonObject:" + jsonObject.toString());
+                    Log.e("OperativesSign", "url:" + url);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -465,13 +529,15 @@ public class MainActivity extends AppCompatActivity implements HttpCallBack, Sto
         message.what = requestId;
         message.obj = response;
         mHandler.sendMessage(message);
+
+
     }
 
     @Override
     public void onHandlerMessageCallback(String response, int requestId) {
 
-        Log.e("response","requestId:"+requestId+"--response:"+response);
-        switch (requestId){
+        Log.e("response", "requestId:" + requestId + "--response:" + response);
+        switch (requestId) {
             case 0:
                 try {
                     mScanCodeBase = JSON.parseObject(response, ScanCodeBase.class);
@@ -487,7 +553,7 @@ public class MainActivity extends AppCompatActivity implements HttpCallBack, Sto
                 break;
             case 1:
                 try {
-                    JSONObject jsonObject=new JSONObject(response);
+                    JSONObject jsonObject = new JSONObject(response);
                     Toast.makeText(this, jsonObject.getString("msg"), Toast.LENGTH_SHORT).show();
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -495,7 +561,7 @@ public class MainActivity extends AppCompatActivity implements HttpCallBack, Sto
                 break;
             case 2:
                 try {
-                    JSONObject jsonObject=new JSONObject(response);
+                    JSONObject jsonObject = new JSONObject(response);
                     Toast.makeText(this, jsonObject.getString("msg"), Toast.LENGTH_SHORT).show();
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -556,7 +622,6 @@ public class MainActivity extends AppCompatActivity implements HttpCallBack, Sto
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-
         if (grantResults.length != 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED && requestCode == RC_HANDLE_CAMERA_PERM_RGB) {
             Intent intent = new Intent(mContext, FaceDetectRGBActivity.class);
             startActivity(intent);
@@ -575,4 +640,13 @@ public class MainActivity extends AppCompatActivity implements HttpCallBack, Sto
 
     }
 
+
+    //广播接收者
+    public class LocatiopnBroadcast extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            //收到广播后的操作
+            Toast.makeText(MainActivity.this, intent.getStringExtra("msg"), Toast.LENGTH_SHORT).show();
+        }
+    }
 }

@@ -11,7 +11,7 @@ public class AddFaceBase {
 
     /**
      * suc : true
-     * msg : 添加人脸认证成功
+     * msg : \添加人脸认证成功
      */
 
     private boolean suc;
