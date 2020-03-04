@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.alibaba.fastjson.JSON;
 import com.xsylsb.integrity.R;
 import com.xsylsb.integrity.base.WorkerSelectBase;
 

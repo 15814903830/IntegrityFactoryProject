@@ -178,6 +178,7 @@
                 android:layout_height="wrap_content"></android.support.v7.widget.RecyclerView>
         </LinearLayout>
         <LinearLayout
+            android:visibility="gone"
             android:id="@+id/ll_safetyworkpermitsign_dtail"
             android:orientation="vertical"
             android:layout_width="match_parent"

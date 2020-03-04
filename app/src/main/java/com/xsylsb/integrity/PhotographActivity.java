@@ -1,9 +1,11 @@
 package com.xsylsb.integrity;
 
 import android.annotation.SuppressLint;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.RequiresApi;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -243,13 +245,11 @@ public class PhotographActivity extends TakePhotoActivity implements PhotographA
                         }
                     }
 
-
                     if (projectLocationLeaderId.length() > 0) {
                         //属地单位
                         jsonObject.put("projectLocationLeaderId", projectLocationLeaderId);
                         jsonObject.put("projectLocationLeaderFullName", projectLocationLeaderFullName);
                     }
-
 
                     jsonObject.put("PermitId", "" + photGraphBase.getModel().getPermitId());
                     jsonObject.put("workerId", "" + "" + SharedPrefUtil.getString(SharedPrefUtil.ID));
@@ -266,7 +266,7 @@ public class PhotographActivity extends TakePhotoActivity implements PhotographA
                     if (!etYijiang.getText().toString().equals("")) {
                         jsonObject.put("Opinion", "" + etYijiang.getText().toString());
                     }
-                  OkHttpUtils.doPostJson(MyURL.URL + "SafetyWorkPermitSign", jsonObject.toString(), mHttpCallBack, 2);
+                    OkHttpUtils.doPostJson(MyURL.URL + "SafetyWorkPermitSign", jsonObject.toString(), mHttpCallBack, 2);
                     Log.e("jsonObject", MyURL.URL + "SafetyWorkPermitSign");
                     Log.e("jsonObject", jsonObject.toString());
                 } catch (JSONException e) {
@@ -283,79 +283,133 @@ public class PhotographActivity extends TakePhotoActivity implements PhotographA
         switch (view.getId()) {
             case R.id.btn_lijisp:
 
-                sceneGuardianId = "";
-                sceneGuardianFullName = "";
-                projectLocationLeaderId = "";
-                projectLocationLeaderFullName = "";
+                if (xuanzhe.equals("2")) {
 
-                if (llXmzg.getVisibility() == View.VISIBLE) {
-                    if (tvXmzgText.getText().toString().equals("") & xuanzhe.equals("2")) {
-                        Toast.makeText(this, "请选择项目主管科室", Toast.LENGTH_SHORT).show();
-                        return;
+                    sceneGuardianId = "";
+                    sceneGuardianFullName = "";
+                    projectLocationLeaderId = "";
+                    projectLocationLeaderFullName = "";
+
+                    if (llXmzg.getVisibility() == View.VISIBLE) {
+                        if (tvXmzgText.getText().toString().equals("") & xuanzhe.equals("2")) {
+                            Toast.makeText(this, "请选择项目主管科室", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
                     }
-                }
 
-                if (photGraphBase.getModel().getSignRole() == 3) {
-                    //signRole=3的时候，两个同时显示
-                    //属地单位监护人
-                    if (safetyDtailAdapter!=null){
-                        if (safetyDtailAdapter.getBookListBase() != null) {
-                            for (int j = 0; j < safetyDtailAdapter.getBookListBase().size(); j++) {
-                                if (safetyDtailAdapter.getBookListBase().get(j).getIsselise().equals("ABC")) {
-                                    projectLocationLeaderId = projectLocationLeaderId + safetyDtailAdapter.getBookListBase().get(j).getValue() + ",";
-                                    projectLocationLeaderFullName = projectLocationLeaderFullName + safetyDtailAdapter.getBookListBase().get(j).getName().split("----")[1] + ",";
+                    if (photGraphBase.getModel().getSignRole() == 3) {
+                        //signRole=3的时候，两个同时显示
+                        //属地单位监护人
+                        if (safetyDtailAdapter != null) {
+                            if (safetyDtailAdapter.getBookListBase() != null) {
+                                for (int j = 0; j < safetyDtailAdapter.getBookListBase().size(); j++) {
+                                    if (safetyDtailAdapter.getBookListBase().get(j).getIsselise().equals("ABC")) {
+                                        projectLocationLeaderId = projectLocationLeaderId + safetyDtailAdapter.getBookListBase().get(j).getValue() + ",";
+                                        projectLocationLeaderFullName = projectLocationLeaderFullName + safetyDtailAdapter.getBookListBase().get(j).getName().split("----")[1] + ",";
+                                    }
                                 }
                             }
                         }
+
+                        if (projectLocationLeaderId.length() > 0) {
+                            //属地单位
+                        } else {
+                            Toast.makeText(PhotographActivity.this, "请选择属地单位监护人", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        if (workerxmSelectAdapter.getBookListBase().size() > 1 & workerxmSelectAdapter.getBookListBase() != null) {
+                            for (int i = 0; i < workerxmSelectAdapter.getBookListBase().size() - 1; i++) {
+                                if (i == workerxmSelectAdapter.getBookListBase().size() - 2) {
+                                    sceneGuardianId = sceneGuardianId + workerxmSelectAdapter.getBookListBase().get(i).getValue();
+                                    sceneGuardianFullName = sceneGuardianFullName + workerxmSelectAdapter.getBookListBase().get(i).getName();
+                                } else {
+                                    sceneGuardianId = sceneGuardianId + workerxmSelectAdapter.getBookListBase().get(i).getValue() + ",";
+                                    sceneGuardianFullName = sceneGuardianFullName + workerxmSelectAdapter.getBookListBase().get(i).getName() + ",";
+                                }
+                            }
+
+                        } else {
+                            Toast.makeText(this, "请选择施工单位负责人", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
                     }
 
-
-                    if (projectLocationLeaderId.length() > 0) {
-                        //属地单位
-                    } else {
-                        Toast.makeText(PhotographActivity.this, "请选择属地单位监护人", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-
-                    if (workerxmSelectAdapter.getBookListBase().size() > 1 & workerxmSelectAdapter.getBookListBase() != null) {
-                        for (int i = 0; i < workerxmSelectAdapter.getBookListBase().size() - 1; i++) {
-                            if (i == workerxmSelectAdapter.getBookListBase().size() - 2) {
-                                sceneGuardianId = sceneGuardianId + workerxmSelectAdapter.getBookListBase().get(i).getValue();
-                                sceneGuardianFullName = sceneGuardianFullName + workerxmSelectAdapter.getBookListBase().get(i).getName();
-                            } else {
-                                sceneGuardianId = sceneGuardianId + workerxmSelectAdapter.getBookListBase().get(i).getValue() + ",";
-                                sceneGuardianFullName = sceneGuardianFullName + workerxmSelectAdapter.getBookListBase().get(i).getName() + ",";
+                    if (photGraphBase.getModel().getSignRole() == 1) {
+                        //signRole&1==1显示属地单位监护人的选项
+                        //属地单位监护人
+                        if (safetyDtailAdapter != null) {
+                            for (int j = 0; j < safetyDtailAdapter.getBookListBase().size(); j++) {
+                                if (safetyDtailAdapter.getBookListBase().get(j).getIsselise().equals("ABC")) {
+                                    projectLocationLeaderId = projectLocationLeaderId + safetyDtailAdapter.getBookListBase().get(j).getValue() + ",";
+                                    projectLocationLeaderFullName = projectLocationLeaderFullName + safetyDtailAdapter.getBookListBase().get(j).getName() + ",";
+                                }
                             }
                         }
 
-                    } else {
-                        Toast.makeText(this, "请选择施工单位负责人", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-                }
 
-                if (photGraphBase.getModel().getSignRole() == 1) {
-                    //signRole&1==1显示属地单位监护人的选项
-                    //属地单位监护人
-                    if (safetyDtailAdapter != null) {
-                        for (int j = 0; j < safetyDtailAdapter.getBookListBase().size(); j++) {
-                            if (safetyDtailAdapter.getBookListBase().get(j).getIdno().equals("ABC")) {
-                                projectLocationLeaderId = projectLocationLeaderId + safetyDtailAdapter.getBookListBase().get(j).getValue() + ",";
-                                projectLocationLeaderFullName = projectLocationLeaderFullName + safetyDtailAdapter.getBookListBase().get(j).getName() + ",";
-                            }
+                        if (projectLocationLeaderId.length() > 0) {
+                            //属地单位
+                        } else {
+                            Toast.makeText(PhotographActivity.this, "请选择属地单位监护人", Toast.LENGTH_SHORT).show();
+                            return;
                         }
                     }
-                    if (projectLocationLeaderId.length() > 0) {
-                        //属地单位
-                    } else {
-                        Toast.makeText(PhotographActivity.this, "请选择属地单位监护人", Toast.LENGTH_SHORT).show();
-                        return;
+
+
+                    if (photGraphBase.getModel().getSignRole() == 2) {
+                        //signRole&2==2显示施工单位现场监护人的选项
+                        if (workerxmSelectAdapter != null) {
+                            if (workerxmSelectAdapter.getBookListBase().size() > 0 & workerxmSelectAdapter.getBookListBase() != null) {
+                                for (int i = 0; i < workerxmSelectAdapter.getBookListBase().size() - 1; i++) {
+                                    if (i == workerxmSelectAdapter.getBookListBase().size() - 2) {
+                                        sceneGuardianId = sceneGuardianId + workerxmSelectAdapter.getBookListBase().get(i).getValue();
+                                        sceneGuardianFullName = sceneGuardianFullName + workerxmSelectAdapter.getBookListBase().get(i).getName();
+                                    } else {
+                                        sceneGuardianId = sceneGuardianId + workerxmSelectAdapter.getBookListBase().get(i).getValue() + ",";
+                                        sceneGuardianFullName = sceneGuardianFullName + workerxmSelectAdapter.getBookListBase().get(i).getName() + ",";
+                                    }
+                                }
+
+                            }
+                        } else {
+                            Toast.makeText(this, "请选择施工单位负责人", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
                     }
-                }
-                if (photGraphBase.getModel().getSignRole() == 2) {
-                    //signRole&2==2显示施工单位现场监护人的选项
-                    if (workerxmSelectAdapter != null) {
-                        if (workerxmSelectAdapter.getBookListBase().size() > 0 & workerxmSelectAdapter.getBookListBase() != null) {
+
+
+                    if (imglist.size() == 1) {
+                        SafetyWorkPermitSign();
+                    } else {
+                        for (int i = 0; i < imglist.size() - 1; i++) {
+                            UploadFile(new File(imglist.get(i)).getName(), FileToBase64.best64yimg(imglist.get(i)));
+                        }
+                    }
+                    showLoading();
+                } else {
+                    sceneGuardianId = "";
+                    sceneGuardianFullName = "";
+                    projectLocationLeaderId = "";
+                    projectLocationLeaderFullName = "";
+
+
+                    if (photGraphBase.getModel().getSignRole() == 3) {
+                        //signRole=3的时候，两个同时显示
+                        //属地单位监护人
+                        if (safetyDtailAdapter != null) {
+                            if (safetyDtailAdapter.getBookListBase() != null) {
+                                for (int j = 0; j < safetyDtailAdapter.getBookListBase().size(); j++) {
+                                    if (safetyDtailAdapter.getBookListBase().get(j).getIsselise().equals("ABC")) {
+                                        projectLocationLeaderId = projectLocationLeaderId + safetyDtailAdapter.getBookListBase().get(j).getValue() + ",";
+                                        projectLocationLeaderFullName = projectLocationLeaderFullName + safetyDtailAdapter.getBookListBase().get(j).getName().split("----")[1] + ",";
+                                    }
+                                }
+                            }
+                        }
+
+
+                        if (workerxmSelectAdapter.getBookListBase().size() > 1 & workerxmSelectAdapter.getBookListBase() != null) {
                             for (int i = 0; i < workerxmSelectAdapter.getBookListBase().size() - 1; i++) {
                                 if (i == workerxmSelectAdapter.getBookListBase().size() - 2) {
                                     sceneGuardianId = sceneGuardianId + workerxmSelectAdapter.getBookListBase().get(i).getValue();
@@ -367,19 +421,51 @@ public class PhotographActivity extends TakePhotoActivity implements PhotographA
                             }
 
                         }
+                    }
+
+                    if (photGraphBase.getModel().getSignRole() == 1) {
+                        //signRole&1==1显示属地单位监护人的选项
+                        //属地单位监护人
+                        if (safetyDtailAdapter != null) {
+                            for (int j = 0; j < safetyDtailAdapter.getBookListBase().size(); j++) {
+                                if (safetyDtailAdapter.getBookListBase().get(j).getIsselise().equals("ABC")) {
+                                    projectLocationLeaderId = projectLocationLeaderId + safetyDtailAdapter.getBookListBase().get(j).getValue() + ",";
+                                    projectLocationLeaderFullName = projectLocationLeaderFullName + safetyDtailAdapter.getBookListBase().get(j).getName() + ",";
+                                }
+                            }
+                        }
+                    }
+
+
+                    if (photGraphBase.getModel().getSignRole() == 2) {
+                        //signRole&2==2显示施工单位现场监护人的选项
+                        if (workerxmSelectAdapter != null) {
+                            if (workerxmSelectAdapter.getBookListBase().size() > 0 & workerxmSelectAdapter.getBookListBase() != null) {
+                                for (int i = 0; i < workerxmSelectAdapter.getBookListBase().size() - 1; i++) {
+                                    if (i == workerxmSelectAdapter.getBookListBase().size() - 2) {
+                                        sceneGuardianId = sceneGuardianId + workerxmSelectAdapter.getBookListBase().get(i).getValue();
+                                        sceneGuardianFullName = sceneGuardianFullName + workerxmSelectAdapter.getBookListBase().get(i).getName();
+                                    } else {
+                                        sceneGuardianId = sceneGuardianId + workerxmSelectAdapter.getBookListBase().get(i).getValue() + ",";
+                                        sceneGuardianFullName = sceneGuardianFullName + workerxmSelectAdapter.getBookListBase().get(i).getName() + ",";
+                                    }
+                                }
+
+                            }
+                        }
+                    }
+
+
+                    if (imglist.size() == 1) {
+                        SafetyWorkPermitSign();
                     } else {
-                        Toast.makeText(this, "请选择施工单位负责人", Toast.LENGTH_SHORT).show();
-                        return;
+                        for (int i = 0; i < imglist.size() - 1; i++) {
+                            UploadFile(new File(imglist.get(i)).getName(), FileToBase64.best64yimg(imglist.get(i)));
+                        }
                     }
+                    showLoading();
+
                 }
-                if (imglist.size() == 1) {
-                    SafetyWorkPermitSign();
-                } else {
-                    for (int i = 0; i < imglist.size() - 1; i++) {
-                        UploadFile(new File(imglist.get(i)).getName(), FileToBase64.best64yimg(imglist.get(i)));
-                    }
-                }
-                showLoading();
                 break;
             case R.id.ll_xmzg:
                 OptionsPickerView<String> mOptionsPickerView = new OptionsPickerView<>(PhotographActivity.this);
@@ -478,6 +564,8 @@ public class PhotographActivity extends TakePhotoActivity implements PhotographA
                         return;
                     }
                     photGraphBase = JSON.parseObject(response, PhotGraphBase.class);
+
+                    Log.e("photGraphBase", "" + photGraphBase.getModel().getSignRole());
                     if (photGraphBase.getModel().getSignRole() == 3) {
                         //signRole=3的时候，两个不就是同时显示
                         GetWorkerXmSelectJson();//施工单位现场监护人
@@ -606,13 +694,13 @@ public class PhotographActivity extends TakePhotoActivity implements PhotographA
                     @Override
                     protected void convertView(final ViewHolder holder, final BaseNiceDialog dialog) {
                         final EditText ed_send = holder.getView(R.id.ed_send);
-                        final String send="";
+                        final String send = "";
 
                         final RecyclerView rvSafetyworkpermitsignDtail = holder.getView(R.id.rv_safetyworkpermitsign_dtail);
                         LinearLayoutManager linearLayoutManager2 = new LinearLayoutManager(PhotographActivity.this);
                         linearLayoutManager2.setOrientation(LinearLayoutManager.VERTICAL);
                         rvSafetyworkpermitsignDtail.setLayoutManager(linearLayoutManager2);
-                        safetyDtailAdapter = new SafetyDtailAdapter(PhotographActivity.this, safetylist, PhotographActivity.this,send);
+                        safetyDtailAdapter = new SafetyDtailAdapter(PhotographActivity.this, safetylist, PhotographActivity.this, send);
                         rvSafetyworkpermitsignDtail.setAdapter(safetyDtailAdapter);
                         rvSafetyworkpermitsignDtail.setHasFixedSize(true);
                         rvSafetyworkpermitsignDtail.setNestedScrollingEnabled(false);
@@ -627,7 +715,7 @@ public class PhotographActivity extends TakePhotoActivity implements PhotographA
                                             LinearLayoutManager linearLayoutManager2 = new LinearLayoutManager(PhotographActivity.this);
                                             linearLayoutManager2.setOrientation(LinearLayoutManager.VERTICAL);
                                             rvSafetyworkpermitsignDtail.setLayoutManager(linearLayoutManager2);
-                                            safetyDtailAdapter = new SafetyDtailAdapter(PhotographActivity.this, safetylist, PhotographActivity.this,ed_send.getText().toString());
+                                            safetyDtailAdapter = new SafetyDtailAdapter(PhotographActivity.this, safetylist, PhotographActivity.this, ed_send.getText().toString());
                                             rvSafetyworkpermitsignDtail.setAdapter(safetyDtailAdapter);
                                             rvSafetyworkpermitsignDtail.setHasFixedSize(true);
                                             rvSafetyworkpermitsignDtail.setNestedScrollingEnabled(false);
@@ -743,17 +831,32 @@ public class PhotographActivity extends TakePhotoActivity implements PhotographA
 
                         TextView tv_qudin = holder.getView(R.id.tv_qudin);
                         tv_qudin.setOnClickListener(new View.OnClickListener() {
+                            @RequiresApi(api = Build.VERSION_CODES.N)
                             @Override
                             public void onClick(View v) {
                                 dialog.dismiss();
                                 Toast.makeText(PhotographActivity.this, "确定", Toast.LENGTH_SHORT).show();
-                                workerSelectBaseList2.clear();
                                 for (int i = 0; i < personAdapter.getList().size(); i++) {
                                     if (personAdapter.getList().get(i).isSelsecr()) {
                                         workerSelectBaseList2.add(0, personAdapter.getList().get(i));
+                                    } else {
+                                        for (int k = 0; k < workerSelectBaseList2.size(); k++) {
+                                            if (personAdapter.getList().get(i).getIdno() == workerSelectBaseList2.get(k).getIdno()) {
+                                                if (personAdapter.getList().get(i).isSelsecr() == false) {
+                                                    workerSelectBaseList2.remove(k);
+                                                }
+                                            }
+                                        }
                                     }
                                 }
-                                workerSelectBaseList2.add(new WorkerSelectBase());
+                                for (int i = 0; i < workerSelectBaseList2.size() - 1; i++) {
+                                    for (int j = workerSelectBaseList2.size() - 1; j > i; j--) {
+                                        if (workerSelectBaseList2.get(j).equals(workerSelectBaseList2.get(i))) {
+                                            workerSelectBaseList2.remove(j);
+                                        }
+                                    }
+                                }
+                                Log.e("workerSelectBaseList2", JSON.toJSONString(workerSelectBaseList2));
                                 workerxmSelectAdapter.notifyDataSetChanged();
                             }
                         });
@@ -772,16 +875,19 @@ public class PhotographActivity extends TakePhotoActivity implements PhotographA
         if (id.equals("添加")) {
             searchid();
         } else {
-            for (int i = 0; i < workerxmSelectAdapter.getBookListBase().size()-1; i++) {
+            Log.e("personAdapter:", JSON.toJSONString(personAdapter.getList()));
+            for (int i = 0; i < workerxmSelectAdapter.getBookListBase().size() - 1; i++) {
                 if (workerxmSelectAdapter.getBookListBase().get(i) != null) {
                     if (workerxmSelectAdapter.getBookListBase().get(i).getIdno().equals(id)) {
-                        for (int j = 0; j < personAdapter.getList().size(); j++) {
-                            if (personAdapter.getList().get(j).getIdno().equals( workerxmSelectAdapter.getBookListBase().get(i).getIdno())) {
-                                personAdapter.getList().get(j).setSelsecr(false);
-                                personAdapter.notifyDataSetChanged();
-                                workerxmSelectAdapter.getBookListBase().remove(i);
+
+                        for (int j = 0; j < workerSelectBaseList.size(); j++) {
+                            if (workerSelectBaseList.get(j).getIdno().equals(id)) {
+                                Log.e("workerxmSelectAdapter", "remove" + workerSelectBaseList2.get(i).getIdno());
+                                workerSelectBaseList.get(j).setSelsecr(false);
+                                workerSelectBaseList2.remove(i);
                             }
                         }
+
                     }
 
                 }
@@ -789,6 +895,7 @@ public class PhotographActivity extends TakePhotoActivity implements PhotographA
             }
             workerxmSelectAdapter.notifyDataSetChanged();
         }
+        Log.e("workerxmSelectAdapter", JSON.toJSONString(workerxmSelectAdapter.getBookListBase()));
     }
 
 
@@ -800,10 +907,10 @@ public class PhotographActivity extends TakePhotoActivity implements PhotographA
             for (int j = 0; j < safetyDtailAdapter.getBookListBase().size(); j++) {
                 if (safetyDtailAdapter.getBookListBase().get(j).getIsselise().equals("ABC")) {
                     //   projectLocationLeaderId=projectLocationLeaderId+safetyDtailAdapter.getBookListBase().get(j).getValue()+",";
-                    if (names.length()>0){
-                        names = names +","+ safetyDtailAdapter.getBookListBase().get(j).getName().split("----")[1];
-                    }else {
-                        names = names + safetyDtailAdapter.getBookListBase().get(j).getName().split("----")[1] ;
+                    if (names.length() > 0) {
+                        names = names + "," + safetyDtailAdapter.getBookListBase().get(j).getName().split("----")[1];
+                    } else {
+                        names = names + safetyDtailAdapter.getBookListBase().get(j).getName().split("----")[1];
                     }
                 }
             }
