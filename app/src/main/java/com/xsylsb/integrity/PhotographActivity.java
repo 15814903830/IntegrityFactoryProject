@@ -346,8 +346,6 @@ public class PhotographActivity extends TakePhotoActivity implements PhotographA
                                 }
                             }
                         }
-
-
                         if (projectLocationLeaderId.length() > 0) {
                             //属地单位
                         } else {
