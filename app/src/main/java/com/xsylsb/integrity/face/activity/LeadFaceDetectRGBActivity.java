@@ -220,6 +220,7 @@ public final class LeadFaceDetectRGBActivity extends AppCompatActivity implement
                         jsonObject.put(list.get(i).getKey(), list.get(i).getValue());
                     }
                     OkHttpUtils.doPostJson(url, jsonObject.toString(), mHttpCallBack, 283);
+                    Log.e("jsonObject:", "url:"+url);
                     Log.e("jsonObject:", jsonObject.toString());
                 } catch (JSONException e) {
                     e.printStackTrace();

@@ -32,7 +32,7 @@ public class ControlActivity extends AppCompatActivity {
 
     }
     public void setapiimg() {
-        if (MyURL.URLL.equals("http://liugangapitest.gx11.cn/")) {
+        if (MyURL.URLL.equals("http://api.liugang.gx11.cn/")) {
             ivShengchang.setSelected(true);
             ivTest.setSelected(false);
             ivKaiqi.setSelected(false);
@@ -53,7 +53,7 @@ public class ControlActivity extends AppCompatActivity {
         switch (view.getId()) {
             case R.id.iv_shengchang:
                 //生产
-                etApiTest.setText("http://liugangapitest.gx11.cn/");
+                etApiTest.setText("http://api.liugang.gx11.cn/");
                 ivShengchang.setSelected(true);
                 ivTest.setSelected(false);
                 ivKaiqi.setSelected(false);
@@ -71,7 +71,7 @@ public class ControlActivity extends AppCompatActivity {
                 ivShengchang.setSelected(false);
                 ivTest.setSelected(false);
                 ivKaiqi.setSelected(true);
-                etApiTest.setText("http://192.168.0.24/factory.api/");
+                etApiTest.setText("http://192.168.0.110/factory.api/");
                 break;
             case R.id.btn_preserve:
                 //保存

@@ -55,22 +55,10 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class PhotographActivity extends TakePhotoActivity implements PhotographAdapter.MyClassifyAdapterOnItem, HttpCallBack, WorkerxmSelectAdapter.OnItmeClickListener, SafetyDtailAdapter.GetItemid {
+public class PhotographActivity extends TakePhotoActivity implements PhotographAdapter.MyClassifyAdapterOnItem, HttpCallBack, WorkerxmSelectAdapter.OnItmeClickListener, SafetyDtailAdapter.GetItemid ,SelectStatusAdapter.StatusOnItemClickListener{
 
     @BindView(R.id.iv_return)
     ImageView ivReturn;
-    @BindView(R.id.iv_shenghe1)
-    ImageView ivShenghe1;
-    @BindView(R.id.ll_shenghe1)
-    LinearLayout llShenghe1;
-    @BindView(R.id.iv_shenghe2)
-    ImageView ivShenghe2;
-    @BindView(R.id.ll_shenghe2)
-    LinearLayout llShenghe2;
-    @BindView(R.id.iv_shenghe3)
-    ImageView ivShenghe3;
-    @BindView(R.id.ll_shenghe3)
-    LinearLayout llShenghe3;
     @BindView(R.id.et_yijiang)
     EditText etYijiang;
     @BindView(R.id.rv_tupian)
@@ -84,6 +72,10 @@ public class PhotographActivity extends TakePhotoActivity implements PhotographA
     LinearLayout llXmzg;
     @BindView(R.id.rv_getworkerxm_select)
     RecyclerView rvGetworkerxmSelect;
+
+    @BindView(R.id.rv_select_starue)
+    RecyclerView rv_select_starue;
+
     @BindView(R.id.ll_getworkerxm_select)
     LinearLayout llGetworkerxmSelect;
     @BindView(R.id.ll_safetyworkpermitsign_dtail)
@@ -140,6 +132,8 @@ public class PhotographActivity extends TakePhotoActivity implements PhotographA
     private String sceneGuardianFullName = "";
     private String projectLocationLeaderId = "";
     private String projectLocationLeaderFullName = "";
+
+    private SelectStatusAdapter selectStatusAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -274,17 +268,13 @@ public class PhotographActivity extends TakePhotoActivity implements PhotographA
                 }
             }
         }).start();
-
-
     }
 
-    @OnClick({R.id.btn_lijisp, R.id.ll_shenghe1, R.id.ll_shenghe2, R.id.ll_shenghe3, R.id.iv_return, R.id.ll_xmzg, R.id.ll_shudidanwei_xuanzhe})
+    @OnClick({R.id.btn_lijisp, R.id.iv_return, R.id.ll_xmzg, R.id.ll_shudidanwei_xuanzhe})
     public void MyOnClick(View view) {
         switch (view.getId()) {
             case R.id.btn_lijisp:
-
                 if (xuanzhe.equals("2")) {
-
                     sceneGuardianId = "";
                     sceneGuardianFullName = "";
                     projectLocationLeaderId = "";
@@ -484,24 +474,6 @@ public class PhotographActivity extends TakePhotoActivity implements PhotographA
                 });
                 mOptionsPickerView.show();
                 break;
-            case R.id.ll_shenghe1:
-                xuanzhe = "2";
-                Glide.with(PhotographActivity.this).load(R.mipmap.xuanzheyes).into(ivShenghe1);
-                Glide.with(PhotographActivity.this).load(R.mipmap.xuanzhetrue).into(ivShenghe2);
-                Glide.with(PhotographActivity.this).load(R.mipmap.xuanzhetrue).into(ivShenghe3);
-                break;
-            case R.id.ll_shenghe2:
-                xuanzhe = "3";
-                Glide.with(PhotographActivity.this).load(R.mipmap.xuanzhetrue).into(ivShenghe1);
-                Glide.with(PhotographActivity.this).load(R.mipmap.xuanzheyes).into(ivShenghe2);
-                Glide.with(PhotographActivity.this).load(R.mipmap.xuanzhetrue).into(ivShenghe3);
-                break;
-            case R.id.ll_shenghe3:
-                xuanzhe = "4";
-                Glide.with(PhotographActivity.this).load(R.mipmap.xuanzhetrue).into(ivShenghe1);
-                Glide.with(PhotographActivity.this).load(R.mipmap.xuanzhetrue).into(ivShenghe2);
-                Glide.with(PhotographActivity.this).load(R.mipmap.xuanzheyes).into(ivShenghe3);
-                break;
             case R.id.ll_shudidanwei_xuanzhe:
                 //属地单位监护人弹窗
                 searchidshigon();
@@ -586,6 +558,26 @@ public class PhotographActivity extends TakePhotoActivity implements PhotographA
                             listvolume.add(photGraphBase.getWorkShop().get(i).getText());
                         }
                     }
+
+
+                    for (int i=0;i<photGraphBase.getStatus().size();i++){
+                        if (i==0){
+                            photGraphBase.getStatus().get(i).setIs_select(true);
+                        }else {
+                            photGraphBase.getStatus().get(i).setIs_select(false);
+                        }
+
+                    }
+
+                    LinearLayoutManager linearLayoutManager = new LinearLayoutManager(PhotographActivity.this);
+                    selectStatusAdapter = new SelectStatusAdapter(PhotographActivity.this, photGraphBase.getStatus(), PhotographActivity.this);
+                    rv_select_starue.setLayoutManager(linearLayoutManager);
+                    rv_select_starue.setAdapter(selectStatusAdapter);
+
+
+
+
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -921,4 +913,16 @@ public class PhotographActivity extends TakePhotoActivity implements PhotographA
         }
     }
 
+    @Override
+    public void StatusOnItemClickListener(int id) {
+        xuanzhe=""+id;
+        for (int i=0;i<selectStatusAdapter.getList().size();i++){
+            if (selectStatusAdapter.getList().get(i).getValue()==id){
+                selectStatusAdapter.getList().get(i).setIs_select(true);
+            }else {
+                selectStatusAdapter.getList().get(i).setIs_select(false);
+            }
+        }
+        selectStatusAdapter.notifyDataSetChanged();
+    }
 }

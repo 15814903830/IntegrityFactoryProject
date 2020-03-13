@@ -59,74 +59,12 @@
         android:orientation="vertical"
         android:layout_marginHorizontal="15dp"
         android:layout_width="match_parent"
-        android:layout_height="150dp">
-        <LinearLayout
-            android:id="@+id/ll_shenghe1"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
+        android:layout_height="wrap_content">
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_select_starue"
+            android:padding="10dp"
             android:layout_width="match_parent"
-            android:layout_height="49dp">
-
-            <TextView
-                android:layout_width="341dp"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="15dp"
-                android:layout_weight="1"
-                android:text="审批通过" />
-            <ImageView
-                android:id="@+id/iv_shenghe1"
-                android:src="@mipmap/xuanzheyes"
-                android:layout_marginRight="15dp"
-                android:layout_width="18dp"
-                android:layout_height="18dp" />
-        </LinearLayout>
-        <View
-            android:background="#FFF5F5F5"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"/>
-        <LinearLayout
-            android:id="@+id/ll_shenghe2"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="49dp">
-            <TextView
-                android:layout_marginLeft="15dp"
-                android:layout_weight="1"
-                android:text="审批不通过"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content" />
-            <ImageView
-                android:id="@+id/iv_shenghe2"
-                android:src="@mipmap/xuanzhetrue"
-                android:layout_marginRight="15dp"
-                android:layout_width="18dp"
-                android:layout_height="18dp" />
-        </LinearLayout>
-        <View
-            android:background="#FFF5F5F5"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"/>
-        <LinearLayout
-            android:id="@+id/ll_shenghe3"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="49dp">
-            <TextView
-                android:layout_marginLeft="15dp"
-                android:layout_weight="1"
-                android:text="终止审核"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content" />
-            <ImageView
-                android:id="@+id/iv_shenghe3"
-                android:src="@mipmap/xuanzhetrue"
-                android:layout_marginRight="15dp"
-                android:layout_width="18dp"
-                android:layout_height="18dp" />
-        </LinearLayout>
-
+            android:layout_height="wrap_content"/>
     </LinearLayout>
 
        <LinearLayout

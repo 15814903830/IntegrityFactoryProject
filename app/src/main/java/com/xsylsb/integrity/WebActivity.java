@@ -161,7 +161,6 @@ public class WebActivity extends AppCompatActivity implements HttpCallBack {
         webView = findViewById(R.id.wv_web);
         wedTitleActivity.setText(mTitle);
 
-
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
@@ -205,7 +204,8 @@ public class WebActivity extends AppCompatActivity implements HttpCallBack {
                 } else if (url.contains("Permit/MyCustody")) {
                     webView.loadUrl(url);
                     iv_ewm.setVisibility(View.VISIBLE);
-                } else if (url.contains("OperativesFacesSign")) {
+                } else if (url.contains("OperativesFacesSign")||url.contains("CourseFacesSign")) {
+
                     if (isNetworkConnected(WebActivity.this)) {
                         //人脸识别
                         int rc = ActivityCompat.checkSelfPermission(WebActivity.this, Manifest.permission.CAMERA);
@@ -221,6 +221,7 @@ public class WebActivity extends AppCompatActivity implements HttpCallBack {
                         Toast.makeText(WebActivity.this, "请检查网络链接", Toast.LENGTH_SHORT).show();
                     }
                     iv_ewm.setVisibility(View.VISIBLE);
+
                 } else {
                     iv_ewm.setVisibility(View.GONE);
                     Log.e("else", "--------else");

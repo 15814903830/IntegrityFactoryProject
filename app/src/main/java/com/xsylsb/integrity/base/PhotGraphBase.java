@@ -247,6 +247,15 @@ public class PhotGraphBase {
 
         private int value;
         private String text;
+        private boolean is_select;
+
+        public boolean isIs_select() {
+            return is_select;
+        }
+
+        public void setIs_select(boolean is_select) {
+            this.is_select = is_select;
+        }
 
         public int getValue() {
             return value;

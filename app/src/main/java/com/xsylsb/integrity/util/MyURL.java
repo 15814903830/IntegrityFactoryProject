@@ -9,10 +9,9 @@ package com.xsylsb.integrity.util;
  */
 public class MyURL {
 
-
     //正式地址
-    public static String URL = "http://liugangapitest.gx11.cn/Api/Account/";
-    public static String URLL = "http://liugangapitest.gx11.cn/";
+    public static String URL = "http://api.liugang.gx11.cn/Api/Account/";
+    public static String URLL = "http://api.liugang.gx11.cn/";
 
 
 //    //测试地址

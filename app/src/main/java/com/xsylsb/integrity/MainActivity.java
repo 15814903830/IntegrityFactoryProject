@@ -289,8 +289,8 @@ public class MainActivity extends AppCompatActivity implements HttpCallBack, Sto
                 mainTvPersonage.setSelected(true);
                 break;
             case R.id.btn_zhengshi:
-                MyURL.URL="http://liugangapitest.gx11.cn/Api/Account/";
-                MyURL.URLL = "http://liugangapitest.gx11.cn/";
+                MyURL.URL="http://api.liugang.gx11.gx11.cn/Api/Account/";
+                MyURL.URLL = "http://api.liugang.gx11.gx11.cn/";
                 ivApiTest.setText(""+ MyURL.URL);
                 break;
             case R.id.btn_ceisi:

@@ -138,7 +138,6 @@ public class PersonageFragment extends MVPBaseFragment<PersonageContract.View, P
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-
                 Log.e(TAG, url);
                 if (url.contains("Worker/Logout")) {//退出
                     NiceDialog.init()
